@@ -3,18 +3,19 @@ import {useState} from "react";
 import {setAuthToken} from "../../components/Auth.tsx";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
 
-function Login() {
+function Register() {
 
     let navigate: NavigateFunction = useNavigate();
     const [login, setLogin] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        fetch("http://localhost:8080/auth/login", {
+        fetch("http://localhost:8080/auth/register", {
             method: "POST",
             headers: {"content-type": "application/json"},
-            body: JSON.stringify({login: login, password: password})
+            body: JSON.stringify({username: username,  login: login, password: password})
         }).then(response => {
             if (response.status == 200) {
                 return response.json();
@@ -25,11 +26,9 @@ function Login() {
         }).then(data => {
             console.log(data);
             if (data !== null) {
-                setAuthToken(data["token"]);
-                navigate("/mainPage")
+                // setAuthToken(data["token"]);
+                navigate("/login")
 
-            } else {
-                setAuthToken(null);
             }
         });
     }
@@ -41,6 +40,16 @@ function Login() {
                 <span className="text-white text-2xl">🔗</span>
             </header>
             <div className="bg-white p-6 rounded-md shadow-md w-80">
+                <label className="block mb-2">Username</label>
+                <input
+                    name="username"
+                    type="text"
+                    className="w-full mb-4 px-3 py-2 border rounded"
+                    placeholder="Enter your username"
+                    onChange={(event) => setUsername(event.target.value)}
+                />
+                <label className="block mb-2">Password</label>
+
                 <label className="block mb-2">Email</label>
                 <input
                     name="login"
@@ -58,15 +67,11 @@ function Login() {
                     onChange={(event) => setPassword(event.target.value)}
                 />
                 <button type={"submit"} className="w-full bg-black text-white py-2 rounded hover:bg-gray-800">
-                    Sign In
+                    Register
                 </button>
-                <div className="text-sm mt-2 text-right">
-                    <a href="#" className="text-blue-500 hover:underline">
-                        Forgot password?
-                    </a>
-                </div>
             </div>
         </form>
     );
 }
-export default Login;
+
+export default Register;
