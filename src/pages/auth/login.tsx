@@ -1,6 +1,6 @@
 import './App.css'
 
-function AuthPage() {
+function Login() {
     return (
         <div className="min-h-screen flex flex-col items-center bg-gray-200">
             <h1 className="text-5xl font-black my-4">Pc-Build</h1>
@@ -33,4 +33,4 @@ function AuthPage() {
         </div>
     );
 }
-export default AuthPage;
+export default Login;
