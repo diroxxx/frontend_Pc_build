@@ -1,13 +1,16 @@
 import './App.css'
 import {useState} from "react";
-import {setAuthToken} from "../../components/Auth.tsx";
+import {setAuthToken, setRefreshToken} from "../../components/Auth.tsx";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
+import { useUser } from "../../components/UserContext.tsx";
 
 function Login() {
 
-    let navigate: NavigateFunction = useNavigate();
+    const navigate: NavigateFunction = useNavigate();
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
+    const { setUser } = useUser();
 
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -25,13 +28,20 @@ function Login() {
         }).then(data => {
             console.log(data);
             if (data !== null) {
-                setAuthToken(data["token"]);
-                navigate("/mainPage")
+                setAuthToken(data["accessToken"]);
+                setRefreshToken(data["refreshToken"]);
+                const decoded: any = jwtDecode(data.accessToken);
+                setUser({
+                    email: decoded.sub,
+                    role: decoded.role,
+                });
+                navigate("/")
 
-            } else {
-                setAuthToken(null);
             }
-        });
+        }).catch((error) => {
+            console.error("Error during login:", error);
+            setAuthToken(null);
+        })
     }
     return (
         <form onSubmit={onSubmit} className="min-h-screen flex flex-col items-center bg-gray-200">

@@ -1,12 +1,11 @@
 import './App.css'
 import {useState} from "react";
-import {setAuthToken} from "../../components/Auth.tsx";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
 
 function Register() {
 
-    let navigate: NavigateFunction = useNavigate();
-    const [login, setLogin] = useState("");
+    const navigate: NavigateFunction = useNavigate();
+    const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
@@ -15,18 +14,17 @@ function Register() {
         fetch("http://localhost:8080/auth/register", {
             method: "POST",
             headers: {"content-type": "application/json"},
-            body: JSON.stringify({username: username,  login: login, password: password})
+            body: JSON.stringify({username: username,  email: email, password: password})
         }).then(response => {
-            if (response.status == 200) {
-                return response.json();
-
+            if (response.status == 201) {
+                navigate("/login")
             } else {
+                // warto dodac przechwycenie błedów
                 return null;
             }
         }).then(data => {
             console.log(data);
             if (data !== null) {
-                // setAuthToken(data["token"]);
                 navigate("/login")
 
             }
@@ -56,7 +54,7 @@ function Register() {
                     type="email"
                     className="w-full mb-4 px-3 py-2 border rounded"
                     placeholder="Enter your email"
-                    onChange={(event) => setLogin(event.target.value)}
+                    onChange={(event) => setEmail(event.target.value)}
                 />
                 <label className="block mb-2">Password</label>
                 <input

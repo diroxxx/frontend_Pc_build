@@ -5,15 +5,17 @@ import {jwtDecode} from "jwt-decode";
 import type {CustomJwtPayload} from "./components/CustomJwtPayload.tsx";
 import MainPage from "./pages/mainPage/MainPage.tsx";
 import {RoleProtectedRoute} from "./components/RoleProtectedRoute.tsx";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Unauthorized from "./components/Unauthorized.tsx";
+import {Routes, Route } from "react-router-dom";
+import Unauthorized from "./pages/Unauthorized.tsx";
 import Register from "./pages/auth/Register.tsx";
-function App() {
+import Layout from "./pageComponents/Layout.tsx";
+import Components from "./pages/componentsPage/Components.tsx";
 
+function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [role, setRole] = useState("user");
     useEffect(() => {
-        let token = getAuthToken();
+        const token = getAuthToken();
         if (token !== null) {
             setIsAuthenticated(true);
             const decode = jwtDecode<CustomJwtPayload>(token);
@@ -24,23 +26,32 @@ function App() {
     }, []);
     return(
     <div>
-        <Router>
+        {/*<Router>*/}
             <Routes>
+
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route
-                    path="/mainPage"
-                    element={
-                        <RoleProtectedRoute role="USER">
-                            <MainPage />
-                        </RoleProtectedRoute>
-                    }
-                />
+
+                <Route element={<Layout/>}>
+                    <Route path="/" element={<MainPage />} />
+                    <Route path="/components" element={<Components />} />
+                </Route>
+
+
+                {/*<Route*/}
+                {/*    path="/mainPage"*/}
+                {/*    element={*/}
+
+
+
+                {/*        <RoleProtectedRoute role="USER">*/}
+                {/*        // </RoleProtectedRoute>*/}
+                {/*    }*/}
+                {/*/>*/}
                 <Route path="/unauthorized" element={<Unauthorized />} />
             </Routes>
-        </Router>
+        {/*</Router>*/}
     </div>
     )
 }
-
 export default App;
