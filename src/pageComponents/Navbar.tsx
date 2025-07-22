@@ -32,7 +32,10 @@ return (
                     >
                         Log In
                     </button>
-                    <button className="bg-white text-red-600 px-4 py-1 rounded-full">
+                    <button
+                        onClick={() => navigate("/register")}
+                        className="bg-white text-red-600 px-4 py-1 rounded-full"
+                    >
                         Register
                     </button>
                 </>

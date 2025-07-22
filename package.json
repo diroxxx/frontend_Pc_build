@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:responsive": "node tests/run-responsive-tests.js",
+    "test:browser": "echo 'Open tests/responsive-test-runner.html in your browser to run cross-browser tests'"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.11",
