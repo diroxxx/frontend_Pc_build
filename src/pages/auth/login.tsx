@@ -1,4 +1,3 @@
-import './App.css'
 import {useState} from "react";
 import {setAuthToken, setRefreshToken} from "../../components/Auth.tsx";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
@@ -10,6 +9,7 @@ function Login() {
     const navigate: NavigateFunction = useNavigate();
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
+    const [nickname, setNickname] = useState("");
     const { setUser } = useUser();
 
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -17,7 +17,10 @@ function Login() {
         fetch("http://localhost:8080/auth/login", {
             method: "POST",
             headers: {"content-type": "application/json"},
-            body: JSON.stringify({login: login, password: password})
+            body: JSON.stringify({
+                login: login,
+                password: password
+                })
         }).then(response => {
             if (response.status == 200) {
                 return response.json();
@@ -34,6 +37,7 @@ function Login() {
                 setUser({
                     email: decoded.sub,
                     role: decoded.role,
+                    nickname: decoded.username
                 });
                 navigate("/")
 
@@ -47,8 +51,8 @@ function Login() {
         <form onSubmit={onSubmit} className="min-h-screen flex flex-col items-center bg-gray-200">
             <h1 className="text-5xl font-black my-4">Pc-Build</h1>
             <header className="w-full bg-red-600 py-4 flex justify-between px-4">
-                <span className="text-white text-2xl">📧</span>
-                <span className="text-white text-2xl">🔗</span>
+                {/* <span className="text-white text-2xl">📧</span>
+                <span className="text-white text-2xl">🔗</span> */}
             </header>
             <div className="bg-white p-6 rounded-md shadow-md w-80">
                 <label className="block mb-2">Email</label>

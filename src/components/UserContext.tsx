@@ -5,6 +5,7 @@ import {jwtDecode} from "jwt-decode";
 interface User {
     email: string;
     role: string;
+    nickname: string
 }
 
 interface UserContextType {
@@ -28,6 +29,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                 setUser({
                     email: decoded.sub,
                     role: decoded.role,
+                    nickname: decoded.username
                 });
             } catch (e) {
                 setUser(null);

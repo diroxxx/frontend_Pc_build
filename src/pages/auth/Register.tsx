@@ -1,4 +1,3 @@
-import './App.css'
 import {useState} from "react";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
 

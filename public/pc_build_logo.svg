@@ -1,0 +1,75 @@
+<svg width="280" height="80" viewBox="0 0 280 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="techGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#00ccff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0099ff;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="buildGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff4757;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff6b35;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+
+  
+  <!-- Tekst "Pc" - styl monospace/kodowy -->
+  <text x="20" y="50" 
+        font-family="'Courier New', monospace" 
+        font-size="36" 
+        font-weight="bold" 
+        fill="url(#techGrad)" 
+        filter="url(#glow)">Pc</text>
+  
+  <!-- Separator/łącznik w stylu tech - bardziej wyrażisty -->
+  <g transform="translate(85, 30)">
+    <!-- Główna belka pozioma -->
+    <rect x="0" y="12" width="20" height="4" fill="url(#techGrad)" rx="2" filter="url(#glow)"/>
+    
+    <!-- Końcówki w stylu złączy -->
+    <rect x="-3" y="10" width="6" height="8" fill="url(#buildGrad)" rx="3"/>
+    <rect x="17" y="10" width="6" height="8" fill="url(#buildGrad)" rx="3"/>
+    
+    <!-- Środkowy element - jak dioda -->
+    <rect x="8" y="10" width="4" height="8" fill="url(#buildGrad)" rx="2"/>
+    <rect x="9" y="11" width="2" height="6" fill="#fff" opacity="0.4"/>
+    
+    <!-- Pulsujący efekt -->
+    <rect x="8" y="10" width="4" height="8" fill="url(#techGrad)" rx="2" opacity="0.6">
+      <animate attributeName="opacity" values="0.3;0.9;0.3" dur="2s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+  
+  <!-- Tekst "build" -->
+  <text x="130" y="50" 
+        font-family="'Courier New', monospace" 
+        font-size="36" 
+        font-weight="bold" 
+        fill="url(#buildGrad)" 
+        filter="url(#glow)">build</text>
+  
+  <!-- Statyczny kursor/underscore -->
+  <text x="220" y="50" 
+        font-family="'Courier New', monospace" 
+        font-size="36" 
+        font-weight="normal" 
+        fill="url(#techGrad)" 
+        opacity="0.7">_</text>
+  
+
+  
+  <!-- Dodatkowe efekty świetlne -->
+  <circle cx="25" cy="25" r="2" fill="url(#techGrad)" opacity="0.6">
+    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="255" cy="55" r="1.5" fill="url(#buildGrad)" opacity="0.6">
+    <animate attributeName="opacity" values="0.3;0.9;0.3" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+</svg>
