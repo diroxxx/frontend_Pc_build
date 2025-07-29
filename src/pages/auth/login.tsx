@@ -1,54 +1,19 @@
-<<<<<<< HEAD
 import {useState} from "react";
 import {setAuthToken, setRefreshToken} from "../../components/Auth.tsx";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
 import {jwtDecode} from "jwt-decode";
 import { useUser } from "../../components/UserContext.tsx";
-=======
-import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import AuthLayout from '../../components/auth/AuthLayout';
-import FormField from '../../components/auth/FormField';
-import PasswordField from '../../components/auth/PasswordField';
-import Button from '../../components/ui/Button';
-import ErrorMessage from '../../components/ui/ErrorMessage';
-import AuthNavigation from '../../components/auth/AuthNavigation';
-import useFormValidation, { validationRules } from '../../hooks/useFormValidation';
-import useAuth from '../../hooks/useAuth';
->>>>>>> 2fbe6434b8a1b02c3c553533a2d447d07526bd54
 
 function Login() {
-    const location = useLocation();
-    const successMessage = location.state?.message;
 
-<<<<<<< HEAD
     const navigate: NavigateFunction = useNavigate();
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
     const [nickname, setNickname] = useState("");
     const { setUser } = useUser();
-=======
-    const { data, errors, handleChange, handleBlur, validateAllFields } = useFormValidation(
-        { email: '', password: '' },
-        {
-            email: validationRules.email,
-            password: validationRules.password
-        }
-    );
->>>>>>> 2fbe6434b8a1b02c3c553533a2d447d07526bd54
 
-    const { isLoading, error, login, clearError } = useAuth();
-
-    // Clear auth error when user starts typing
-    useEffect(() => {
-        if (error) {
-            clearError();
-        }
-    }, [data.email, data.password]);
-
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-<<<<<<< HEAD
         fetch("http://localhost:8080/auth/login", {
             method: "POST",
             headers: {"content-type": "application/json"},
@@ -75,94 +40,90 @@ function Login() {
                     nickname: decoded.username
                 });
                 navigate("/")
-=======
-        
-        if (!validateAllFields()) {
-            return;
-        }
 
-        await login({
-            email: data.email,
-            password: data.password
-        });
-    };
->>>>>>> 2fbe6434b8a1b02c3c553533a2d447d07526bd54
-
+            }
+        }).catch((error) => {
+            console.error("Error during login:", error);
+            setAuthToken(null);
+        })
+    }
     return (
-<<<<<<< HEAD
-        <form onSubmit={onSubmit} className="min-h-screen flex flex-col items-center bg-gray-200">
-            <h1 className="text-5xl font-black my-4">Pc-Build</h1>
-            <header className="w-full bg-red-600 py-4 flex justify-between px-4">
-                {/* <span className="text-white text-2xl">📧</span>
-                <span className="text-white text-2xl">🔗</span> */}
-            </header>
-            <div className="bg-white p-6 rounded-md shadow-md w-80">
-                <label className="block mb-2">Email</label>
-                <input
-                    name="login"
-=======
-        <AuthLayout 
-            title="Welcome Back" 
-            subtitle="Sign in to your account to continue"
-        >
-            {successMessage && (
-                <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <p className="text-sm text-green-700">{successMessage}</p>
+        <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="sm:mx-auto sm:w-full sm:max-w-md">
+                <h1 className="text-center text-4xl font-bold text-slate-800 mb-2">Pc-Build</h1>
+                <h2 className="text-center text-2xl font-semibold text-gray-900 mb-8">
+                    Sign in to your account
+                </h2>
+            </div>
+
+            <div className="sm:mx-auto sm:w-full sm:max-w-md">
+                <div className="bg-white py-8 px-6 shadow-lg rounded-lg border border-gray-200">
+                    <form onSubmit={onSubmit} className="space-y-6">
+                        <div>
+                            <label htmlFor="login" className="block text-sm font-medium text-gray-700 mb-2">
+                                Email Address
+                            </label>
+                            <input
+                                id="login"
+                                name="login"
+                                type="email"
+                                required
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+                                placeholder="Enter your email address"
+                                onChange={(event) => setLogin(event.target.value)}
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                                Password
+                            </label>
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                required
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+                                placeholder="Enter your password"
+                                onChange={(event) => setPassword(event.target.value)}
+                            />
+                        </div>
+
+                        <div>
+                            <button 
+                                type="submit" 
+                                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                            >
+                                Sign In
+                            </button>
+                        </div>
+
+                        <div className="text-center">
+                            <a 
+                                href="#" 
+                                className="text-sm text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
+                            >
+                                Forgot your password?
+                            </a>
+                        </div>
+                    </form>
+
+                    <div className="mt-6">
+                        <div className="text-center">
+                            <span className="text-sm text-gray-600">
+                                Don't have an account?{' '}
+                                <a 
+                                    href="/register" 
+                                    className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
+                                >
+                                    Sign up
+                                </a>
+                            </span>
+                        </div>
+                    </div>
                 </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <FormField
-                    label="Email Address"
->>>>>>> 2fbe6434b8a1b02c3c553533a2d447d07526bd54
-                    type="email"
-                    name="email"
-                    value={data.email}
-                    onChange={(value) => handleChange('email', value)}
-                    onBlur={() => handleBlur('email')}
-                    error={errors.email}
-                    required
-                    placeholder="Enter your email address"
-                    autoComplete="email"
-                />
-
-                <PasswordField
-                    label="Password"
-                    name="password"
-                    value={data.password}
-                    onChange={(value) => handleChange('password', value)}
-                    onBlur={() => handleBlur('password')}
-                    error={errors.password}
-                    required
-                    placeholder="Enter your password"
-                    autoComplete="current-password"
-                />
-
-                {error && (
-                    <ErrorMessage message={error} />
-                )}
-
-                <Button
-                    type="submit"
-                    loading={isLoading}
-                    fullWidth
-                    disabled={isLoading}
-                >
-                    {isLoading ? 'Signing In...' : 'Sign In'}
-                </Button>
-
-                <div className="text-center">
-                    <a 
-                        href="#" 
-                        className="text-sm text-purple-600 hover:text-purple-500 transition-colors duration-200"
-                    >
-                        Forgot your password?
-                    </a>
-                </div>
-            </form>
-
-            <AuthNavigation type="login" />
-        </AuthLayout>
+            </div>
+        </div>
     );
 }
 export default Login;

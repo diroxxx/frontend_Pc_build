@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-import {useState} from "react";
-import {type NavigateFunction, useNavigate} from "react-router-dom";
-=======
 import React, { useEffect } from 'react';
 import AuthLayout from '../../components/auth/AuthLayout';
 import FormField from '../../components/auth/FormField';
@@ -11,7 +7,6 @@ import ErrorMessage from '../../components/ui/ErrorMessage';
 import AuthNavigation from '../../components/auth/AuthNavigation';
 import useFormValidation, { validationRules } from '../../hooks/useFormValidation';
 import useAuth from '../../hooks/useAuth';
->>>>>>> 2fbe6434b8a1b02c3c553533a2d447d07526bd54
 
 function Register() {
     const { data, errors, handleChange, handleBlur, validateAllFields } = useFormValidation(

@@ -54,14 +54,7 @@ return (
                         >
                         Log In
                     </button>
-<<<<<<< HEAD
                     <button className="bg-white text-slate-800 px-4 py-1 rounded-full hover:bg-gray-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400 transition-all duration-200">
-=======
-                    <button
-                        onClick={() => navigate("/register")}
-                        className="bg-white text-red-600 px-4 py-1 rounded-full"
-                    >
->>>>>>> 2fbe6434b8a1b02c3c553533a2d447d07526bd54
                         Register
                     </button>
                 </>
