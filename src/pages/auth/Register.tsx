@@ -1,73 +1,111 @@
+<<<<<<< HEAD
 import {useState} from "react";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
+=======
+import React, { useEffect } from 'react';
+import AuthLayout from '../../components/auth/AuthLayout';
+import FormField from '../../components/auth/FormField';
+import PasswordField from '../../components/auth/PasswordField';
+import Button from '../../components/ui/Button';
+import ErrorMessage from '../../components/ui/ErrorMessage';
+import AuthNavigation from '../../components/auth/AuthNavigation';
+import useFormValidation, { validationRules } from '../../hooks/useFormValidation';
+import useAuth from '../../hooks/useAuth';
+>>>>>>> 2fbe6434b8a1b02c3c553533a2d447d07526bd54
 
 function Register() {
+    const { data, errors, handleChange, handleBlur, validateAllFields } = useFormValidation(
+        { username: '', email: '', password: '' },
+        {
+            username: validationRules.username,
+            email: validationRules.email,
+            password: validationRules.password
+        }
+    );
 
-    const navigate: NavigateFunction = useNavigate();
-    const [email, setEmail] = useState("");
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const { isLoading, error, register, clearError } = useAuth();
 
-    const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    // Clear auth error when user starts typing
+    useEffect(() => {
+        if (error) {
+            clearError();
+        }
+    }, [data.username, data.email, data.password]);
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        fetch("http://localhost:8080/auth/register", {
-            method: "POST",
-            headers: {"content-type": "application/json"},
-            body: JSON.stringify({username: username,  email: email, password: password})
-        }).then(response => {
-            if (response.status == 201) {
-                navigate("/login")
-            } else {
-                // warto dodac przechwycenie błedów
-                return null;
-            }
-        }).then(data => {
-            console.log(data);
-            if (data !== null) {
-                navigate("/login")
+        
+        if (!validateAllFields()) {
+            return;
+        }
 
-            }
+        await register({
+            username: data.username,
+            email: data.email,
+            password: data.password
         });
-    }
-    return (
-        <form onSubmit={onSubmit} className="min-h-screen flex flex-col items-center bg-gray-200">
-            <h1 className="text-5xl font-black my-4">Pc-Build</h1>
-            <header className="w-full bg-red-600 py-4 flex justify-between px-4">
-                <span className="text-white text-2xl">📧</span>
-                <span className="text-white text-2xl">🔗</span>
-            </header>
-            <div className="bg-white p-6 rounded-md shadow-md w-80">
-                <label className="block mb-2">Username</label>
-                <input
-                    name="username"
-                    type="text"
-                    className="w-full mb-4 px-3 py-2 border rounded"
-                    placeholder="Enter your username"
-                    onChange={(event) => setUsername(event.target.value)}
-                />
-                <label className="block mb-2">Password</label>
+    };
 
-                <label className="block mb-2">Email</label>
-                <input
-                    name="login"
+    return (
+        <AuthLayout 
+            title="Create Account" 
+            subtitle="Join the PC Build community today"
+        >
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <FormField
+                    label="Username"
+                    type="text"
+                    name="username"
+                    value={data.username}
+                    onChange={(value) => handleChange('username', value)}
+                    onBlur={() => handleBlur('username')}
+                    error={errors.username}
+                    required
+                    placeholder="Choose a username"
+                    autoComplete="username"
+                />
+
+                <FormField
+                    label="Email Address"
                     type="email"
-                    className="w-full mb-4 px-3 py-2 border rounded"
-                    placeholder="Enter your email"
-                    onChange={(event) => setEmail(event.target.value)}
+                    name="email"
+                    value={data.email}
+                    onChange={(value) => handleChange('email', value)}
+                    onBlur={() => handleBlur('email')}
+                    error={errors.email}
+                    required
+                    placeholder="Enter your email address"
+                    autoComplete="email"
                 />
-                <label className="block mb-2">Password</label>
-                <input
-                    name={"password"}
-                    type="password"
-                    className="w-full mb-4 px-3 py-2 border rounded"
-                    placeholder="Enter your password"
-                    onChange={(event) => setPassword(event.target.value)}
+
+                <PasswordField
+                    label="Password"
+                    name="password"
+                    value={data.password}
+                    onChange={(value) => handleChange('password', value)}
+                    onBlur={() => handleBlur('password')}
+                    error={errors.password}
+                    required
+                    placeholder="Create a secure password"
+                    autoComplete="new-password"
                 />
-                <button type={"submit"} className="w-full bg-black text-white py-2 rounded hover:bg-gray-800">
-                    Register
-                </button>
-            </div>
-        </form>
+
+                {error && (
+                    <ErrorMessage message={error} />
+                )}
+
+                <Button
+                    type="submit"
+                    loading={isLoading}
+                    fullWidth
+                    disabled={isLoading}
+                >
+                    {isLoading ? 'Creating Account...' : 'Create Account'}
+                </Button>
+            </form>
+
+            <AuthNavigation type="register" />
+        </AuthLayout>
     );
 }
 
