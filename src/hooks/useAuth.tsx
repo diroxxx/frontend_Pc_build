@@ -51,6 +51,7 @@ const useAuth = () => {
         setUser({
           email: decoded.sub,
           role: decoded.role,
+          nickname: decoded.username
         });
 
         setAuthState({ isLoading: false, error: null });
