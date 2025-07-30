@@ -14,9 +14,6 @@ export const RoleProtectedRoute = ({
     const token = getAuthToken();
     if (!token) return <Navigate to="/login" replace />;
 
-    const decoded = jwtDecode<CustomJwtPayload>(token);
-    if (decoded.role !== role) return <Navigate to="/unauthorized" replace />;
-
     try {
         const decoded = jwtDecode<CustomJwtPayload>(token);
         if (decoded.role !== role) {
@@ -25,4 +22,5 @@ export const RoleProtectedRoute = ({
         return children;
     } catch {
         return <Navigate to="/login" replace />;
-    }};
+    }
+};

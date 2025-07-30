@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 
 function Unauthorized() {
     return (
@@ -8,12 +9,12 @@ function Unauthorized() {
                 <p className="text-gray-600 mb-6">
                     Nie masz uprawnień, aby zobaczyć tę stronę.
                 </p>
-                <a
-                    href="/login"
+                <Link
+                    to="/login"
                     className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-xl transition"
                 >
                     Wróć do logowania
-                </a>
+                </Link>
             </div>
         </div>
     );

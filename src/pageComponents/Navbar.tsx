@@ -36,6 +36,15 @@ return (
                         <div className="absolute right-0 top-12 w-32 bg-white rounded-md shadow-lg z-50">
                             <button
                                 onClick={() => {
+                                    navigate("/userInfo");
+                                    setShowDropdown(false);
+                                }}
+                                className="block w-full text-left px-4 py-2 text-slate-800 hover:bg-gray-100 transition-colors duration-200"
+                            >
+                                Profile
+                            </button>
+                            <button
+                                onClick={() => {
                                     logout();
                                     setShowDropdown(false);
                                 }}

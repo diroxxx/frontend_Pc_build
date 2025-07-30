@@ -10,6 +10,7 @@ import Unauthorized from "./pages/Unauthorized.tsx";
 import Register from "./pages/auth/Register.tsx";
 import Layout from "./pageComponents/Layout.tsx";
 import Components from "./pages/componentsPage/Components.tsx";
+import UserPage from "./UserInfoPage/UserPage";
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -31,24 +32,22 @@ function App() {
 
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/unauthorized" element={<Unauthorized />} />
 
                 <Route element={<Layout/>}>
                     <Route path="/" element={<MainPage />} />
                     <Route path="/components" element={<Components />} />
+                    
+                    <Route
+                        path="/userInfo"
+                        element={
+                            <RoleProtectedRoute role="USER">
+                                <UserPage />
+                            </RoleProtectedRoute>
+                        }
+                    />
                 </Route>
 
-
-                {/*<Route*/}
-                {/*    path="/mainPage"*/}
-                {/*    element={*/}
-
-
-
-                {/*        <RoleProtectedRoute role="USER">*/}
-                {/*        // </RoleProtectedRoute>*/}
-                {/*    }*/}
-                {/*/>*/}
-                <Route path="/unauthorized" element={<Unauthorized />} />
             </Routes>
         {/*</Router>*/}
     </div>
