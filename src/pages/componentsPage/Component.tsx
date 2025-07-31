@@ -16,7 +16,7 @@ export interface ComponentDto {
   cpuBase_clock?: string;
 
   // cooler
-  coolerSocketType?: string;
+  coolerSocketsType?: string[];
 
   // graphics card
   gpuMemorySize?: number;
@@ -55,18 +55,15 @@ function Component(props: ComponentDto) {
     console.log('Props:', props);
     
     const componentType = props.componentType?.toLowerCase().replace(/\s+/g, '_');
+    console.log('Processed componentType:', componentType);
     
     switch (componentType) {
-      case 'graphics_card':
-      case 'gpu':
-      case 'karta_graficzna':
+      case 'graphicsCard':
         if (props.gpuMemorySize) tags.push(`${props.gpuMemorySize}GB`);
         if (props.gpuGddr) tags.push(props.gpuGddr);
         if (props.gpuPowerDraw) tags.push(`${props.gpuPowerDraw}W TDP`);
         break;
       case 'processor':
-      case 'procesor':
-      case 'cpu':
         if (props.cpuCores) tags.push(`${props.cpuCores} rdzeni`);
         if (props.cpuThreads) tags.push(`${props.cpuThreads} wątków`);
         if (props.cpuBase_clock) tags.push(props.cpuBase_clock);
@@ -74,44 +71,44 @@ function Component(props: ComponentDto) {
         break;
       case 'memory':
       case 'ram':
-      case 'pamiec':
         if (props.ramCapacity) tags.push(`${props.ramCapacity}GB`);
         if (props.ramSpeed) tags.push(props.ramSpeed);
         if (props.ramType) tags.push(props.ramType);
         break;
       case 'storage':
-      case 'dysk':
       case 'ssd':
       case 'hdd':
         if (props.storageCapacity) tags.push(`${props.storageCapacity}GB`);
         break;
-      case 'power_supply':
-      case 'zasilacz':
-      case 'psu':
+      case 'powerSupply':
         if (props.powerSupplyMaxPowerWatt) tags.push(`${props.powerSupplyMaxPowerWatt}W`);
         break;
       case 'motherboard':
-      case 'plyta_glowna':
         if (props.boardSocketType) tags.push(props.boardSocketType);
         if (props.boardChipset) tags.push(props.boardChipset);
         if (props.boardFormat) tags.push(props.boardFormat);
         break;
       case 'cooler':
       case 'chlodzenie':
-        if (props.coolerSocketType) tags.push(props.coolerSocketType);
+        if (props.coolerSocketsType) tags.push(...props.coolerSocketsType);
         break;
-      case 'case':
-      case 'obudowa':
+      case 'casePc':
         if (props.caseFormat) tags.push(props.caseFormat);
         break;
       default:
         console.log('Unknown component type:', componentType);
-        // Add generic tags if available
+        // Add brand as fallback
         if (props.brand) tags.push(props.brand);
+        // Try to add any available specs
+        if (props.gpuMemorySize) tags.push(`${props.gpuMemorySize}GB`);
+        if (props.cpuCores) tags.push(`${props.cpuCores} rdzeni`);
+        if (props.ramCapacity) tags.push(`${props.ramCapacity}GB`);
+        if (props.storageCapacity) tags.push(`${props.storageCapacity}GB`);
         break;
     }
     
     console.log('Generated tags:', tags);
+    console.log('Tags length:', tags.length);
     return tags;
   };
 
