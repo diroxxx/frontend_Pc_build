@@ -286,10 +286,6 @@ function UserProfile(){
                                     </div>
                                 )}
                             </div>
-
-                            <button className="w-full bg-gray-800 text-white py-3 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200 font-medium">
-                                Edit Profile
-                            </button>
                         </div>
                     </div>
     );

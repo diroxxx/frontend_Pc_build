@@ -124,7 +124,11 @@ function Component(props: ComponentDto) {
             alt={`${props.brand} ${props.model}`}
             className="w-full h-full object-contain"
             onError={(e) => {
-              e.currentTarget.src = '/placeholder-image.png';
+              e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zNSA0MEg2NVY2MEgzNVY0MFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTQ1IDQ1SDU1VjUwSDQ1VjQ1WiIgZmlsbD0iIzZCNzI4MCIvPgo8L3N2Zz4K';
+              e.currentTarget.style.backgroundColor = '#f3f4f6';
+            }}
+            onLoad={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
             }}
           />
         </div>
@@ -163,7 +167,7 @@ function Component(props: ComponentDto) {
                 <img src="olx.png" alt="OLX" className="w-12 h-12 object-contain" />
               )}
               {props.shop === 'allegro_lokalnie' && (
-                <img src="allegroLok.png" alt="Allegro Lokalnie" className="w-12 h-12 object-contain" />
+                <img src="Allegro-Lokalnie.png" alt="Allegro Lokalnie" className="w-12 h-12 object-contain" />
               )}
             </div>
           </div>
@@ -186,7 +190,12 @@ function Component(props: ComponentDto) {
           <div className="flex justify-end items-end">
             <div className="flex items-end gap-4">
               <span className="text-3xl font-bold text-gray-900">
-                {props.price?.toFixed(0)}zł
+                {new Intl.NumberFormat('pl-PL', {
+                  style: 'currency',
+                  currency: 'PLN',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2
+                }).format(props.price).replace('PLN', 'zł')}
               </span>
               
               <a
