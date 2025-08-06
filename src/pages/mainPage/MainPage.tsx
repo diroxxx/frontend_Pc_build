@@ -7,7 +7,9 @@ function mainPage() {
         <div className="bg-gray-100 font-sans">
             {/* Ikony - grid */}
             <div className="flex justify-center gap-8 px-6 py-8">
-                <div className="flex flex-col items-center text-gray-800 hover:text-indigo-600 transition-colors duration-200 cursor-pointer" onClick={() => navigate("/components")}>
+                <div
+                    className="flex flex-col items-center text-gray-800 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
+                    onClick={() => navigate("/components")}>
                     <div className="w-20 h-20">
                         <img
                             src="/components_mainPage.png"
@@ -18,7 +20,9 @@ function mainPage() {
                     </div>
                 </div>
 
-                <div className="flex flex-col items-center text-gray-800 hover:text-indigo-600 transition-colors duration-200 cursor-pointer" onClick={() => navigate("/builds")}>
+                <div
+                    className="flex flex-col items-center text-gray-800 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
+                    onClick={() => navigate("/builds")}>
                     <div className="w-20 h-20">
                         <img
                             src="/build_pc_main.png"
@@ -29,7 +33,9 @@ function mainPage() {
                     </div>
                 </div>
 
-                <div className="flex flex-col items-center text-gray-800 hover:text-indigo-600 transition-colors duration-200 cursor-pointer" onClick={() => navigate("/community")}>
+                <div
+                    className="flex flex-col items-center text-gray-800 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
+                    onClick={() => navigate("/community")}>
                     <div className="w-20 h-20">
                         <img
                             src="/community_main.png"
@@ -37,6 +43,32 @@ function mainPage() {
                             className="w-full h-full object-cover rounded shadow-md hover:shadow-lg transition-shadow duration-200"
                         />
                         <p className="mt-2 text-sm font-medium">Community</p>
+                    </div>
+                </div>
+
+                <div
+                    className="flex flex-col items-center text-gray-800 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
+                    onClick={() => navigate("/check-games")}>
+                    <div className="w-20 h-20">
+                        <img
+                            src="/check-games.png"
+                            alt="Check Games"
+                            className="w-full h-full object-cover rounded shadow-md hover:shadow-lg transition-shadow duration-200"
+                        />
+                        <p className="mt-2 text-sm font-medium">Check Games</p>
+                    </div>
+                </div>
+
+                <div
+                    className="flex flex-col items-center text-gray-800 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
+                    onClick={() => navigate("/recommendations")}>
+                    <div className="w-20 h-20">
+                        <img
+                            src="/recommendations.png"
+                            alt="Recommendations"
+                            className="w-full h-full object-cover rounded shadow-md hover:shadow-lg transition-shadow duration-200"
+                        />
+                        <p className="mt-2 text-sm font-medium">Recommendations</p>
                     </div>
                 </div>
             </div>
@@ -48,7 +80,8 @@ function mainPage() {
                     alt="Komputer"
                     className="w-full md:w-80 h-auto md:h-full object-cover rounded-l shadow-md"
                 />
-                <div className="bg-slate-800 text-white p-8 rounded-r w-full md:w-96 text-center flex flex-col justify-center">
+                <div
+                    className="bg-slate-800 text-white p-8 rounded-r w-full md:w-96 text-center flex flex-col justify-center">
                     <h2 className="text-2xl font-bold mb-4">
                         Stwórz idealny zestaw komputerowy i dziel się z innymi!
                     </h2>

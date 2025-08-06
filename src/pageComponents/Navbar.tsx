@@ -75,6 +75,8 @@ return (
                 <nav className="flex gap-4 justify-center">
                     <button onClick={() => navigate("/")} className="hover:bg-indigo-700 hover:text-gray-100 px-3 py-1 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200">Home</button>
                     <button onClick={() => navigate("/components")} className="hover:bg-indigo-700 hover:text-gray-100 px-3 py-1 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200">Components</button>
+                    <button onClick={() => navigate("/check-games")} className="hover:bg-indigo-700 hover:text-gray-100 px-3 py-1 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200">Check games</button>
+                    <button onClick={() => navigate("/recommendations")} className="hover:bg-indigo-700 hover:text-gray-100 px-3 py-1 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200">Recommendations</button>
                 </nav>
             </div>
         )}

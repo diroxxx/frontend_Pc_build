@@ -1,3 +1,4 @@
+
 export interface ComponentDto {
   // item
   brand: string;
