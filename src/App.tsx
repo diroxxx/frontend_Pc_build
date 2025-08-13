@@ -11,7 +11,7 @@ import Register from "./pages/auth/Register.tsx";
 import Layout from "./pageComponents/Layout.tsx";
 import Components from "./pages/componentsPage/Components.tsx";
 import UserPage from "./UserInfoPage/UserPage";
-
+import Builds from "./pages/builds/builds.tsx";
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [role, setRole] = useState("user");
@@ -33,10 +33,10 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/unauthorized" element={<Unauthorized />} />
-
                 <Route element={<Layout/>}>
                     <Route path="/" element={<MainPage />} />
                     <Route path="/components" element={<Components />} />
+                    <Route path="/builds" element={<Builds />} />
                     
                     <Route
                         path="/userInfo"

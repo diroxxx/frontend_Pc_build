@@ -1,11 +1,29 @@
 import instance from '../../components/instance.tsx';
 import {useEffect, useState, useRef} from "react";
-import Component, { type ComponentDto } from './Component';
+import { useAtom } from 'jotai';
+import Component from './Component';
+import {
+  type ComponentDto,
+  componentsAtom,
+  componentsLoadingAtom,
+  componentsErrorAtom,
+  priceRangeAtom,
+  selectedManufacturerAtom,
+  selectedConditionAtom,
+  selectedCategoryAtom,
+  selectedShopAtom,
+  searchTextAtom,
+  filteredComponentsAtom,
+  manufacturersAtom,
+  conditionsAtom,
+  categoriesAtom,
+  shopsAtom,
+  clearFiltersAtom
+} from '../../atomContext/offerAtom';
 
 const getComponents = async (): Promise<ComponentDto[]> => {
     try {
         const response = await instance.get("/components");
-        console.log("Components:", response.data);
         return response.data;
     } catch (error) {
         console.error("Error fetching components:", error);
@@ -14,71 +32,66 @@ const getComponents = async (): Promise<ComponentDto[]> => {
 };
 
 function Components() {
-    const [components, setComponents] = useState<ComponentDto[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    // Atom state
+    const [components, setComponents] = useAtom(componentsAtom);
+    const [loading, setLoading] = useAtom(componentsLoadingAtom);
+    const [error, setError] = useAtom(componentsErrorAtom);
+    const [priceRange, setPriceRange] = useAtom(priceRangeAtom);
+    const [selectedManufacturer, setSelectedManufacturer] = useAtom(selectedManufacturerAtom);
+    const [selectedCondition, setSelectedCondition] = useAtom(selectedConditionAtom);
+    const [selectedCategory, setSelectedCategory] = useAtom(selectedCategoryAtom);
+    const [selectedShop, setSelectedShop] = useAtom(selectedShopAtom);
+    const [searchText, setSearchText] = useAtom(searchTextAtom);
+    
+    // Derived state
+    const [filteredComponents] = useAtom(filteredComponentsAtom);
+    const [manufacturers] = useAtom(manufacturersAtom);
+    const [conditions] = useAtom(conditionsAtom);
+    const [categories] = useAtom(categoriesAtom);
+    const [shops] = useAtom(shopsAtom);
+    const [, clearFilters] = useAtom(clearFiltersAtom);
+
+    // Local state for pagination and loading
     const [currentPage, setCurrentPage] = useState(1);
+    const [sortBy, setSortBy] = useState('newest');
     const componentsPerPage = 25;
     const mainContentRef = useRef<HTMLDivElement>(null);
-    
-    // Filter states
-    const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 });
-    const [selectedManufacturer, setSelectedManufacturer] = useState('');
-    const [selectedCondition, setSelectedCondition] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [selectedShop, setSelectedShop] = useState('');
-    const [searchText, setSearchText] = useState('');
-    const [filteredComponents, setFilteredComponents] = useState<ComponentDto[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        getComponents()
-            .then((data) => {
-                setComponents(data);
-                setLoading(false);
-            })
-            .catch((err) => {
-                console.error(err);
-                setError('Błąd podczas ładowania komponentów');
-                setLoading(false);
-            });
-    }, []);
+        // Only fetch if components are empty to avoid refetching
+        if (components.length === 0) {
+            getComponents()
+                .then((data) => {
+                    setComponents(data);
+                    setLoading(false);
+                })
+                .catch((err) => {
+                    console.error(err);
+                    setError('Błąd podczas ładowania komponentów');
+                    setLoading(false);
+                });
+        }
+    }, [components.length, setComponents, setLoading, setError]);
 
-    // Get unique manufacturers, conditions, categories, and shops
-    const manufacturers = [...new Set(components.map(c => c.brand))].sort();
-    const conditions = [...new Set(components.map(c => c.condition))].sort();
-    const categories = [...new Set(components.map(c => c.componentType))].sort();
-    const shops = [...new Set(components.map(c => c.shop))].sort();
-    
-    // Filter components based on selected filters
+    // Reset to first page when filters change
     useEffect(() => {
-        let filtered = components.filter(component => {
-            const priceMatch = component.price >= priceRange.min && component.price <= priceRange.max;
-            const manufacturerMatch = !selectedManufacturer || component.brand === selectedManufacturer;
-            const conditionMatch = !selectedCondition || component.condition === selectedCondition;
-            const categoryMatch = !selectedCategory || component.componentType === selectedCategory;
-            const shopMatch = !selectedShop || component.shop === selectedShop;
-            
-            if (!component.brand) {
-                component.brand = '';
-            }
-            if (!component.model) {
-                component.model = '';
-            }
-            if (!component.componentType) {
-                component.componentType = '';
-            }
-            const searchMatch = !searchText ||
-                component.brand.toLowerCase().includes(searchText.toLowerCase()) ||
-                component.model.toLowerCase().includes(searchText.toLowerCase()) ||
-                component.componentType.toLowerCase().includes(searchText.toLowerCase());
-            
-            return priceMatch && manufacturerMatch && conditionMatch && categoryMatch && shopMatch && searchMatch;
-        });
-        
-        setFilteredComponents(filtered);
-        setCurrentPage(1); // Reset to first page when filters change
-    }, [components, priceRange, selectedManufacturer, selectedCondition, selectedCategory, selectedShop, searchText]);
+        setCurrentPage(1);
+    }, [filteredComponents.length]); // Use length instead of the whole array
+
+    // Sort filtered components - create new array to avoid mutation
+    const sortedComponents = [...filteredComponents].sort((a, b) => {
+        switch (sortBy) {
+            case 'cheapest':
+                return a.price - b.price;
+            case 'expensive':
+                return b.price - a.price;
+            case 'newest':
+            case 'oldest':
+            default:
+                return 0; // Default sorting when no date field available
+        }
+    });
 
     if (loading) return (
         <div className="flex justify-center items-center min-h-screen">
@@ -91,15 +104,15 @@ function Components() {
             <div className="text-lg text-red-600 bg-red-50 p-4 rounded-lg">Błąd: {error}</div>
         </div>
     );
-    
+
     // Calculate total pages for filtered components
-    const totalComponents = filteredComponents.length;
+    const totalComponents = sortedComponents.length;
     const totalPages = Math.ceil(totalComponents / componentsPerPage);
     
     // Get components for current page
     const startIndex = (currentPage - 1) * componentsPerPage;
     const endIndex = startIndex + componentsPerPage;
-    const currentPageComponents = filteredComponents.slice(startIndex, endIndex);
+    const currentPageComponents = sortedComponents.slice(startIndex, endIndex);
 
     const handlePageChange = (page: number) => {
         setIsLoading(true);
@@ -117,7 +130,7 @@ function Components() {
     };
 
     const handleSearch = () => {
-        // Search is handled automatically by useEffect when searchText changes
+        // Search is handled automatically by filteredComponentsAtom
     };
 
     const handleSearchKeyPress = (e: React.KeyboardEvent) => {
@@ -156,11 +169,15 @@ function Components() {
                   </div>
                 </div>
                 
-                <select className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
-                  <option>filter by oldest date</option>
-                  <option>Najnowsze</option>
-                  <option>Najtańsze</option>
-                  <option>Najdroższe</option>
+                <select 
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                >
+                  <option value="oldest">Od najstarszych</option>
+                  <option value="newest">Najnowsze</option>
+                  <option value="cheapest">Najtańsze</option>
+                  <option value="expensive">Najdroższe</option>
                 </select>
               </div>
             </div>
@@ -281,14 +298,7 @@ function Components() {
 
                 {/* Clear filters button */}
                 <button
-                  onClick={() => {
-                    setPriceRange({ min: 0, max: 10000 });
-                    setSelectedManufacturer('');
-                    setSelectedCondition('');
-                    setSelectedCategory('');
-                    setSelectedShop('');
-                    setSearchText('');
-                  }}
+                  onClick={clearFilters}
                   className="w-full px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
                   Wyczyść filtry

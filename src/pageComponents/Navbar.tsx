@@ -21,7 +21,6 @@ return (
     <header className="bg-slate-800 text-white px-6 pt-3 pb-0 flex flex-col justify-between min-h-[120px]">
         <div className="flex justify-between items-center">
         <div className="text-2xl font-bold">Pc-Build</div>
-        {/* <img src="pc_build_logo.svg" width="1024" height="1024" alt="Logo" className="h-10" /> */}
         <div className="flex gap-2 relative">
             {user ? (
                 <div className="relative flex items-center gap-3">

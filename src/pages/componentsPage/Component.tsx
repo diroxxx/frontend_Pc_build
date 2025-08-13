@@ -1,70 +1,21 @@
-
-export interface ComponentDto {
-  // item
-  brand: string;
-  model: string;
-  condition: string;
-  photo_url: string;
-  website_url: string;
-  price: number;
-  shop: string;
-  componentType: string;
-
-  // processor
-  cpuCores?: number;
-  cpuThreads?: number;
-  cpuSocketType?: string;
-  cpuBase_clock?: string;
-
-  // cooler
-  coolerSocketsType?: string[];
-
-  // graphics card
-  gpuMemorySize?: number;
-  gpuGddr?: string;
-  gpuPowerDraw?: number;
-
-  // memory
-  ramType?: string;
-  ramCapacity?: number;
-  ramSpeed?: string;
-  ramLatency?: string;
-
-  // motherboard
-  boardChipset?: string;
-  boardSocketType?: string;
-  boardMemoryType?: string;
-  boardFormat?: string;
-
-  // power supply
-  powerSupplyMaxPowerWatt?: number;
-
-  // storage
-  storageCapacity?: number;
-
-  // case
-  caseFormat?: string;
-}
+import type { ComponentDto } from '../../atomContext/offerAtom';
 
 function Component(props: ComponentDto) {
   // Funkcja do renderowania specyfikacji w formie tagów
   const renderSpecTags = () => {
     const tags = [];
     
-    // Debug: log the componentType and props
-    console.log('ComponentType:', props.componentType);
-    console.log('Props:', props);
-    
     const componentType = props.componentType?.toLowerCase().replace(/\s+/g, '_');
-    console.log('Processed componentType:', componentType);
     
     switch (componentType) {
-      case 'graphicsCard':
+      case 'graphics_card':
+      case 'graphicscard':
         if (props.gpuMemorySize) tags.push(`${props.gpuMemorySize}GB`);
         if (props.gpuGddr) tags.push(props.gpuGddr);
         if (props.gpuPowerDraw) tags.push(`${props.gpuPowerDraw}W TDP`);
         break;
       case 'processor':
+      case 'cpu':
         if (props.cpuCores) tags.push(`${props.cpuCores} rdzeni`);
         if (props.cpuThreads) tags.push(`${props.cpuThreads} wątków`);
         if (props.cpuBase_clock) tags.push(props.cpuBase_clock);
@@ -81,7 +32,8 @@ function Component(props: ComponentDto) {
       case 'hdd':
         if (props.storageCapacity) tags.push(`${props.storageCapacity}GB`);
         break;
-      case 'powerSupply':
+      case 'power_supply':
+      case 'powersupply':
         if (props.powerSupplyMaxPowerWatt) tags.push(`${props.powerSupplyMaxPowerWatt}W`);
         break;
       case 'motherboard':
@@ -93,11 +45,11 @@ function Component(props: ComponentDto) {
       case 'chlodzenie':
         if (props.coolerSocketsType) tags.push(...props.coolerSocketsType);
         break;
-      case 'casePc':
+      case 'case_pc':
+      case 'casepc':
         if (props.caseFormat) tags.push(props.caseFormat);
         break;
       default:
-        console.log('Unknown component type:', componentType);
         // Add brand as fallback
         if (props.brand) tags.push(props.brand);
         // Try to add any available specs
@@ -108,8 +60,6 @@ function Component(props: ComponentDto) {
         break;
     }
     
-    console.log('Generated tags:', tags);
-    console.log('Tags length:', tags.length);
     return tags;
   };
 
