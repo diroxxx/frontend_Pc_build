@@ -1,5 +1,5 @@
 import {createContext, useContext, useEffect, useState} from "react";
-import {getAuthToken} from "./Auth.tsx";
+import {getAuthToken, setAuthToken} from "./Auth.tsx";
 import {jwtDecode} from "jwt-decode";
 
 interface User {
@@ -11,11 +11,13 @@ interface User {
 interface UserContextType {
     user: User | null;
     setUser: (user: User | null) => void;
+    logout: () => void;
 }
 
 const UserContext = createContext<UserContextType>({
     user: null,
     setUser: () => {},
+    logout: () => {},
 });
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
@@ -37,8 +39,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, []);
 
+    const logout = () => {
+        setAuthToken(null);
+        setUser(null);
+        // Remove from localStorage if you're storing it there
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+    };
+
     return (
-        <UserContext.Provider value={{ user, setUser }}>
+        <UserContext.Provider value={{ user, setUser, logout }}>
             {children}
         </UserContext.Provider>
     );

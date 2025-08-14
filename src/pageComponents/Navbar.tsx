@@ -5,19 +5,12 @@ import {useState} from "react";
 
 
 export default function Navbar() {
-
     const navigate = useNavigate();
     const location = useLocation();
-    const { user, setUser } = useUser();
+    const { user, logout } = useUser();
     const [showDropdown, setShowDropdown] = useState(false);
 
-const logout = () => {
-    setAuthToken(null);
-    setUser(null);
-    navigate("/login");
-};
-
-return (
+ return (
     <header className="bg-slate-800 text-white px-6 pt-3 pb-0 flex flex-col justify-between min-h-[120px]">
         <div className="flex justify-between items-center">
         <div className="text-2xl font-bold">Pc-Build</div>

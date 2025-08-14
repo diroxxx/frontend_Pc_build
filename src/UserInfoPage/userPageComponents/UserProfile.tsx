@@ -70,6 +70,7 @@ function UserProfile(){
                 setConfirmPassword('');
                 setIsPasswordVerified(false);
                 setPasswordError('');
+                
             }
         } catch (error: any) {
             setPasswordError(error.response?.data?.message || 'Failed to change password');
