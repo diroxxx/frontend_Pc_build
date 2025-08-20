@@ -125,6 +125,8 @@ function Components() {
     const endIndex = startIndex + componentsPerPage;
     const currentPageComponents = sortedComponents.slice(startIndex, endIndex);
 
+
+
     const handlePageChange = (page: number) => {
         setIsLoading(true);
         setCurrentPage(page);

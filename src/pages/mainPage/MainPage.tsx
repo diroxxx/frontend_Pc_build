@@ -1,10 +1,13 @@
 import { useNavigate } from "react-router-dom";
+import SidePanelBuilds from "../Builds/SidePanelBuilds.tsx";
 
 function mainPage() {
     const navigate = useNavigate();
 
     return (
         <div className="bg-gray-100 font-sans">
+
+            <SidePanelBuilds />
             {/* Ikony - grid */}
             <div className="flex justify-center gap-8 px-6 py-8">
                 <div
