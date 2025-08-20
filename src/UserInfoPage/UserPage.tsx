@@ -1,5 +1,6 @@
 import { useState } from "react";
 import UserProfile from "./userPageComponents/UserProfile.tsx";
+import UserComputers from "./userPageComponents/UserComputers.tsx";
 
 function UserPage() {
     const [activeTab, setActiveTab] = useState("profile");
@@ -67,10 +68,7 @@ function UserPage() {
                 )}
 
                 {activeTab === "builds" && (
-                    <div className="text-center text-gray-600 py-8">
-                        <h3 className="text-xl font-medium">My Builds</h3>
-                        <p className="mt-2">Your computer builds will be displayed here</p>
-                    </div>
+                    <UserComputers />
                 )}
 
                 {activeTab === "saved" && (

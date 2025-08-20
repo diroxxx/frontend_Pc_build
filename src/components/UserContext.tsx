@@ -1,6 +1,6 @@
-import {createContext, useContext, useEffect, useState} from "react";
-import {getAuthToken, setAuthToken} from "./Auth.tsx";
-import {jwtDecode} from "jwt-decode";
+import {createContext, useContext, useEffect} from "react";
+import { useAtom } from 'jotai';
+import { userAtom, logoutUserAtom, initializeUserAtom } from '../atomContext/userAtom';
 
 interface User {
     email: string;
@@ -21,31 +21,13 @@ const UserContext = createContext<UserContextType>({
 });
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useAtom(userAtom);
+    const [, logout] = useAtom(logoutUserAtom);
+    const [, initializeUser] = useAtom(initializeUserAtom);
 
     useEffect(() => {
-        const token = getAuthToken();
-        if (token) {
-            try {
-                const decoded: any = jwtDecode(token);
-                setUser({
-                    email: decoded.sub,
-                    role: decoded.role,
-                    nickname: decoded.username
-                });
-            } catch (e) {
-                setUser(null);
-            }
-        }
-    }, []);
-
-    const logout = () => {
-        setAuthToken(null);
-        setUser(null);
-        // Remove from localStorage if you're storing it there
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-    };
+        initializeUser();
+    }, [initializeUser]);
 
     return (
         <UserContext.Provider value={{ user, setUser, logout }}>

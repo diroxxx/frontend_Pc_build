@@ -100,6 +100,7 @@ export const filteredComponentsAtom = atom((get) => {
   const selectedShop = get(selectedShopAtom);
   const searchText = get(searchTextAtom);
 
+  // Filter components without any sorting - maintain original API order
   return components.filter(component => {
     const priceMatch = component.price >= priceRange.min && component.price <= priceRange.max;
     const manufacturerMatch = !selectedManufacturer || component.brand === selectedManufacturer;
@@ -118,7 +119,7 @@ export const filteredComponentsAtom = atom((get) => {
       componentType.toLowerCase().includes(searchText.toLowerCase());
     
     return priceMatch && manufacturerMatch && conditionMatch && categoryMatch && shopMatch && searchMatch;
-  });
+  }); // No .sort() call here - maintains original order
 });
 
 // Clear filters action atom

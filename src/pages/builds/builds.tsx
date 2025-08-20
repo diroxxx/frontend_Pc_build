@@ -64,7 +64,7 @@ function Builds() {
                                     </div>
                                 </div>
                                 <div className="font-semibold text-green-600 text-right">
-                                    ${selectedItems[category.key].price}
+                                    {selectedItems[category.key].price}zł
                                 </div>
                                 <div className="text-center text-sm text-gray-700">
                                     {selectedItems[category.key].shop}

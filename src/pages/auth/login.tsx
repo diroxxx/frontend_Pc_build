@@ -2,15 +2,17 @@ import {useState} from "react";
 import {setAuthToken, setRefreshToken} from "../../components/Auth.tsx";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
 import {jwtDecode} from "jwt-decode";
-import { useUser } from "../../components/UserContext.tsx";
+import { useAtom } from 'jotai';
+import { loginUserAtom } from '../../atomContext/userAtom';
+import { migrateGuestDataAtom } from '../../atomContext/computer';
 
 function Login() {
-
     const navigate: NavigateFunction = useNavigate();
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
     const [nickname, setNickname] = useState("");
-    const { setUser } = useUser();
+    const [, loginUser] = useAtom(loginUserAtom);
+    const [, migrateGuestData] = useAtom(migrateGuestDataAtom);
 
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -31,14 +33,14 @@ function Login() {
         }).then(data => {
             console.log(data);
             if (data !== null) {
-                setAuthToken(data["accessToken"]);
                 setRefreshToken(data["refreshToken"]);
-                const decoded: any = jwtDecode(data.accessToken);
-                setUser({
-                    email: decoded.sub,
-                    role: decoded.role,
-                    nickname: decoded.username
-                });
+                
+                // Use Jotai atom to set user
+                loginUser(data["accessToken"]);
+                
+                // Migrate guest data to user account
+                migrateGuestData();
+                
                 navigate("/")
 
             }

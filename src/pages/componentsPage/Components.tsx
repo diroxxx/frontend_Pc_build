@@ -2,6 +2,7 @@ import instance from '../../components/instance.tsx';
 import {useEffect, useState, useRef} from "react";
 import { useAtom } from 'jotai';
 import Component from './Component';
+import SidePanelBuilds from '../builds/SidePanelBuilds';
 import {
   type ComponentDto,
   componentsAtom,
@@ -20,6 +21,9 @@ import {
   shopsAtom,
   clearFiltersAtom
 } from '../../atomContext/offerAtom';
+import { currentBuildAtom } from '../../atomContext/computer';
+import { compatibilityIssuesAtom, clearCompatibilityIssuesAtom } from '../../atomContext/computer';
+import ToastContainer from '../../components/ui/ToastProvider/ToastContainer';
 
 const getComponents = async (): Promise<ComponentDto[]> => {
     try {
@@ -42,18 +46,22 @@ function Components() {
     const [selectedCategory, setSelectedCategory] = useAtom(selectedCategoryAtom);
     const [selectedShop, setSelectedShop] = useAtom(selectedShopAtom);
     const [searchText, setSearchText] = useAtom(searchTextAtom);
+    const [currentBuild] = useAtom(currentBuildAtom);
+    const [compatibilityIssues] = useAtom(compatibilityIssuesAtom);
     
+    const [, clearFilters] = useAtom(clearFiltersAtom);
+    const [, clearCompatibilityIssues] = useAtom(clearCompatibilityIssuesAtom);
+
     // Derived state
     const [filteredComponents] = useAtom(filteredComponentsAtom);
     const [manufacturers] = useAtom(manufacturersAtom);
     const [conditions] = useAtom(conditionsAtom);
     const [categories] = useAtom(categoriesAtom);
     const [shops] = useAtom(shopsAtom);
-    const [, clearFilters] = useAtom(clearFiltersAtom);
 
     // Local state for pagination and loading
     const [currentPage, setCurrentPage] = useState(1);
-    const [sortBy, setSortBy] = useState('newest');
+    const [sortBy, setSortBy] = useState('');
     const componentsPerPage = 25;
     const mainContentRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -80,18 +88,21 @@ function Components() {
     }, [filteredComponents.length]); // Use length instead of the whole array
 
     // Sort filtered components - create new array to avoid mutation
-    const sortedComponents = [...filteredComponents].sort((a, b) => {
-        switch (sortBy) {
-            case 'cheapest':
-                return a.price - b.price;
-            case 'expensive':
-                return b.price - a.price;
-            case 'newest':
-            case 'oldest':
-            default:
-                return 0; // Default sorting when no date field available
-        }
-    });
+    const sortedComponents = sortBy === '' 
+        ? filteredComponents  // No sorting - maintain original order
+        : [...filteredComponents].sort((a, b) => {
+            switch (sortBy) {
+                case 'cheapest':
+                    return a.price - b.price;
+                case 'expensive':
+                    return b.price - a.price;
+                case 'newest':
+                case 'oldest':
+                    return 0; // Default sorting when no date field available
+                default:
+                    return 0;
+            }
+        });
 
     if (loading) return (
         <div className="flex justify-center items-center min-h-screen">
@@ -141,6 +152,12 @@ function Components() {
 
     return (
         <div className="min-h-screen bg-gray-50">
+          {/* Add Toast Container */}
+          <ToastContainer />
+          
+          {/* Side Panel */}
+          <SidePanelBuilds />
+          
           {/* Header */}
           <div className="bg-white border-b border-gray-200 px-4 py-6">
             <div className="max-w-7xl mx-auto">
@@ -174,6 +191,7 @@ function Components() {
                   onChange={(e) => setSortBy(e.target.value)}
                   className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                 >
+                  <option value="">Domyślne sortowanie</option>
                   <option value="oldest">Od najstarszych</option>
                   <option value="newest">Najnowsze</option>
                   <option value="cheapest">Najtańsze</option>

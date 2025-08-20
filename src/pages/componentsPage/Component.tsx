@@ -1,6 +1,18 @@
+import { useAtom } from 'jotai';
+import { addComponentToBuildAtom, currentBuildAtom } from '../../atomContext/computer';
 import type { ComponentDto } from '../../atomContext/offerAtom';
 
 function Component(props: ComponentDto) {
+  const [, addComponentToBuild] = useAtom(addComponentToBuildAtom);
+  const [currentBuild] = useAtom(currentBuildAtom);
+
+  const isInBuild = currentBuild.some(c => c.componentType === props.componentType);
+  const existingComponent = currentBuild.find(c => c.componentType === props.componentType);
+
+  const handleAddToBuild = () => {
+    addComponentToBuild(props);
+  };
+
   // Funkcja do renderowania specyfikacji w formie tagów
   const renderSpecTags = () => {
     const tags = [];
@@ -18,7 +30,15 @@ function Component(props: ComponentDto) {
       case 'cpu':
         if (props.cpuCores) tags.push(`${props.cpuCores} rdzeni`);
         if (props.cpuThreads) tags.push(`${props.cpuThreads} wątków`);
-        if (props.cpuBase_clock) tags.push(props.cpuBase_clock);
+        if (props.cpuBase_clock) {
+          const baseClockValue = props.cpuBase_clock;
+          // Check if it already contains GHz, if not add it
+          if (baseClockValue.includes('GHz') || baseClockValue.includes('MHz')) {
+            tags.push(baseClockValue);
+          } else {
+            tags.push(`${baseClockValue} GHz`);
+          }
+        }
         if (props.cpuSocketType) tags.push(props.cpuSocketType);
         break;
       case 'memory':
@@ -66,7 +86,7 @@ function Component(props: ComponentDto) {
   const specTags = renderSpecTags();
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 mx-4 relative">
+    <div className="bg-white border rounded-lg p-4 shadow-sm transition-shadow duration-200 mx-4 relative border-gray-200 hover:border-gray-300">
       <div className="flex gap-6 min-h-[120px]">
         {/* Product image on the left */}
         <div className="w-32 h-32 flex-shrink-0">
@@ -90,35 +110,47 @@ function Component(props: ComponentDto) {
           <div className="flex items-center justify-between gap-2 mb-3">
             <div className="flex items-center gap-2">
               {props.condition.toLowerCase() === 'defective' && (
-                <span className="bg-pink-100 text-pink-700 text-sm px-3 py-1 rounded-full font-medium">
+                <span className="bg-red-100 text-red-700 text-sm px-3 py-1 rounded-full font-medium">
                   defective
                 </span>
               )}
               {props.condition.toLowerCase() === 'used' && (
-                <span className="bg-pink-100 text-pink-700 text-sm px-3 py-1 rounded-full font-medium">
+                <span className="bg-yellow-100 text-yellow-700 text-sm px-3 py-1 rounded-full font-medium">
                   used
                 </span>
               )}
               {props.condition.toLowerCase() === 'new' && (
-                <span className="bg-pink-100 text-pink-700 text-sm px-3 py-1 rounded-full font-medium">
+                <span className="bg-green-100 text-green-700 text-sm px-3 py-1 rounded-full font-medium">
                   new
                 </span>
               )}
               <h3 className="text-lg font-medium text-gray-900 leading-tight">
-                {props.model}
+                {props.brand} {props.model}
               </h3>
             </div>
             
             {/* Shop logo */}
             <div className="flex-shrink-0">
               {props.shop === 'allegro' && (
-                <img src="allegro.png" alt="Allegro" className="w-12 h-12 object-contain" />
+                <img 
+                  src="allegro.png" 
+                  alt="Allegro" 
+                  className="w-12 h-12 object-contain" 
+                />
               )}
               {props.shop === 'olx' && (
-                <img src="olx.png" alt="OLX" className="w-12 h-12 object-contain" />
+                <img 
+                  src="olx.png" 
+                  alt="OLX" 
+                  className="w-12 h-12 object-contain" 
+                />
               )}
               {props.shop === 'allegro_lokalnie' && (
-                <img src="Allegro-Lokalnie.png" alt="Allegro Lokalnie" className="w-12 h-12 object-contain" />
+                <img 
+                  src="Allegro-Lokalnie.png" 
+                  alt="Allegro Lokalnie" 
+                  className="w-12 h-12 object-contain" 
+                />
               )}
             </div>
           </div>
@@ -137,28 +169,48 @@ function Component(props: ComponentDto) {
             </div>
           )}
 
-          {/* Bottom section - date and price/button */}
-          <div className="flex justify-end items-end">
-            <div className="flex items-end gap-4">
-              <span className="text-3xl font-bold text-gray-900">
-                {new Intl.NumberFormat('pl-PL', {
-                  style: 'currency',
-                  currency: 'PLN',
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 2
-                }).format(props.price).replace('PLN', 'zł')}
-              </span>
-              
+          {/* Bottom section - price and buttons */}
+          <div className="flex justify-between items-center">
+            <span className="text-3xl font-bold text-gray-900">
+              {new Intl.NumberFormat('pl-PL', {
+                style: 'currency',
+                currency: 'PLN',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+              }).format(props.price).replace('PLN', 'zł')}
+            </span>
+            
+            <div className="flex gap-2">
               <a
                 href={props.website_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition-colors duration-200"
-                >
-                  Dodaj do zestawu
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Zobacz ofertę
               </a>
+              
+              <button
+                onClick={handleAddToBuild}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  isInBuild
+                    ? 'bg-orange-600 text-white hover:bg-orange-700'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+              >
+                {isInBuild 
+                  ? `Zamień ${props.componentType}` 
+                  : `Dodaj do zestawu`
+                }
+              </button>
             </div>
           </div>
+          
+          {isInBuild && existingComponent && (
+            <p className="text-xs text-orange-600 mt-1">
+              Zastąpi: {existingComponent.brand} {existingComponent.model}
+            </p>
+          )}
         </div>
       </div>
     </div>

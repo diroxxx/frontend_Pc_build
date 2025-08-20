@@ -1,13 +1,13 @@
 import {useNavigate, useLocation} from "react-router-dom";
-import {useUser} from "../components/UserContext.tsx";
-import {setAuthToken} from "../components/Auth.tsx";
 import {useState} from "react";
-
+import { useAtom } from 'jotai';
+import { userAtom, logoutUserAtom } from '../atomContext/userAtom';
 
 export default function Navbar() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user, logout } = useUser();
+    const [user] = useAtom(userAtom);
+    const [, logout] = useAtom(logoutUserAtom);
     const [showDropdown, setShowDropdown] = useState(false);
 
  return (

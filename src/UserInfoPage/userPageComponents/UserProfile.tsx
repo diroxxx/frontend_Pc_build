@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import instance from '../../components/instance';
-import {useUser} from "../../components/UserContext.tsx";
-
+import { useAtom } from 'jotai';
+import { userAtom } from '../../atomContext/userAtom';
 
 function UserProfile(){
-    const { user, setUser } = useUser();
+    const [user, setUser] = useAtom(userAtom);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
