@@ -15,7 +15,7 @@ const AuthNavigation: React.FC<AuthNavigationProps> = ({ type }) => {
             to="/register" 
             className="font-medium text-purple-600 hover:text-purple-500 transition-colors duration-200 focus:outline-none focus:underline"
           >
-            Sign up here
+            Zaloguj się tutaj
           </Link>
         </p>
       </div>
@@ -25,12 +25,12 @@ const AuthNavigation: React.FC<AuthNavigationProps> = ({ type }) => {
   return (
     <div className="text-center mt-6">
       <p className="text-sm text-gray-600">
-        Already have an account?{' '}
+        Posiadasz już konto?{' '}
         <Link 
           to="/login" 
           className="font-medium text-purple-600 hover:text-purple-500 transition-colors duration-200 focus:outline-none focus:underline"
         >
-          Sign in here
+          Zaloguj się tutaj
         </Link>
       </p>
     </div>

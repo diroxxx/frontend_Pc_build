@@ -42,13 +42,13 @@ function Register() {
     };
 
     return (
-        <AuthLayout 
-            title="Create Account" 
-            subtitle="Join the PC Build community today"
+        <AuthLayout
+            title="Stwórz swoje konto"
+            subtitle="Dołącz do PC-Build dzisiaj!"
         >
             <form onSubmit={handleSubmit} className="space-y-6">
                 <FormField
-                    label="Username"
+                    label="Nazwa użytkownika"
                     type="text"
                     name="username"
                     value={data.username}
@@ -56,12 +56,12 @@ function Register() {
                     onBlur={() => handleBlur('username')}
                     error={errors.username}
                     required
-                    placeholder="Choose a username"
+                    placeholder="Wpisz swoją nazwę"
                     autoComplete="username"
                 />
 
                 <FormField
-                    label="Email Address"
+                    label="Adres Email"
                     type="email"
                     name="email"
                     value={data.email}
@@ -69,19 +69,19 @@ function Register() {
                     onBlur={() => handleBlur('email')}
                     error={errors.email}
                     required
-                    placeholder="Enter your email address"
+                    placeholder="Adres Email"
                     autoComplete="email"
                 />
 
                 <PasswordField
-                    label="Password"
+                    label="Hasło"
                     name="password"
                     value={data.password}
                     onChange={(value) => handleChange('password', value)}
                     onBlur={() => handleBlur('password')}
                     error={errors.password}
                     required
-                    placeholder="Create a secure password"
+                    placeholder="Wpisz bezpieczne hasło"
                     autoComplete="new-password"
                 />
 
@@ -95,7 +95,7 @@ function Register() {
                     fullWidth
                     disabled={isLoading}
                 >
-                    {isLoading ? 'Creating Account...' : 'Create Account'}
+                    {isLoading ? 'Tworzę konto...' : 'Stwórz konto'}
                 </Button>
             </form>
 

@@ -19,7 +19,7 @@ function mainPage() {
                             alt="Components"
                             className="w-full h-full object-cover rounded shadow-md hover:shadow-lg transition-shadow duration-200"
                         />
-                        <p className="mt-2 text-sm font-medium">Components</p>
+                        <p className="mt-2 text-sm font-medium">Komponenty</p>
                     </div>
                 </div>
 
@@ -32,7 +32,7 @@ function mainPage() {
                             alt="Tools"
                             className="w-full h-full object-cover rounded shadow-md hover:shadow-lg transition-shadow duration-200"
                         />
-                        <p className="mt-2 text-sm font-medium">Builds</p>
+                        <p className="mt-2 text-sm font-medium">Konfigurator</p>
                     </div>
                 </div>
 
@@ -45,7 +45,7 @@ function mainPage() {
                             alt="Community"
                             className="w-full h-full object-cover rounded shadow-md hover:shadow-lg transition-shadow duration-200"
                         />
-                        <p className="mt-2 text-sm font-medium">Community</p>
+                        <p className="mt-2 text-sm font-medium">Forum</p>
                     </div>
                 </div>
 
@@ -58,7 +58,7 @@ function mainPage() {
                             alt="Check Games"
                             className="w-full h-full object-cover rounded shadow-md hover:shadow-lg transition-shadow duration-200"
                         />
-                        <p className="mt-2 text-sm font-medium">Check Games</p>
+                        <p className="mt-2 text-sm font-medium">Sprawdz gry</p>
                     </div>
                 </div>
 
@@ -71,7 +71,7 @@ function mainPage() {
                             alt="Recommendations"
                             className="w-full h-full object-cover rounded shadow-md hover:shadow-lg transition-shadow duration-200"
                         />
-                        <p className="mt-2 text-sm font-medium">Recommendations</p>
+                        <p className="mt-2 text-sm font-medium">Rekomendaje</p>
                     </div>
                 </div>
             </div>
