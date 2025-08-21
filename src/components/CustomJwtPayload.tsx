@@ -1,5 +1,8 @@
 import type {JwtPayload} from "jwt-decode";
 
 export interface CustomJwtPayload extends JwtPayload {
-    role?: string;
+  sub: string;
+  role: string;
+  username: string;
+  exp: number;
 }

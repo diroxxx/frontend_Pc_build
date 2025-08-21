@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getAuthToken, getRefreshToken, setRefreshToken, setAuthToken } from "./Auth";
+import { showToast } from "./ui/ToastProvider/toastUtils";
 
 const instance = axios.create({
     baseURL: "http://localhost:8080",
@@ -34,6 +35,7 @@ instance.interceptors.response.use(
                 console.error("Refresh token failed:", refreshError);
                 setAuthToken(null);
                 setRefreshToken(null);
+                showToast.error("Sesja wygasła. Zaloguj się ponownie.");
                 window.location.href = "/login"; // Przekieruj do logowania
                 return Promise.reject(refreshError);
             }

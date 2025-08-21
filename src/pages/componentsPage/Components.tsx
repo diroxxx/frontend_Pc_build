@@ -23,7 +23,8 @@ import {
 } from '../../atomContext/offerAtom';
 import { currentBuildAtom } from '../../atomContext/computer';
 import { compatibilityIssuesAtom, clearCompatibilityIssuesAtom } from '../../atomContext/computer';
-import ToastContainer from '../../components/ui/ToastProvider/ToastContainer';
+import ToastContainer from '../../components/ui/ToastProvider/ToastContainer.tsx';
+import { useNavigate } from 'react-router-dom';
 
 const getComponents = async (): Promise<ComponentDto[]> => {
     try {
@@ -65,7 +66,9 @@ function Components() {
     const componentsPerPage = 25;
     const mainContentRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
+    // ALL useEffect hooks MUST be here, before any conditional returns
     useEffect(() => {
         // Only fetch if components are empty to avoid refetching
         if (components.length === 0) {
@@ -85,7 +88,7 @@ function Components() {
     // Reset to first page when filters change
     useEffect(() => {
         setCurrentPage(1);
-    }, [filteredComponents.length]); // Use length instead of the whole array
+    }, [filteredComponents.length]);
 
     // Sort filtered components - create new array to avoid mutation
     const sortedComponents = sortBy === '' 
@@ -104,6 +107,7 @@ function Components() {
             }
         });
 
+    // CONDITIONAL RETURNS can only happen AFTER all hooks
     if (loading) return (
         <div className="flex justify-center items-center min-h-screen">
             <div className="text-lg text-gray-600">Ładowanie komponentów...</div>
@@ -124,8 +128,6 @@ function Components() {
     const startIndex = (currentPage - 1) * componentsPerPage;
     const endIndex = startIndex + componentsPerPage;
     const currentPageComponents = sortedComponents.slice(startIndex, endIndex);
-
-
 
     const handlePageChange = (page: number) => {
         setIsLoading(true);
@@ -154,7 +156,7 @@ function Components() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-          {/* Add Toast Container */}
+          {/* Toast Container - POTRZEBNY dla wyświetlania toastów! */}
           <ToastContainer />
           
           {/* Side Panel */}
