@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import instance from '../components/instance';
-import type { ComponentDto } from '../pages/componentsPage/Component';
+import type { ComponentDto } from '../atomContext/offerAtom';
 
 const CACHE_KEY = 'components_cache';
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes

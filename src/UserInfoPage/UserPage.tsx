@@ -1,12 +1,14 @@
 import { useState } from "react";
 import UserProfile from "./userPageComponents/UserProfile.tsx";
 import UserComputers from "./userPageComponents/UserComputers.tsx";
+import ToastContainer from '../components/ui/ToastProvider/ToastContainer';
 
 function UserPage() {
     const [activeTab, setActiveTab] = useState("profile");
 
     return (
         <div className="min-h-screen bg-gray-100">
+            <ToastContainer />
             <div className="max-w-4xl mx-auto py-8 px-4">
                 {/* Navigation Tabs */}
                 <div className="flex justify-center mb-8">
