@@ -70,6 +70,7 @@ export default function Navbar() {
                     <button onClick={() => navigate("/")} className="hover:bg-indigo-700 hover:text-gray-100 px-3 py-1 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200">Strona główna</button>
                     <button onClick={() => navigate("/builds")} className="hover:bg-indigo-700 hover:text-gray-100 px-3 py-1 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200">Konfigurator</button>
                     <button onClick={() => navigate("/components")} className="hover:bg-indigo-700 hover:text-gray-100 px-3 py-1 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200">Komponenty</button>
+                    <button onClick={() => navigate("/community")} className="hover:bg-indigo-700 hover:text-gray-100 px-3 py-1 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200">Forum</button>
                     <button onClick={() => navigate("/check-games")} className="hover:bg-indigo-700 hover:text-gray-100 px-3 py-1 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200">Sprawdz gry</button>
                     <button onClick={() => navigate("/recommendations")} className="hover:bg-indigo-700 hover:text-gray-100 px-3 py-1 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200">Rekomendacje</button>
                 </nav>

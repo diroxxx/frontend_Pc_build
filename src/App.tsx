@@ -7,7 +7,8 @@ import Register from "./pages/auth/Register.tsx";
 import Layout from "./pageComponents/Layout.tsx";
 import Components from "./pages/componentsPage/Components.tsx";
 import UserPage from "./UserInfoPage/UserPage";
-import Builds from "./pages/builds/builds.tsx";
+import Builds from "./pages/Builds/builds.tsx";
+import Community from "./pages/Community/community.tsx";
 
 function App() {
     return(
@@ -20,7 +21,8 @@ function App() {
                 <Route path="/" element={<MainPage />} />
                 <Route path="/components" element={<Components />} />
                 <Route path="/builds" element={<Builds />} />
-                
+                <Route path="/community" element={<Community/>} />
+
                 <Route
                     path="/userInfo"
                     element={
