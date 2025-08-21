@@ -14,46 +14,46 @@ import {
 export default function EdgeExpandButton() {
   const [hovered, setHovered] = useState(false);
   const [computers] = useAtom(listOfComputers);
-  const [selectedComputerId] = useAtom(selectedComputerIdAtom);
+  const [selectedComputerIndex] = useAtom(selectedComputerIdAtom);
   const [compatibilityIssues] = useAtom(compatibilityIssuesAtom);
-  const selectedComputer = computers.find(c => c.id === selectedComputerId);
+  const selectedComputer = selectedComputerIndex !== null ? computers[selectedComputerIndex] : null;
   const [, selectComputer] = useAtom(selectComputerAtom);
   const [, deleteComputer] = useAtom(deleteComputerAtom);
   const [, renameComputer] = useAtom(renameComputerAtom);
   const [, removeComponentFromBuild] = useAtom(removeComponentFromBuildAtom);
   const [, createNewEmptyComputer] = useAtom(createNewEmptyComputerAtom);
-  const [editingNameId, setEditingNameId] = useState<string | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingName, setEditingName] = useState('');
 
   const handleCreateNewComputer = () => {
     createNewEmptyComputer();
   };
 
-  const handleSelectComputer = (computerId: string) => {
-    selectComputer(computerId);
+  const handleSelectComputer = (computerIndex: number) => {
+    selectComputer(computerIndex);
   };
 
-  const handleDeleteComputer = (computerId: string, e: React.MouseEvent) => {
+  const handleDeleteComputer = (computerIndex: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    deleteComputer(computerId);
+    deleteComputer(computerIndex);
   };
 
-  const handleStartRename = (computer: any, e: React.MouseEvent) => {
+  const handleStartRename = (computer: any, index: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    setEditingNameId(computer.id);
+    setEditingIndex(index);
     setEditingName(computer.name);
   };
 
   const handleSaveRename = () => {
-    if (editingNameId && editingName.trim()) {
-      renameComputer(editingNameId, editingName.trim());
+    if (editingIndex !== null && editingName.trim()) {
+      renameComputer(editingIndex, editingName.trim());
     }
-    setEditingNameId(null);
+    setEditingIndex(null);
     setEditingName('');
   };
 
   const handleCancelRename = () => {
-    setEditingNameId(null);
+    setEditingIndex(null);
     setEditingName('');
   };
 
@@ -138,18 +138,18 @@ export default function EdgeExpandButton() {
                 <p className="text-xs text-gray-500">Brak komputerów. Utwórz nowy powyżej.</p>
               ) : (
                 <div className="space-y-1 max-h-32 overflow-y-auto">
-                  {computers.map((computer) => (
+                  {computers.map((computer, index) => (
                     <div
-                      key={computer.id}
-                      onClick={() => handleSelectComputer(computer.id)}
+                      key={index}
+                      onClick={() => handleSelectComputer(index)}
                       className={`flex items-center justify-between p-2 rounded cursor-pointer transition-colors ${
-                        selectedComputerId === computer.id
+                        selectedComputerIndex === index
                           ? 'bg-blue-100 border border-blue-300'
                           : 'bg-gray-50 hover:bg-gray-100'
                       }`}
                     >
                       <div className="flex-1 min-w-0">
-                        {editingNameId === computer.id ? (
+                        {editingIndex === index ? (
                           <input
                             type="text"
                             value={editingName}
@@ -175,7 +175,7 @@ export default function EdgeExpandButton() {
                       
                       <div className="flex items-center space-x-1 ml-2">
                         <button
-                          onClick={(e) => handleStartRename(computer, e)}
+                          onClick={(e) => handleStartRename(computer, index, e)}
                           className="text-gray-400 hover:text-gray-600 p-1"
                           title="Zmień nazwę"
                         >
@@ -190,7 +190,7 @@ export default function EdgeExpandButton() {
                           </svg>
                         </button>
                         <button
-                          onClick={(e) => handleDeleteComputer(computer.id, e)}
+                          onClick={(e) => handleDeleteComputer(index, e)}
                           className="text-red-400 hover:text-red-600 p-1"
                           title="Usuń komputer"
                         >

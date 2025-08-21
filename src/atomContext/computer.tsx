@@ -2,12 +2,11 @@ import {atom} from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { userAtom, canSaveComputersAtom } from './userAtom';
 import instance from '../components/instance';
-import toast from 'react-hot-toast';
+import { showToast } from '../components/ui/ToastProvider/toastUtils';
 
 import type { ComponentDto } from './offerAtom';
 
 export type computer= {
-    id: string;
     name: string;
     price: number;
     isvisible: boolean;
@@ -195,8 +194,8 @@ export const listOfComputers = atom(
   }
 );
 
-const guestSelectedComputerIdAtom = atom<string | null>(null);
-const userSelectedComputerIdAtom = atomWithStorage<string | null>('user_selectedComputerId', null);
+const guestSelectedComputerIdAtom = atom<number | null>(null);
+const userSelectedComputerIdAtom = atomWithStorage<number | null>('user_selectedComputerId', null);
 
 export const selectedComputerIdAtom = atom(
   (get) => {
@@ -207,26 +206,26 @@ export const selectedComputerIdAtom = atom(
       return get(guestSelectedComputerIdAtom);
     }
   },
-  (get, set, newId: string | null) => {
+  (get, set, newIndex: number | null) => {
     const user = get(userAtom);
     if (user) {
-      set(userSelectedComputerIdAtom, newId);
+      set(userSelectedComputerIdAtom, newIndex);
     } else {
-      set(guestSelectedComputerIdAtom, newId);
+      set(guestSelectedComputerIdAtom, newIndex);
     }
   }
 );
 // Action to save computer to database (tylko dla zalogowanych)
 export const saveComputerToDbAtom = atom(
   null,
-  async (get, set, computerId: string) => {
+  async (get, set, computerIndex: number) => {
     const canSave = get(canSaveComputersAtom);
     if (!canSave) {
       throw new Error('Musisz być zalogowany aby zapisać zestaw');
     }
 
     const computers = get(listOfComputers);
-    const computer = computers.find(c => c.id === computerId);
+    const computer = computers[computerIndex];
     
     if (!computer) return;
 
@@ -263,11 +262,11 @@ export const migrateGuestDataAtom = atom(
 // Current build being created (now represents the selected computer's components)
 export const currentBuildAtom = atom<ComponentDto[]>((get) => {
   const computers = get(listOfComputers);
-  const selectedId = get(selectedComputerIdAtom);
+  const selectedIndex = get(selectedComputerIdAtom);
   
-  if (!selectedId) return [];
+  if (selectedIndex === null) return [];
   
-  const selectedComputer = computers.find(c => c.id === selectedId);
+  const selectedComputer = computers[selectedIndex];
   return selectedComputer?.components || [];
 });
 
@@ -276,26 +275,25 @@ export const createNewEmptyComputerAtom = atom(
   null,
   (get, set) => {
     const computers = get(listOfComputers);
-    const newId = `computer-${Date.now()}`;
     
     const newComputer: computer = {
-      id: newId,
       name: `Komputer ${computers.length + 1}`,
       price: 0,
       isvisible: false,
       components: []
     };
     
-    set(listOfComputers, [...computers, newComputer]);
-    set(selectedComputerIdAtom, newId);
+    const newComputers = [...computers, newComputer];
+    set(listOfComputers, newComputers);
+    set(selectedComputerIdAtom, newComputers.length - 1);
   }
 );
 
 // Action to select computer
 export const selectComputerAtom = atom(
   null,
-  (get, set, computerId: string | null) => {
-    set(selectedComputerIdAtom, computerId);
+  (get, set, computerIndex: number | null) => {
+    set(selectedComputerIdAtom, computerIndex);
   }
 );
 
@@ -304,31 +302,28 @@ export const addComponentToBuildAtom = atom(
   null,
   (get, set, component: ComponentDto) => {
     const computers = get(listOfComputers);
-    const selectedId = get(selectedComputerIdAtom);
+    const selectedIndex = get(selectedComputerIdAtom);
     
-    if (!selectedId) {
+    if (selectedIndex === null) {
       // Create new computer if none selected
-      const newId = `computer-${Date.now()}`;
       const newComputer: computer = {
-        id: newId,
         name: `Komputer ${computers.length + 1}`,
         price: component.price,
         isvisible: false,
         components: [component]
       };
       
-      set(listOfComputers, [...computers, newComputer]);
-      set(selectedComputerIdAtom, newId);
+      const newComputers = [...computers, newComputer];
+      set(listOfComputers, newComputers);
+      set(selectedComputerIdAtom, newComputers.length - 1);
       set(compatibilityIssuesAtom, []);
       
-      toast.success(`Dodano ${component.brand} ${component.model} do nowego komputera`, {
-        duration: 3000,
-      });
+      showToast.success(`Dodano ${component.brand} ${component.model} do nowego komputera`);
       
       return;
     }
     
-    const selectedComputer = computers.find(c => c.id === selectedId);
+    const selectedComputer = computers[selectedIndex];
     if (!selectedComputer) return;
     
     // Check compatibility before adding
@@ -342,32 +337,21 @@ export const addComponentToBuildAtom = atom(
       
       if (errorIssues.length > 0) {
         errorIssues.forEach(issue => {
-          toast.error(issue.message, {
-            duration: 6000,
-            icon: '⚠️',
-          });
+          showToast.error(issue.message);
         });
       }
       
       if (warningIssues.length > 0) {
         warningIssues.forEach(issue => {
-          toast(issue.message, {
-            duration: 5000,
-            icon: '⚠️',
-            style: {
-              border: '1px solid #f59e0b',
-              color: '#92400e',
-              backgroundColor: '#fef3c7',
-            },
-          });
+          showToast.warning(issue.message);
         });
       }
     }
     
     set(compatibilityIssuesAtom, compatibilityIssues);
     
-    const updatedComputers = computers.map(computer => {
-      if (computer.id !== selectedId) return computer;
+    const updatedComputers = computers.map((computer, index) => {
+      if (index !== selectedIndex) return computer;
       
       const existingIndex = computer.components.findIndex(c => c.componentType === component.componentType);
       let newComponents;
@@ -377,16 +361,12 @@ export const addComponentToBuildAtom = atom(
         newComponents = [...computer.components];
         newComponents[existingIndex] = component;
         
-        toast.success(`Zastąpiono komponent: ${component.brand} ${component.model}`, {
-          duration: 3000,
-        });
+        showToast.success(`Zastąpiono komponent: ${component.brand} ${component.model}`);
       } else {
         // Add new component
         newComponents = [...computer.components, component];
         
-        toast.success(`Dodano: ${component.brand} ${component.model}`, {
-          duration: 3000,
-        });
+        showToast.success(`Dodano: ${component.brand} ${component.model}`);
       }
       
       const newPrice = newComponents.reduce((sum, comp) => sum + comp.price, 0);
@@ -415,19 +395,17 @@ export const removeComponentFromBuildAtom = atom(
   null,
   (get, set, componentType: string) => {
     const computers = get(listOfComputers);
-    const selectedId = get(selectedComputerIdAtom);
+    const selectedIndex = get(selectedComputerIdAtom);
     
-    if (!selectedId) return;
+    if (selectedIndex === null) return;
     
-    const updatedComputers = computers.map(computer => {
-      if (computer.id !== selectedId) return computer;
+    const updatedComputers = computers.map((computer, index) => {
+      if (index !== selectedIndex) return computer;
       
       const newComponents = computer.components.filter(c => c.componentType !== componentType);
       const newPrice = newComponents.reduce((sum, comp) => sum + comp.price, 0);
       
-      toast.success(`Usunięto komponent typu: ${componentType}`, {
-        duration: 3000,
-      });
+      showToast.success(`Usunięto komponent typu: ${componentType}`);
       
       return {
         ...computer,
@@ -446,17 +424,20 @@ export const removeComponentFromBuildAtom = atom(
 // Action to delete computer
 export const deleteComputerAtom = atom(
   null,
-  (get, set, computerId: string) => {
+  (get, set, computerIndex: number) => {
     const computers = get(listOfComputers);
-    const selectedId = get(selectedComputerIdAtom);
+    const selectedIndex = get(selectedComputerIdAtom);
     
-    const updatedComputers = computers.filter(c => c.id !== computerId);
+    const updatedComputers = computers.filter((_, index) => index !== computerIndex);
     set(listOfComputers, updatedComputers);
     
     // If deleted computer was selected, clear selection
-    if (selectedId === computerId) {
+    if (selectedIndex === computerIndex) {
       set(selectedComputerIdAtom, null);
       set(compatibilityIssuesAtom, []);
+    } else if (selectedIndex !== null && selectedIndex > computerIndex) {
+      // Adjust selected index if it's after deleted computer
+      set(selectedComputerIdAtom, selectedIndex - 1);
     }
   }
 );
@@ -464,11 +445,11 @@ export const deleteComputerAtom = atom(
 // Action to rename computer
 export const renameComputerAtom = atom(
   null,
-  (get, set, computerId: string, newName: string) => {
+  (get, set, computerIndex: number, newName: string) => {
     const computers = get(listOfComputers);
     
-    const updatedComputers = computers.map(computer => 
-      computer.id === computerId 
+    const updatedComputers = computers.map((computer, index) => 
+      index === computerIndex 
         ? { ...computer, name: newName }
         : computer
     );
@@ -480,11 +461,11 @@ export const renameComputerAtom = atom(
 // Action to toggle computer visibility
 export const toggleComputerVisibilityAtom = atom(
   null,
-  (get, set, computerId: string) => {
+  (get, set, computerIndex: number) => {
     const computers = get(listOfComputers);
     
-    const updatedComputers = computers.map(computer => 
-      computer.id === computerId 
+    const updatedComputers = computers.map((computer, index) => 
+      index === computerIndex 
         ? { ...computer, isvisible: !computer.isvisible }
         : computer
     );

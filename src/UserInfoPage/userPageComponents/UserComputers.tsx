@@ -114,7 +114,7 @@ function UserComputers() {
   const [, renameComputer] = useAtom(renameComputerAtom);
   const [, toggleVisibilityAtom] = useAtom(toggleComputerVisibilityAtom);
   const [selectedComputer, setSelectedComputer] = useState<computer | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingName, setEditingName] = useState('');
 
   const handleViewDetails = (computer: computer) => {
@@ -125,38 +125,36 @@ function UserComputers() {
     setSelectedComputer(null);
   };
 
-  const handleStartRename = (computer: computer, e: React.MouseEvent) => {
+  const handleStartRename = (computerIndex: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    setEditingId(computer.id);
-    setEditingName(computer.name);
+    setEditingIndex(computerIndex);
+    setEditingName(computers[computerIndex].name);
   };
 
   const handleSaveRename = () => {
-    if (editingId && editingName.trim()) {
-      renameComputer(editingId, editingName.trim());
+    if (editingIndex !== null && editingName.trim()) {
+      renameComputer(editingIndex, editingName.trim());
     }
-    setEditingId(null);
+    setEditingIndex(null);
     setEditingName('');
   };
 
   const handleCancelRename = () => {
-    setEditingId(null);
+    setEditingIndex(null);
     setEditingName('');
   };
 
-  const handleDeleteComputer = (computerId: string, e: React.MouseEvent) => {
+  const handleDeleteComputer = (computerIndex: number, e: React.MouseEvent) => {
     e.stopPropagation();
     if (window.confirm('Czy na pewno chcesz usunąć ten zestaw?')) {
-      deleteComputer(computerId);
-      if (selectedComputer?.id === computerId) {
-        setSelectedComputer(null);
-      }
+      deleteComputer(computerIndex);
+      setSelectedComputer(null);
     }
   };
 
-  const toggleVisibility = (computer: computer, e: React.MouseEvent) => {
+  const toggleVisibility = (computerIndex: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    toggleVisibilityAtom(computer.id);
+    toggleVisibilityAtom(computerIndex);
   };
 
   // Calculate compatibility issues for each computer
@@ -183,15 +181,15 @@ function UserComputers() {
         </div>
       ) : (
         <div className="grid gap-4">
-          {computersWithCompatibility.map((computer) => (
+          {computersWithCompatibility.map((computer, index) => (
             <div
-              key={computer.id}
+              key={index}
               onClick={() => handleViewDetails(computer)}
               className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow cursor-pointer"
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  {editingId === computer.id ? (
+                  {editingIndex === index ? (
                     <input
                       type="text"
                       value={editingName}
@@ -308,7 +306,7 @@ function UserComputers() {
 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={(e) => toggleVisibility(computer, e)}
+                    onClick={(e) => toggleVisibility(index, e)}
                     className={`p-2 rounded-lg transition-colors ${
                       computer.isvisible 
                         ? 'text-blue-600 hover:bg-blue-50' 
@@ -330,7 +328,7 @@ function UserComputers() {
                   </button>
 
                   <button
-                    onClick={(e) => handleStartRename(computer, e)}
+                    onClick={(e) => handleStartRename(index, e)}
                     className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
                     title="Zmień nazwę"
                   >
@@ -346,7 +344,7 @@ function UserComputers() {
                   </button>
 
                   <button
-                    onClick={(e) => handleDeleteComputer(computer.id, e)}
+                    onClick={(e) => handleDeleteComputer(index, e)}
                     className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     title="Usuń zestaw"
                   >
