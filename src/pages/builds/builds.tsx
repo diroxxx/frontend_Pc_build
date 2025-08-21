@@ -8,11 +8,11 @@ function Builds() {
     const componentCategories = [
         { key: 'cpu', label: 'CPU' },
         { key: 'gpu', label: 'GPU' },
-        { key: 'motherboard', label: 'Motherboard' },
-        { key: 'cooling', label: 'Cooling' },
-        { key: 'case', label: 'Case' },
-        { key: 'ram', label: 'RAM' },
-        { key: 'psu', label: 'PSU' }
+        { key: 'motherboard', label: 'Płyta główna' },
+        { key: 'cooling', label: 'Chłodzenie' },
+        { key: 'case', label: 'Obudowa' },
+        { key: 'ram', label: 'Pamięć RAM' },
+        { key: 'psu', label: 'Zasilacz' }
     ];
 
     const handleAddComponent = (category: string) => {
@@ -32,15 +32,15 @@ function Builds() {
     return (
         <div className="max-w-6xl mx-auto p-5 bg-gray-50 min-h-screen">
             <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">PC Configurator</h1>
+                <h1 className="text-3xl font-bold text-gray-800">Konfigurator</h1>
             </div>
             
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="grid grid-cols-4 bg-gray-100 border-b border-gray-200 font-bold p-4">
-                    <div>Component</div>
-                    <div>Name</div>
-                    <div>Price</div>
-                    <div>Shop</div>
+                    <div>Komponent</div>
+                    <div>Nazwa</div>
+                    <div>Cena</div>
+                    <div>Sklep</div>
                 </div>
 
                 {componentCategories.map((category) => (
@@ -76,7 +76,7 @@ function Builds() {
                                     className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md font-medium transition-colors duration-200 w-fit"
                                     onClick={() => handleAddComponent(category.key)}
                                 >
-                                    + Add
+                                    + Dodaj
                                 </button>
                                 <div></div>
                                 <div></div>
