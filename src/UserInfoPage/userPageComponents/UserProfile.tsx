@@ -1,29 +1,30 @@
 import { useState } from 'react';
 import instance from '../../components/instance';
 import { useAtom } from 'jotai';
-import { userAtom } from '../../atomContext/userAtom';
+import { userAtom, logoutUserAtom } from '../../atomContext/userAtom';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 function UserProfile(){
     const [user, setUser] = useAtom(userAtom);
+    const [, logout] = useAtom(logoutUserAtom);
+    const navigate = useNavigate();
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isPasswordVerified, setIsPasswordVerified] = useState(false);
     const [isVerifying, setIsVerifying] = useState(false);
-    const [passwordError, setPasswordError] = useState('');
-    const [passwordSuccess, setPasswordSuccess] = useState('');
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const verifyCurrentPassword = async () => {
         if (!currentPassword) {
-            setPasswordError('Please enter your current password');
+            toast.error('Please enter your current password');
             return;
         }
 
         setIsVerifying(true);
-        setPasswordError('');
 
         try {
             const response = await instance.post('/auth/verify-password', {
@@ -32,10 +33,10 @@ function UserProfile(){
 
             if (response.status === 200) {
                 setIsPasswordVerified(true);
-                setPasswordError('');
+                toast.success('Password verified successfully');
             }
         } catch (error: any) {
-            setPasswordError(error.response?.data?.message || 'Current password is incorrect');
+            toast.error(error.response?.data?.message || 'Current password is incorrect');
             setIsPasswordVerified(false);
         } finally {
             setIsVerifying(false);
@@ -44,17 +45,17 @@ function UserProfile(){
 
     const handlePasswordChange = async () => {
         if (!newPassword || !confirmPassword) {
-            setPasswordError('Please fill in all password fields');
+            toast.error('Please fill in all password fields');
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            setPasswordError('New passwords do not match');
+            toast.error('New passwords do not match');
             return;
         }
 
         if (newPassword.length < 8) {
-            setPasswordError('New password must be at least 8 characters long');
+            toast.error('New password must be at least 8 characters long');
             return;
         }
 
@@ -64,16 +65,21 @@ function UserProfile(){
             });
 
             if (response.status === 200) {
-                setPasswordSuccess('Password changed successfully');
-                setCurrentPassword('');
-                setNewPassword('');
-                setConfirmPassword('');
-                setIsPasswordVerified(false);
-                setPasswordError('');
+                toast.success('Password changed successfully! You will be logged out.', {
+                    duration: 3000,
+                });
                 
+                // Reset form
+                resetPasswordForm();
+                
+                // Logout user after 2 seconds
+                setTimeout(() => {
+                    logout();
+                    navigate('/login');
+                }, 2000);
             }
         } catch (error: any) {
-            setPasswordError(error.response?.data?.message || 'Failed to change password');
+            toast.error(error.response?.data?.message || 'Failed to change password');
         }
     };
 
@@ -82,12 +88,10 @@ function UserProfile(){
         setNewPassword('');
         setConfirmPassword('');
         setIsPasswordVerified(false);
-        setPasswordError('');
-        setPasswordSuccess('');
     };
     
     return(
-<div className="bg-gray-100 rounded-lg shadow-lg p-8 max-w-md mx-auto">
+        <div className="bg-gray-100 rounded-lg shadow-lg p-8 max-w-md mx-auto">
                         {/* Profile Image */}
                         <div className="flex justify-center mb-6">
                             <div className="relative">
@@ -273,18 +277,6 @@ function UserProfile(){
                                             </button>
                                         </div>
                                     </>
-                                )}
-
-                                {/* Error/Success Messages */}
-                                {passwordError && (
-                                    <div className="mt-2 text-sm text-red-600 bg-red-50 p-2 rounded">
-                                        {passwordError}
-                                    </div>
-                                )}
-                                {passwordSuccess && (
-                                    <div className="mt-2 text-sm text-green-600 bg-green-50 p-2 rounded">
-                                        {passwordSuccess}
-                                    </div>
                                 )}
                             </div>
                         </div>
