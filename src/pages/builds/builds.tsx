@@ -16,6 +16,8 @@ import { categoriesAtom, selectedCategoryAtom } from '../../atomContext/offerAto
 import type { ComponentDto } from '../../atomContext/offerAtom';
 import ToastContainer from '../../components/ui/ToastProvider/ToastContainer';
 
+
+import { retriveComputersFromDbAtom } from '../../atomContext/computer';
 // Import compatibility checking functions (same as in UserComputers)
 const checkSocketCompatibility = (components: ComponentDto[]): CompatibilityIssue[] => {
   const issues: CompatibilityIssue[] = [];
@@ -115,18 +117,26 @@ const checkAllCompatibility = (components: ComponentDto[]): CompatibilityIssue[]
 };
 
 function Builds() {
+
+
     const [computers] = useAtom(listOfComputers);
     const [selectedComputerIndex] = useAtom(selectedComputerIdAtom);
     const [, selectComputer] = useAtom(selectComputerAtom);
     const [, createNewEmptyComputer] = useAtom(createNewEmptyComputerAtom);
     const [, deleteComputer] = useAtom(deleteComputerAtom);
-    const [, renameComputer] = useAtom(renameComputerAtom);
+    // const [, renameComputer] = useAtom(renameComputerAtom);
     const [, removeComponentFromBuild] = useAtom(removeComponentFromBuildAtom);
     const [categories] = useAtom(categoriesAtom);
     const [, setSelectedCategory] = useAtom(selectedCategoryAtom);
     
     const navigate = useNavigate();
     const selectedComputer = selectedComputerIndex !== null ? computers[selectedComputerIndex] : null;
+
+
+//  console.log('=== BUILDS RENDER ===');
+//     console.log('Computers from listOfComputers:', computers);
+//     console.log('localStorage user_computers:', localStorage.getItem('user_computers'));
+    
 
     // Calculate compatibility issues for selected computer
     const compatibilityIssues = selectedComputer ? checkAllCompatibility(selectedComputer.components) : [];
@@ -172,9 +182,13 @@ function Builds() {
         );
     };
 
+
+
+
     return (
-        <div className="max-w-7xl mx-auto p-5 bg-gray-50 min-h-screen">
+        <div className="max-w-7xl mx-auto p-5 bg-gray-50 min-h-screen">            
             <ToastContainer />
+
             
             <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold text-gray-800 mb-4">Konfigurator PC</h1>
@@ -213,7 +227,7 @@ function Builds() {
                                     <div>
                                         <h3 className="font-medium text-gray-900">{computer.name}</h3>
                                         <p className="text-sm text-gray-500">
-                                            {computer.components.length} komponentów • {computer.price.toLocaleString('pl-PL')} zł
+                                        {(computer.components || []).length} komponentów • {computer.price.toLocaleString('pl-PL')} zł
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-2">
@@ -414,5 +428,4 @@ function Builds() {
         </div>
     );
 }
-
 export default Builds;

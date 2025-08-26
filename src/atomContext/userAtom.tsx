@@ -3,6 +3,8 @@ import { atomWithStorage } from 'jotai/utils';
 import { jwtDecode } from 'jwt-decode';
 import { getAuthToken, setAuthToken, setRefreshToken } from '../components/Auth';
 
+import { saveComputerToDbAtom, listOfComputers, retriveComputersFromDbAtom } from './computer';
+
 export interface User {
   email: string;
   role: string;
@@ -24,7 +26,7 @@ export const isAuthenticatedAtom = atom<boolean>((get) => {
 
 export const loginUserAtom = atom(
   null,
-  (get, set, token: string) => {
+  async (get, set, token: string) => {
     try {
       const decoded = jwtDecode<CustomJwtPayload>(token);
       const user: User = {
@@ -35,6 +37,14 @@ export const loginUserAtom = atom(
       
       setAuthToken(token);
       set(userAtom, user);
+      // set(migrateGuestDataAtom); // Removed or comment out to fix the error
+
+      try {
+        await set(retriveComputersFromDbAtom);
+        console.log('Zestawy pobrane i zsynchronizowane');
+      } catch (error) {
+        console.warn('Nie udało się pobrać zestawów z bazy:', error);
+      }
     } catch (error) {
       console.error('Błąd dekodowania tokenu:', error);
       throw new Error('Nieprawidłowy token');
@@ -42,14 +52,31 @@ export const loginUserAtom = atom(
   }
 );
 
-// Action to logout user
 export const logoutUserAtom = atom(
   null,
-  (get, set) => {
+  async (get, set) => {  // ✅ Dodaj async
+    console.log('=== LOGOUT START ===');
+    console.log('Token before logout:', getAuthToken());
+    
+    // ZAPISZ PRZED wylogowaniem (gdy użytkownik jest jeszcze zalogowany)
+    const user = get(userAtom);
+    if (user) {
+      try {
+        console.log('Saving computers before logout...');
+        await set(saveComputerToDbAtom);  // ✅ Dodaj await
+        console.log('Computers saved successfully');
+      } catch (error) {
+        console.error('Error saving computers before logout:', error);
+        // Nie przerywaj wylogowania z powodu błędu zapisu
+      }
+    }
+    
+    // DOPIERO TERAZ usuń token i wyloguj
+    console.log('Clearing tokens...');
     setAuthToken(null);
     setRefreshToken(null);
     set(userAtom, null);
-    
+
     // Clear user-specific data
     localStorage.removeItem('computers');
     localStorage.removeItem('computers_last_sync');
@@ -57,38 +84,6 @@ export const logoutUserAtom = atom(
   }
 );
 
-export const initializeUserAtom = atom(
-  null,
-  (get, set) => {
-    const token = getAuthToken();
-    if (!token) {
-      set(userAtom, null);
-      return;
-    }
-
-    try {
-      const decoded = jwtDecode<CustomJwtPayload>(token);
-      
-      // Check if token is expired
-      if (decoded.exp * 1000 < Date.now()) {
-        console.log('Token wygasł');
-        set(logoutUserAtom);
-        return;
-      }
-
-      const user: User = {
-        email: decoded.sub,
-        role: decoded.role,
-        nickname: decoded.username
-      };
-      
-      set(userAtom, user);
-    } catch (error) {
-      console.error('Błąd inicjalizacji użytkownika:', error);
-      set(logoutUserAtom);
-    }
-  }
-);
 
 // Computed atom to check if user can save computers
 export const canSaveComputersAtom = atom<boolean>((get) => {

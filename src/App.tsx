@@ -7,10 +7,15 @@ import Register from "./pages/auth/Register.tsx";
 import Layout from "./pageComponents/Layout.tsx";
 import Components from "./pages/componentsPage/Components.tsx";
 import UserPage from "./UserInfoPage/UserPage";
-import Builds from "./pages/Builds/builds.tsx";
 import Community from "./pages/Community/community.tsx";
+import Builds from "./pages/builds/builds.tsx";
+
+import { useAtom } from 'jotai';
+import { useEffect } from 'react';
+
 
 function App() {
+
     return(
     <div>
         <Routes>

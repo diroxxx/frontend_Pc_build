@@ -9,7 +9,7 @@ import type { ComponentDto } from './offerAtom';
 export type computer= {
     name: string;
     price: number;
-    isvisible: boolean;
+    isVisible: boolean;
     components: ComponentDto[]
 }
 
@@ -173,8 +173,7 @@ const checkAllCompatibility = (components: ComponentDto[], newComponent: Compone
 export const compatibilityIssuesAtom = atom<CompatibilityIssue[]>([]);
 
 const userComputersAtom = atomWithStorage<computer[]>('user_computers', []);
-const guestComputersAtom = atom<computer[]>([]);
-
+const guestComputersAtom = atomWithStorage<computer[]>('guest_computers', []);
 export const listOfComputers = atom(
   (get) => {
     const user = get(userAtom);
@@ -194,7 +193,7 @@ export const listOfComputers = atom(
   }
 );
 
-const guestSelectedComputerIdAtom = atom<number | null>(null);
+const guestSelectedComputerIdAtom = atomWithStorage<number | null>('guest_selectedComputerId', null);
 const userSelectedComputerIdAtom = atomWithStorage<number | null>('user_selectedComputerId', null);
 
 export const selectedComputerIdAtom = atom(
@@ -212,49 +211,6 @@ export const selectedComputerIdAtom = atom(
       set(userSelectedComputerIdAtom, newIndex);
     } else {
       set(guestSelectedComputerIdAtom, newIndex);
-    }
-  }
-);
-// Action to save computer to database (tylko dla zalogowanych)
-export const saveComputerToDbAtom = atom(
-  null,
-  async (get, set, computerIndex: number) => {
-    const canSave = get(canSaveComputersAtom);
-    if (!canSave) {
-      throw new Error('Musisz być zalogowany aby zapisać zestaw');
-    }
-
-    const computers = get(listOfComputers);
-    const computer = computers[computerIndex];
-    
-    if (!computer) return;
-
-    try {
-      await instance.post('/user/computers', computer);
-      console.log('Komputer zapisany w bazie');
-    } catch (error) {
-      console.error('Błąd zapisu do bazy:', error);
-      throw error;
-    }
-  }
-);
-// Action to migrate guest data to user account after login
-export const migrateGuestDataAtom = atom(
-  null,
-  (get, set) => {
-    const guestComputers = get(guestComputersAtom);
-    const guestSelectedId = get(guestSelectedComputerIdAtom);
-    
-    if (guestComputers.length > 0) {
-      // Przenieś dane z guest do user storage
-      set(userComputersAtom, guestComputers);
-      set(userSelectedComputerIdAtom, guestSelectedId);
-      
-      // Wyczyść guest storage
-      set(guestComputersAtom, []);
-      set(guestSelectedComputerIdAtom, null);
-      
-      console.log('Dane przeniesione z sesji gościa do konta użytkownika');
     }
   }
 );
@@ -279,7 +235,7 @@ export const createNewEmptyComputerAtom = atom(
     const newComputer: computer = {
       name: `Komputer ${computers.length + 1}`,
       price: 0,
-      isvisible: false,
+      isVisible: false,
       components: []
     };
     
@@ -309,7 +265,7 @@ export const addComponentToBuildAtom = atom(
       const newComputer: computer = {
         name: `Komputer ${computers.length + 1}`,
         price: component.price,
-        isvisible: false,
+        isVisible: false,
         components: [component]
       };
       
@@ -466,10 +422,76 @@ export const toggleComputerVisibilityAtom = atom(
     
     const updatedComputers = computers.map((computer, index) => 
       index === computerIndex 
-        ? { ...computer, isvisible: !computer.isvisible }
+        ? { ...computer, isVisible: !computer.isVisible }
         : computer
     );
     
     set(listOfComputers, updatedComputers);
   }
 );
+
+// Action to migrate guest data to user account after login
+export const migrateGuestDataAtom = atom(
+  null,
+  (get, set) => {
+    const guestComputers = get(guestComputersAtom);
+    const guestSelectedId = get(guestSelectedComputerIdAtom);
+    
+    if (guestComputers.length > 0) {
+      // Przenieś dane z guest do user storage
+      const existingUserComputers = get(userComputersAtom);
+      const mergedComputers = [...existingUserComputers, ...guestComputers];
+      set(userComputersAtom, mergedComputers);
+      set(userSelectedComputerIdAtom, guestSelectedId);
+
+      // Wyczyść guest storage
+      set(guestComputersAtom, []);
+      set(guestSelectedComputerIdAtom, null);
+      
+      console.log('Dane przeniesione z sesji gościa do konta użytkownika');
+    }
+  }
+);
+// Action to save computer to database (tylko dla zalogowanych)
+export const saveComputerToDbAtom = atom(
+  null,
+  async (get, set) => {
+    const canSave = get(canSaveComputersAtom);
+    if (!canSave) {
+      throw new Error('Musisz być zalogowany aby zapisać zestaw');
+    }
+
+    const computers = get(listOfComputers);
+    const userEmail = get(userAtom)?.email;
+    console.log(computers)
+    console.log(userEmail)
+    if (!computers) return;
+
+    try {
+      await instance.post(`/computerApi/user/${userEmail}/computers`, computers);
+      console.log('Komputer zapisany w bazie');
+    } catch (error) {
+      console.error('Błąd zapisu do bazy:', error);
+      throw error;
+    }
+  }
+);
+export const retriveComputersFromDbAtom = atom(
+  null,
+  async(get, set) => {
+    const userEmail = get(userAtom)?.email;
+    try {
+      const response = await instance.get(`/computerApi/user/${userEmail}/computers`);
+      
+       console.log('=== RECEIVED FROM DB ===');
+      console.log('Raw response:', response.data);
+      console.log('First computer:', response.data[0]);
+      console.log('Components:', response.data[0]?.components);
+      set(userComputersAtom, response.data);
+
+    } catch (error) {
+      console.error('Błąd pobierania z bazy:', error);
+      throw error;
+    }
+  }
+)

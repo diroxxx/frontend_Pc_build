@@ -1,10 +1,11 @@
-import {useState} from "react";
+import {use, useState} from "react";
 import {setAuthToken, setRefreshToken} from "../../components/Auth.tsx";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
 import {jwtDecode} from "jwt-decode";
 import { useAtom } from 'jotai';
 import { loginUserAtom } from '../../atomContext/userAtom';
 import { migrateGuestDataAtom } from '../../atomContext/computer';
+import { retriveComputersFromDbAtom } from "../../atomContext/computer";
 
 function Login() {
     const navigate: NavigateFunction = useNavigate();
@@ -13,6 +14,7 @@ function Login() {
     const [nickname, setNickname] = useState("");
     const [, loginUser] = useAtom(loginUserAtom);
     const [, migrateGuestData] = useAtom(migrateGuestDataAtom);
+    const [,retriveComputersFromDb] = useAtom(retriveComputersFromDbAtom);
 
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -39,8 +41,10 @@ function Login() {
                 loginUser(data["accessToken"]);
                 
                 // Migrate guest data to user account
-                migrateGuestData();
-                
+                // migrateGuestData();
+
+                // retriveComputersFromDb();
+
                 navigate("/")
 
             }

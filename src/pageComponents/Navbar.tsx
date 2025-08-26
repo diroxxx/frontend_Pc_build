@@ -39,6 +39,7 @@ export default function Navbar() {
                                 onClick={() => {
                                     logout();
                                     setShowDropdown(false);
+                                    navigate("/")
                                 }}
                                 className="block w-full text-left px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-md transition-colors duration-200"
                             >
