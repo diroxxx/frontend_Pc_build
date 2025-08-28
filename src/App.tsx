@@ -10,6 +10,8 @@ import UserPage from "./UserInfoPage/UserPage";
 import Community from "./pages/Community/community.tsx";
 import Builds from "./pages/builds/builds.tsx";
 
+import AdminLogin from "./pages/adminPage/Adminlogin.tsx";
+import AdminControlPanel from "./pages/adminPage/adminControlPanel.tsx";
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
 
@@ -37,6 +39,18 @@ function App() {
                     }
                 />
             </Route>
+
+            <Route path="/admin/login" element={<AdminLogin />} />
+
+            <Route
+                    path="/admin/controlPanel"
+                    element={
+                        <RoleProtectedRoute role="ADMIN">
+                            <AdminControlPanel />
+                        </RoleProtectedRoute>
+                    }
+                />
+
         </Routes>
     </div>
     )

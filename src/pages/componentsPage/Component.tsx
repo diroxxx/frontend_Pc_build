@@ -13,7 +13,6 @@ function Component(props: ComponentDto) {
     addComponentToBuild(props);
   };
 
-  // Funkcja do renderowania specyfikacji w formie tagów
   const renderSpecTags = () => {
     const tags = [];
     
@@ -70,9 +69,7 @@ function Component(props: ComponentDto) {
         if (props.caseFormat) tags.push(props.caseFormat);
         break;
       default:
-        // Add brand as fallback
         if (props.brand) tags.push(props.brand);
-        // Try to add any available specs
         if (props.gpuMemorySize) tags.push(`${props.gpuMemorySize}GB`);
         if (props.cpuCores) tags.push(`${props.cpuCores} rdzeni`);
         if (props.ramCapacity) tags.push(`${props.ramCapacity}GB`);
@@ -125,7 +122,14 @@ function Component(props: ComponentDto) {
                 </span>
               )}
               <h3 className="text-lg font-medium text-gray-900 leading-tight">
+                <a
+                href={props.website_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-blue-600 hover:underline transition-colors duration-200 cursor-pointer"
+                >
                 {props.brand} {props.model}
+              </a>
               </h3>
             </div>
             
@@ -181,14 +185,7 @@ function Component(props: ComponentDto) {
             </span>
             
             <div className="flex gap-2">
-              <a
-                href={props.website_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Zobacz ofertę
-              </a>
+              
               
               <button
                 onClick={handleAddToBuild}
