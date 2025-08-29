@@ -54,30 +54,26 @@ export const loginUserAtom = atom(
 
 export const logoutUserAtom = atom(
   null,
-  async (get, set) => {  // ✅ Dodaj async
+  async (get, set) => {
     console.log('=== LOGOUT START ===');
     console.log('Token before logout:', getAuthToken());
     
-    // ZAPISZ PRZED wylogowaniem (gdy użytkownik jest jeszcze zalogowany)
     const user = get(userAtom);
     if (user) {
       try {
         console.log('Saving computers before logout...');
-        await set(saveComputerToDbAtom);  // ✅ Dodaj await
+        await set(saveComputerToDbAtom); 
         console.log('Computers saved successfully');
       } catch (error) {
         console.error('Error saving computers before logout:', error);
-        // Nie przerywaj wylogowania z powodu błędu zapisu
       }
     }
     
-    // DOPIERO TERAZ usuń token i wyloguj
     console.log('Clearing tokens...');
     setAuthToken(null);
     setRefreshToken(null);
     set(userAtom, null);
 
-    // Clear user-specific data
     localStorage.removeItem('computers');
     localStorage.removeItem('computers_last_sync');
     localStorage.removeItem('selectedComputerId');
@@ -88,5 +84,5 @@ export const logoutUserAtom = atom(
 // Computed atom to check if user can save computers
 export const canSaveComputersAtom = atom<boolean>((get) => {
   const user = get(userAtom);
-  return user !== null; // Tylko zalogowani użytkownicy mogą zapisywać
+  return user !== null; 
 });

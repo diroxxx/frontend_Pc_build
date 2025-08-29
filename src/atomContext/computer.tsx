@@ -2,7 +2,7 @@ import {atom} from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { userAtom, canSaveComputersAtom } from './userAtom';
 import instance from '../components/instance';
-import { showToast } from '../components/ui/ToastProvider/toastUtils';
+import { showToast } from '../components/ui/ToastProvider/ToastContainer';
 
 import type { ComponentDto } from './offerAtom';
 
@@ -114,58 +114,58 @@ const checkMemoryCompatibility = (components: ComponentDto[], newComponent: Comp
   return issues;
 };
 
-const checkPowerRequirements = (components: ComponentDto[], newComponent: ComponentDto): CompatibilityIssue[] => {
-  const issues: CompatibilityIssue[] = [];
+// const checkPowerRequirements = (components: ComponentDto[], newComponent: ComponentDto): CompatibilityIssue[] => {
+//   const issues: CompatibilityIssue[] = [];
   
-  const psu = components.find(c => c.componentType.toLowerCase().includes('power') || c.componentType.toLowerCase().includes('psu'));
-  const gpu = components.find(c => c.componentType.toLowerCase().includes('graphics') || c.componentType.toLowerCase().includes('gpu'));
+//   const psu = components.find(c => c.componentType.toLowerCase().includes('power') || c.componentType.toLowerCase().includes('psu'));
+//   const gpu = components.find(c => c.componentType.toLowerCase().includes('graphics') || c.componentType.toLowerCase().includes('gpu'));
   
-  if (psu && psu.powerSupplyMaxPowerWatt) {
-    let estimatedPower = 0;
+//   if (psu && psu.powerSupplyMaxPowerWatt) {
+//     let estimatedPower = 0;
     
-    // Estimate power consumption
-    components.forEach(comp => {
-      if (comp.componentType.toLowerCase().includes('graphics') || comp.componentType.toLowerCase().includes('gpu')) {
-        estimatedPower += comp.gpuPowerDraw || 200; // Default estimate
-      } else if (comp.componentType.toLowerCase().includes('processor') || comp.componentType.toLowerCase().includes('cpu')) {
-        estimatedPower += 100; // CPU estimate
-      }
-    });
+//     // Estimate power consumption
+//     components.forEach(comp => {
+//       if (comp.componentType.toLowerCase().includes('graphics') || comp.componentType.toLowerCase().includes('gpu')) {
+//         estimatedPower += comp.gpuPowerDraw || 200; // Default estimate
+//       } else if (comp.componentType.toLowerCase().includes('processor') || comp.componentType.toLowerCase().includes('cpu')) {
+//         estimatedPower += 100; // CPU estimate
+//       }
+//     });
     
-    // Add new component power
-    if (newComponent.componentType.toLowerCase().includes('graphics') || newComponent.componentType.toLowerCase().includes('gpu')) {
-      estimatedPower += newComponent.gpuPowerDraw || 200;
-    } else if (newComponent.componentType.toLowerCase().includes('processor') || newComponent.componentType.toLowerCase().includes('cpu')) {
-      estimatedPower += 100;
-    }
+//     // Add new component power
+//     if (newComponent.componentType.toLowerCase().includes('graphics') || newComponent.componentType.toLowerCase().includes('gpu')) {
+//       estimatedPower += newComponent.gpuPowerDraw || 200;
+//     } else if (newComponent.componentType.toLowerCase().includes('processor') || newComponent.componentType.toLowerCase().includes('cpu')) {
+//       estimatedPower += 100;
+//     }
     
-    // Add base system power (motherboard, RAM, storage, etc.)
-    estimatedPower += 150;
+//     // Add base system power (motherboard, RAM, storage, etc.)
+//     estimatedPower += 150;
     
-    if (estimatedPower > psu.powerSupplyMaxPowerWatt) {
-      issues.push({
-        type: 'error',
-        message: `Zasilacz (${psu.powerSupplyMaxPowerWatt}W) może być za słaby. Szacowane zapotrzebowanie: ${estimatedPower}W`,
-        affectedComponents: ['power_supply']
-      });
-    } else if (estimatedPower > psu.powerSupplyMaxPowerWatt * 0.8) {
-      issues.push({
-        type: 'warning',
-        message: `Zasilacz będzie mocno obciążony. Szacowane zapotrzebowanie: ${estimatedPower}W z ${psu.powerSupplyMaxPowerWatt}W`,
-        affectedComponents: ['power_supply']
-      });
-    }
-  }
+//     if (estimatedPower > psu.powerSupplyMaxPowerWatt) {
+//       issues.push({
+//         type: 'error',
+//         message: `Zasilacz (${psu.powerSupplyMaxPowerWatt}W) może być za słaby. Szacowane zapotrzebowanie: ${estimatedPower}W`,
+//         affectedComponents: ['power_supply']
+//       });
+//     } else if (estimatedPower > psu.powerSupplyMaxPowerWatt * 0.8) {
+//       issues.push({
+//         type: 'warning',
+//         message: `Zasilacz będzie mocno obciążony. Szacowane zapotrzebowanie: ${estimatedPower}W z ${psu.powerSupplyMaxPowerWatt}W`,
+//         affectedComponents: ['power_supply']
+//       });
+//     }
+//   }
   
-  return issues;
-};
+//   return issues;
+// };
 
 const checkAllCompatibility = (components: ComponentDto[], newComponent: ComponentDto): CompatibilityIssue[] => {
   const issues: CompatibilityIssue[] = [];
   
   issues.push(...checkSocketCompatibility(components, newComponent));
   issues.push(...checkMemoryCompatibility(components, newComponent));
-  issues.push(...checkPowerRequirements(components, newComponent));
+  // issues.push(...checkPowerRequirements(components, newComponent));
   
   return issues;
 };
@@ -438,17 +438,15 @@ export const migrateGuestDataAtom = atom(
     const guestSelectedId = get(guestSelectedComputerIdAtom);
     
     if (guestComputers.length > 0) {
-      // Przenieś dane z guest do user storage
       const existingUserComputers = get(userComputersAtom);
       const mergedComputers = [...existingUserComputers, ...guestComputers];
       set(userComputersAtom, mergedComputers);
       set(userSelectedComputerIdAtom, guestSelectedId);
 
-      // Wyczyść guest storage
       set(guestComputersAtom, []);
       set(guestSelectedComputerIdAtom, null);
       
-      console.log('Dane przeniesione z sesji gościa do konta użytkownika');
+      // console.log('Dane przeniesione z sesji gościa do konta użytkownika');
     }
   }
 );
@@ -463,8 +461,8 @@ export const saveComputerToDbAtom = atom(
 
     const computers = get(listOfComputers);
     const userEmail = get(userAtom)?.email;
-    console.log(computers)
-    console.log(userEmail)
+    // console.log(computers)
+    // console.log(userEmail)
     if (!computers) return;
 
     try {
@@ -482,13 +480,7 @@ export const retriveComputersFromDbAtom = atom(
     const userEmail = get(userAtom)?.email;
     try {
       const response = await instance.get(`/computerApi/user/${userEmail}/computers`);
-      
-       console.log('=== RECEIVED FROM DB ===');
-      console.log('Raw response:', response.data);
-      console.log('First computer:', response.data[0]);
-      console.log('Components:', response.data[0]?.components);
       set(userComputersAtom, response.data);
-
     } catch (error) {
       console.error('Błąd pobierania z bazy:', error);
       throw error;

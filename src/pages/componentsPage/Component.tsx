@@ -61,7 +61,6 @@ function Component(props: ComponentDto) {
         if (props.boardFormat) tags.push(props.boardFormat);
         break;
       case 'cooler':
-      case 'chlodzenie':
         if (props.coolerSocketsType) tags.push(...props.coolerSocketsType);
         break;
       case 'case_pc':
@@ -108,17 +107,17 @@ function Component(props: ComponentDto) {
             <div className="flex items-center gap-2">
               {props.condition.toLowerCase() === 'defective' && (
                 <span className="bg-red-100 text-red-700 text-sm px-3 py-1 rounded-full font-medium">
-                  defective
+                  Uszkodzony
                 </span>
               )}
               {props.condition.toLowerCase() === 'used' && (
                 <span className="bg-yellow-100 text-yellow-700 text-sm px-3 py-1 rounded-full font-medium">
-                  used
+                  Używany
                 </span>
               )}
               {props.condition.toLowerCase() === 'new' && (
                 <span className="bg-green-100 text-green-700 text-sm px-3 py-1 rounded-full font-medium">
-                  new
+                  Nowy
                 </span>
               )}
               <h3 className="text-lg font-medium text-gray-900 leading-tight">

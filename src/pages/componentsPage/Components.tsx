@@ -74,6 +74,16 @@ function Components() {
         if (components.length === 0) {
             getComponents()
                 .then((data) => {
+                  console.log('Wszystkie komponenty:', data);
+                console.log('Unikalne typy komponentów:', 
+                    [...new Set(data.map(c => c.componentType))]
+                );
+                const coolers = data.filter(c => 
+                    c.componentType?.toLowerCase().includes('cool') ||
+                    c.componentType?.toLowerCase().includes('chłodz') ||
+                    c.componentType?.toLowerCase().includes('wentyl')
+                );
+                console.log('Znalezione coolery:', coolers);
                     setComponents(data);
                     setLoading(false);
                 })
@@ -154,6 +164,44 @@ function Components() {
         }
     };
 
+    const translateCondition = (condition: string): string => {
+  switch (condition.toLowerCase()) {
+    case 'new':
+      return 'Nowy';
+    case 'used':
+      return 'Używany';
+    case 'defective':
+      return 'Uszkodzony';
+    case 'refurbished':
+      return 'Odnowiony';
+    default:
+      return condition;
+  }
+};
+const translateCategory = (category: string): string => {
+  switch (category.toLowerCase()) {
+    case 'graphicsCard':
+      return 'Karty graficzne';
+    case 'processor':
+      return 'Procesory';
+    case 'memory':
+      return 'Pamięć RAM';
+    case 'storage':
+    case 'ssd':
+    case 'hdd':
+      return 'Dyski';
+    case 'motherboard':
+      return 'Płyty główne';
+    case 'powerSupply':
+      return 'Zasilacze';
+    case 'cooler':
+      return 'Chłodzenie';
+    case 'casePc':
+      return 'Obudowy';
+    default:
+      return category;
+        }
+};
     return (
         <div className="min-h-screen bg-gray-50">
           {/* Toast Container - POTRZEBNY dla wyświetlania toastów! */}
@@ -225,7 +273,7 @@ function Components() {
                     <option value="">Wszystkie kategorie</option>
                     {categories.map(category => (
                       <option key={category} value={category}>
-                        {category}
+                        {translateCategory(category)}
                       </option>
                     ))}
                   </select>
@@ -290,7 +338,7 @@ function Components() {
                     <option value="">Wszystkie stany</option>
                     {conditions.map(condition => (
                       <option key={condition} value={condition}>
-                        {condition}
+                        {translateCondition(condition)}
                       </option>
                     ))}
                   </select>

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { getAuthToken, getRefreshToken, setRefreshToken, setAuthToken } from "./Auth";
-import { showToast } from "./ui/ToastProvider/toastUtils";
+
+import { showToast } from '../components/ui/ToastProvider/ToastContainer';
 
 const instance = axios.create({
     baseURL: "http://localhost:8080",

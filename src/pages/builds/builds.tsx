@@ -132,12 +132,6 @@ function Builds() {
     const navigate = useNavigate();
     const selectedComputer = selectedComputerIndex !== null ? computers[selectedComputerIndex] : null;
 
-
-//  console.log('=== BUILDS RENDER ===');
-//     console.log('Computers from listOfComputers:', computers);
-//     console.log('localStorage user_computers:', localStorage.getItem('user_computers'));
-    
-
     // Calculate compatibility issues for selected computer
     const compatibilityIssues = selectedComputer ? checkAllCompatibility(selectedComputer.components) : [];
 
@@ -155,7 +149,6 @@ function Builds() {
         'storage': 'Pamięć masowa'
     };
 
-    // Użyj rzeczywistych kategorii z API
     const componentCategories = categories.map(category => ({
         key: category,
         label: categoryLabels[category] || category // Fallback to original name if no mapping
