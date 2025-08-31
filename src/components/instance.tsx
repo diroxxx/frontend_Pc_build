@@ -22,8 +22,8 @@ instance.interceptors.response.use(
         const originalRequest = error.config;
         
         // 401 - Token wygasł, spróbuj odświeżyć
-        // if (error.response?.status === 401 && !originalRequest._retry) {
-                if ((error.response?.status === 401 || error.response?.status === 500) && !originalRequest._retry) {
+        if (error.response?.status === 401 && !originalRequest._retry) {
+                // if ((error.response?.status === 401 || error.response?.status === 500) && !originalRequest._retry) {
 
             originalRequest._retry = true;
             try {
@@ -39,34 +39,33 @@ instance.interceptors.response.use(
                 console.error("Refresh token failed:", refreshError);
                 setAuthToken(null);
                 setRefreshToken(null);
-                showToast.error("Sesja wygasła. Zaloguj się ponownie.");
+                // showToast.error("Sesja wygasła. Zaloguj się ponownie.");
                 window.location.href = "/login";
                 return Promise.reject(refreshError);
             }
         }
         
         // 403 - Brak uprawnień (nie próbuj odświeżać tokenu)
-        // if (error.response?.status === 403) {
-        //     console.error("Access forbidden - insufficient permissions");
-        //     showToast.error("Brak uprawnień do wykonania tej operacji.");
+        if (error.response?.status === 403) {
+            console.error("Access forbidden - insufficient permissions");
+            showToast.error("Brak uprawnień do wykonania tej operacji.");
             
-        //     // Sprawdź czy użytkownik jest w ogóle zalogowany
-        //     const token = getAuthToken();
-        //     if (!token) {
-        //         setAuthToken(null);
-        //         setRefreshToken(null);
-        //         window.location.href = "/login";
-        //     }
+            const token = getAuthToken();
+            if (!token) {
+                setAuthToken(null);
+                setRefreshToken(null);
+                window.location.href = "/login";
+            }
             
-        //     return Promise.reject(error);
-        // }
+            return Promise.reject(error);
+        }
         
-        // // 500 - Błąd serwera (usuń z odświeżania tokenów)
-        // if (error.response?.status === 500) {
-        //     console.error("Server error:", error.response.data);
-        //     showToast.error("Błąd serwera. Spróbuj ponownie później.");
-        //     return Promise.reject(error);
-        // }
+        // 500 - Błąd serwera (usuń z odświeżania tokenów)
+        if (error.response?.status === 500) {
+            console.error("Server error:", error.response.data);
+            showToast.error("Błąd serwera. Spróbuj ponownie później.");
+            return Promise.reject(error);
+        }
         
         // Inne błędy
         return Promise.reject(error);

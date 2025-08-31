@@ -180,7 +180,7 @@ function Components() {
 };
 const translateCategory = (category: string): string => {
   switch (category.toLowerCase()) {
-    case 'graphicsCard':
+    case 'graphicscard':
       return 'Karty graficzne';
     case 'processor':
       return 'Procesory';
@@ -192,19 +192,25 @@ const translateCategory = (category: string): string => {
       return 'Dyski';
     case 'motherboard':
       return 'Płyty główne';
-    case 'powerSupply':
+    case 'powersupply':
       return 'Zasilacze';
     case 'cooler':
       return 'Chłodzenie';
-    case 'casePc':
+    case 'casepc':
       return 'Obudowy';
     default:
       return category;
         }
 };
+const getCategoryCount = (category: string): number => {
+  if (!category) return components.length;
+  return components.filter(component => 
+    component.componentType?.toLowerCase() === category.toLowerCase()
+  ).length;
+};
     return (
         <div className="min-h-screen bg-gray-50">
-          {/* Toast Container - POTRZEBNY dla wyświetlania toastów! */}
+          {/* Toast Container */}
           <ToastContainer />
           
           {/* Side Panel */}
@@ -215,7 +221,7 @@ const translateCategory = (category: string): string => {
             <div className="max-w-7xl mx-auto">
               <h1 className="text-3xl font-bold text-gray-900 mb-4">Komponenty komputerowe</h1>
               
-              {/* Search bar podobny do Allegro */}
+              {/* Search bar */}
               <div className="flex gap-4 items-center">
                 <div className="flex-1 max-w-2xl">
                   <div className="relative">
@@ -244,8 +250,8 @@ const translateCategory = (category: string): string => {
                   className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                 >
                   <option value="">Domyślne sortowanie</option>
-                  <option value="oldest">Od najstarszych</option>
-                  <option value="newest">Najnowsze</option>
+                  {/* <option value="oldest">Od najstarszych</option>
+                  <option value="newest">Najnowsze</option> */}
                   <option value="cheapest">Najtańsze</option>
                   <option value="expensive">Najdroższe</option>
                 </select>
@@ -273,7 +279,7 @@ const translateCategory = (category: string): string => {
                     <option value="">Wszystkie kategorie</option>
                     {categories.map(category => (
                       <option key={category} value={category}>
-                        {translateCategory(category)}
+                        {translateCategory(category)} ({getCategoryCount(category)})
                       </option>
                     ))}
                   </select>

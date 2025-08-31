@@ -3,9 +3,9 @@ import {setAuthToken, setRefreshToken} from "../../components/Auth.tsx";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
 import {jwtDecode} from "jwt-decode";
 import { useAtom } from 'jotai';
-import { loginUserAtom } from '../../atomContext/userAtom';
-import { migrateGuestDataAtom } from '../../atomContext/computer';
-import { retriveComputersFromDbAtom } from "../../atomContext/computer";
+import { loginUserAtom } from '../../atomContext/userAtom.tsx';
+import { migrateGuestDataAtom } from '../../atomContext/computer.tsx';
+import { retriveComputersFromDbAtom } from "../../atomContext/computer.tsx";
 
 function Login() {
     const navigate: NavigateFunction = useNavigate();
@@ -36,15 +36,7 @@ function Login() {
             console.log(data);
             if (data !== null) {
                 setRefreshToken(data["refreshToken"]);
-                
-                // Use Jotai atom to set user
                 loginUser(data["accessToken"]);
-                
-                // Migrate guest data to user account
-                // migrateGuestData();
-
-                // retriveComputersFromDb();
-
                 navigate("/")
 
             }

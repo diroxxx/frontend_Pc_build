@@ -1,9 +1,9 @@
-import Login from "./pages/auth/login.tsx";
+import Login from "./pages/UserAuth/login.tsx";
 import MainPage from "./pages/mainPage/MainPage.tsx";
 import {RoleProtectedRoute} from "./components/RoleProtectedRoute.tsx";
 import {Routes, Route } from "react-router-dom";
 import Unauthorized from "./pages/Unauthorized.tsx";
-import Register from "./pages/auth/Register.tsx";
+import Register from "./pages/UserAuth/Register.tsx";
 import Layout from "./pageComponents/Layout.tsx";
 import Components from "./pages/componentsPage/Components.tsx";
 import UserPage from "./UserInfoPage/UserPage";

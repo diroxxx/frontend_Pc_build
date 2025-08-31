@@ -3,7 +3,7 @@ import { atomWithStorage } from 'jotai/utils';
 import { jwtDecode } from 'jwt-decode';
 import { getAuthToken, setAuthToken, setRefreshToken } from '../components/Auth';
 
-import { saveComputerToDbAtom, listOfComputers, retriveComputersFromDbAtom } from './computer';
+import { saveComputerToDbAtom, listOfComputers, retriveComputersFromDbAtom, migrateGuestDataAtom } from './computer';
 
 export interface User {
   email: string;
@@ -37,7 +37,7 @@ export const loginUserAtom = atom(
       
       setAuthToken(token);
       set(userAtom, user);
-      // set(migrateGuestDataAtom); // Removed or comment out to fix the error
+      set(migrateGuestDataAtom);
 
       try {
         await set(retriveComputersFromDbAtom);
@@ -55,9 +55,6 @@ export const loginUserAtom = atom(
 export const logoutUserAtom = atom(
   null,
   async (get, set) => {
-    console.log('=== LOGOUT START ===');
-    console.log('Token before logout:', getAuthToken());
-    
     const user = get(userAtom);
     if (user) {
       try {
@@ -86,3 +83,43 @@ export const canSaveComputersAtom = atom<boolean>((get) => {
   const user = get(userAtom);
   return user !== null; 
 });
+
+
+
+export const loginAdminAtom = atom(
+  null,
+  async (get, set, token: string) => {
+    try {
+      const decoded = jwtDecode<CustomJwtPayload>(token);
+      
+      if (decoded.role !== 'ADMIN') {
+        throw new Error('Brak uprawnień administratora');
+      }
+      
+      const user: User = {
+        email: decoded.sub,
+        role: decoded.role,
+        nickname: decoded.username
+      };
+      
+      setAuthToken(token);
+      set(userAtom, user);
+            
+    } catch (error) {
+      console.error('Błąd logowania administratora:', error);
+      throw new Error('Nieprawidłowy token administratora');
+    }
+  }
+);
+
+export const logoutAdminAtom = atom(
+  null,
+  async (get, set) => {
+
+    setAuthToken(null);
+    setRefreshToken(null);
+    set(userAtom, null);
+        
+    console.log('Administrator wylogowany');
+  }
+);
