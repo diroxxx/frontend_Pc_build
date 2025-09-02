@@ -68,6 +68,26 @@ function Components() {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
+    const [showScrollTop, setShowScrollTop] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollTop = window.scrollY;
+            // Pokazuj przycisk po przescrollowaniu 300px
+            setShowScrollTop(scrollTop > 300);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
+
+
     // ALL useEffect hooks MUST be here, before any conditional returns
     useEffect(() => {
         // Only fetch if components are empty to avoid refetching
@@ -410,6 +430,32 @@ const getCategoryCount = (category: string): number => {
                 <div className="text-center py-12">
                   <div className="text-gray-500 text-lg">Nie znaleziono komponentów spełniających kryteria wyszukiwania</div>
                 </div>
+              )}
+
+
+              {/* Scroll to Top Button */}
+              {showScrollTop && (
+                <button
+                  onClick={scrollToTop}
+                  className="fixed bottom-6 right-6 z-40 bg-gradient-ocean hover:bg-gradient-ocean-hover text-white p-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 hover:shadow-xl"
+                  title="Powrót na górę"
+                >
+                  <svg 
+                    width="24" 
+                    height="24" 
+                    fill="none" 
+                    viewBox="0 0 24 24"
+                    className="transform transition-transform duration-200"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 19V5m-7 7l7-7 7 7"
+                    />
+                  </svg>
+                </button>
               )}
               
               {/* Pagination */}

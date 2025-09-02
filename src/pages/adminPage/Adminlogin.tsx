@@ -48,9 +48,9 @@ const AdminLogin = () => {
     return (
         <div className="min-h-screen bg-gray-100 font-sans">
             {/* Header w stylu forum */}
-            <div className="bg-slate-800 text-white py-12 mb-8">
+            <div className="bg-ocean-dark-blue text-white py-12 mb-8">
                 <div className="container mx-auto px-4">
-                    <h1 className="text-4xl md:text-5xl font-bold text-center">
+                    <h1 className="text-text-ocean-white text-4xl md:text-5xl font-bold text-center">
                         PANEL ADMINISTRATORA
                     </h1>
                     <p className="text-center text-gray-300 mt-3 text-lg">
@@ -96,7 +96,7 @@ const AdminLogin = () => {
                         
                         <button 
                             type="submit"
-                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 shadow-sm"
+                            className="w-full bg-ocean-blue hover:bg-ocean-dark-blue text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 shadow-sm"
                         >
                             Zaloguj jako Administrator
                         </button>
@@ -105,31 +105,13 @@ const AdminLogin = () => {
                     <div className="text-center mt-6 pt-6 border-t border-gray-200">
                         <a 
                             href="/login" 
-                            className="text-sm text-gray-600 hover:text-indigo-600 transition-colors duration-200"
+                            className="text-sm text-gray-600 hover:text-ocean-blue transition-colors duration-200"
                         >
                             ← Powrót do logowania użytkownika
                         </a>
                     </div>
                 </div>
             </div>
-
-            {/* <div className="max-w-4xl mx-auto px-6 py-12">
-                <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8 text-center">
-                    <div className="flex items-center justify-center mb-6">
-                        <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center">
-                            <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                            </svg>
-                        </div>
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                        Bezpieczne zarządzanie portalem
-                    </h2>
-                    <p className="text-gray-600 max-w-2xl mx-auto">
-                        Panel administratora umożliwia zarządzanie użytkownikami, komponentami i wszystkimi aspektami portalu PC-Build w bezpiecznym środowisku.
-                    </p>
-                </div>
-            </div> */}
         </div>
     );
 };

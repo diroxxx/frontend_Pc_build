@@ -2,7 +2,7 @@ import {Navigate} from "react-router-dom";
 import type {JSX} from "react";
 import {getAuthToken} from "./Auth.tsx";
 import {jwtDecode} from "jwt-decode";
-import type {CustomJwtPayload} from "./CustomJwtPayload.tsx";
+import type {CustomJwtPayload} from "../atomContext/userAtom.tsx";
 
 export const RoleProtectedRoute = ({
                                        children,
@@ -12,7 +12,12 @@ export const RoleProtectedRoute = ({
     role: string;
 }) => {
     const token = getAuthToken();
-    if (!token) return <Navigate to="/login" replace />;
+    if (!token) {
+        if(location.pathname.startsWith("/admin")){
+            return <Navigate to="/admin/login" replace />;
+        }
+        return <Navigate to="/login" replace />;
+    }
 
     try {
         const decoded = jwtDecode<CustomJwtPayload>(token);

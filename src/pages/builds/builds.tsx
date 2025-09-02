@@ -178,247 +178,248 @@ function Builds() {
 
 
 
-    return (
-        <div className="max-w-7xl mx-auto p-5 bg-gray-50 min-h-screen">            
-            <ToastContainer />
+return (
+    <div className="max-w-7xl mx-auto p-5  min-h-screen">            
+        <ToastContainer />
 
-            
-            <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-800 mb-4">Konfigurator PC</h1>
-                <p className="text-gray-600">Stwórz swój wymarzony zestaw komputerowy</p>
+        {/* Header */}
+        <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-midnight-dark mb-4">Konfigurator PC</h1>
+            <p className="text-text-midnight-dark">Stwórz swój wymarzony zestaw komputerowy</p>
+        </div>
+
+        {/* Build Selection */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6 border border-ocean-light-blue">
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold text-midnight-dark">Twoje zestawy</h2>
+                <button
+                    onClick={handleCreateNewBuild}
+                    className="bg-gradient-ocean hover:bg-gradient-ocean-hover text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+                >
+                    + Nowy zestaw
+                </button>
             </div>
 
-            {/* Build Selection */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-gray-800">Twoje zestawy</h2>
-                    <button
-                        onClick={handleCreateNewBuild}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                    >
-                        + Nowy zestaw
-                    </button>
+            {computers.length === 0 ? (
+                <div className="text-center py-8 text-ocean-blue">
+                    <p>Brak zestawów. Utwórz swój pierwszy zestaw!</p>
                 </div>
+            ) : (
+                <div className="grid gap-3 max-h-48 overflow-y-auto">
+                    {computers.map((computer, index) => (
+                        <div
+                            key={index}
+                            onClick={() => handleSelectBuild(index)}
+                            className={`p-3 rounded-lg border cursor-pointer transition-all duration-200 ${
+                                selectedComputerIndex === index
+                                    ? 'border-ocean-blue bg-ocean-light-blue bg-opacity-20 shadow-md'
+                                    : 'border-ocean-light-blue hover:border-ocean-blue hover:bg-ocean-light-blue hover:bg-opacity-10'
+                            }`}
+                        >
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h3 className="font-medium text-midnight-dark">{computer.name}</h3>
+                                    <p className="text-sm text-ocean-blue">
+                                        {(computer.components || []).length} komponentów • {computer.price.toLocaleString('pl-PL')} zł
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            deleteComputer(index);
+                                        }}
+                                        className="text-ocean-red hover:text-red-600 p-1 transition-colors duration-200"
+                                        title="Usuń zestaw"
+                                    >
+                                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+                                            <path
+                                                stroke="currentColor"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M6 18L18 6M6 6l12 12"
+                                            />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
 
-                {computers.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                        <p>Brak zestawów. Utwórz swój pierwszy zestaw!</p>
-                    </div>
-                ) : (
-                    <div className="grid gap-3 max-h-48 overflow-y-auto">
-                        {computers.map((computer, index) => (
+        {/* Component Configuration */}
+        <div className="bg-white rounded-lg shadow-md overflow-hidden border border-ocean-light-blue">
+            <div className="bg-gradient-ocean-dark text-white p-4">
+                <h2 className="text-xl font-bold">
+                    {selectedComputer ? selectedComputer.name : 'Wybierz lub utwórz zestaw'}
+                </h2>
+                {selectedComputer && (
+                    <p className="text-ocean-light-blue text-sm">
+                        Łączna cena: {selectedComputer.price.toLocaleString('pl-PL')} zł
+                    </p>
+                )}
+            </div>
+
+            {/* Compatibility Issues Section */}
+            {selectedComputer && compatibilityIssues.length > 0 && (
+                <div className="bg-red-50 border-b border-red-200 p-4">
+                    <h3 className="text-sm font-medium text-ocean-red mb-2 flex items-center">
+                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="mr-1 text-ocean-red">
+                            <path
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                            />
+                        </svg>
+                        Problemy z kompatybilnością ({compatibilityIssues.length})
+                    </h3>
+                    
+                    <div className="space-y-2">
+                        {compatibilityIssues.map((issue, index) => (
                             <div
                                 key={index}
-                                onClick={() => handleSelectBuild(index)}
-                                className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                                    selectedComputerIndex === index
-                                        ? 'border-blue-500 bg-blue-50'
-                                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                className={`p-3 rounded-lg border ${
+                                    issue.type === 'error'
+                                        ? 'bg-red-100 text-ocean-red border-red-300'
+                                        : 'bg-yellow-100 text-yellow-800 border-yellow-300'
                                 }`}
                             >
-                                <div className="flex justify-between items-center">
-                                    <div>
-                                        <h3 className="font-medium text-gray-900">{computer.name}</h3>
-                                        <p className="text-sm text-gray-500">
-                                        {(computer.components || []).length} komponentów • {computer.price.toLocaleString('pl-PL')} zł
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                deleteComputer(index);
-                                            }}
-                                            className="text-red-400 hover:text-red-600 p-1"
-                                            title="Usuń zestaw"
-                                        >
-                                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                                                <path
-                                                    stroke="currentColor"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M6 18L18 6M6 6l12 12"
-                                                />
-                                            </svg>
-                                        </button>
-                                    </div>
+                                <div className="flex items-start gap-2">
+                                    {issue.type === 'error' ? (
+                                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5 text-ocean-red">
+                                            <path
+                                                stroke="currentColor"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M6 18L18 6M6 6l12 12"
+                                            />
+                                        </svg>
+                                    ) : (
+                                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5 text-yellow-600">
+                                            <path
+                                                stroke="currentColor"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                            />
+                                        </svg>
+                                    )}
+                                    <span className="text-sm">{issue.message}</span>
                                 </div>
                             </div>
                         ))}
                     </div>
-                )}
+                </div>
+            )}
+
+            <div className="grid grid-cols-4 bg-gradient-gray border-b border-ocean-light-blue font-bold p-4 text-midnight-dark">
+                <div>Komponent</div>
+                <div>Nazwa</div>
+                <div>Cena</div>
+                <div>Akcje</div>
             </div>
 
-            {/* Component Configuration */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4">
-                    <h2 className="text-xl font-bold">
-                        {selectedComputer ? selectedComputer.name : 'Wybierz lub utwórz zestaw'}
-                    </h2>
-                    {selectedComputer && (
-                        <p className="text-blue-100 text-sm">
-                            Łączna cena: {selectedComputer.price.toLocaleString('pl-PL')} zł
-                        </p>
-                    )}
-                </div>
-
-                {/* Compatibility Issues Section */}
-                {selectedComputer && compatibilityIssues.length > 0 && (
-                    <div className="bg-red-50 border-b border-red-200 p-4">
-                        <h3 className="text-sm font-medium text-red-800 mb-2 flex items-center">
-                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="mr-1 text-red-600">
-                                <path
-                                    stroke="currentColor"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                                />
-                            </svg>
-                            Problemy z kompatybilnością ({compatibilityIssues.length})
-                        </h3>
-                        
-                        <div className="space-y-2">
-                            {compatibilityIssues.map((issue, index) => (
-                                <div
-                                    key={index}
-                                    className={`p-3 rounded-lg border ${
-                                        issue.type === 'error'
-                                            ? 'bg-red-100 text-red-800 border-red-300'
-                                            : 'bg-yellow-100 text-yellow-800 border-yellow-300'
-                                    }`}
-                                >
-                                    <div className="flex items-start gap-2">
-                                        {issue.type === 'error' ? (
-                                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5 text-red-600">
-                                                <path
-                                                    stroke="currentColor"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M6 18L18 6M6 6l12 12"
-                                                />
-                                            </svg>
-                                        ) : (
-                                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5 text-yellow-600">
-                                                <path
-                                                    stroke="currentColor"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                                                />
-                                            </svg>
-                                        )}
-                                        <span className="text-sm">{issue.message}</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                <div className="grid grid-cols-4 bg-gray-100 border-b border-gray-200 font-bold p-4">
-                    <div>Komponent</div>
-                    <div>Nazwa</div>
-                    <div>Cena</div>
-                    <div>Akcje</div>
-                </div>
-
-                {componentCategories.map((category) => {
-                    const component = getComponentForCategory(category.key);
-                    
-                    return (
-                        <div key={category.key} className="grid grid-cols-4 border-b border-gray-200 p-4 items-center last:border-b-0 hover:bg-gray-50">
-                            <div className="flex items-center gap-3">
-                                <div>
-                                    <div className="font-medium text-gray-700">{category.label}</div>
-                                </div>
+            {componentCategories.map((category) => {
+                const component = getComponentForCategory(category.key);
+                
+                return (
+                    <div key={category.key} className="grid grid-cols-4 border-b border-ocean-light-blue p-4 items-center last:border-b-0 hover:bg-ocean-light-blue hover:bg-opacity-10 transition-colors duration-200">
+                        <div className="flex items-center gap-3">
+                            <div>
+                                <div className="font-medium text-midnight-dark">{category.label}</div>
                             </div>
-                            
-                            {component ? (
-                                <>
-                                    <div className="flex items-center gap-3">
-                                        {component.photo_url && (
-                                            <img 
-                                                src={component.photo_url} 
-                                                alt={`${component.brand} ${component.model}`}
-                                                className="w-12 h-12 object-contain rounded"
-                                                onError={(e) => {
-                                                    e.currentTarget.style.display = 'none';
-                                                }}
-                                            />
-                                        )}
-                                        <div>
-                                            <div className="font-medium text-gray-900">
-                                                {component.brand} {component.model}
-                                            </div>
-                                            <div className="text-xs text-gray-500">
-                                                {component.condition}
-                                            </div>
+                        </div>
+                        
+                        {component ? (
+                            <>
+                                <div className="flex items-center gap-3">
+                                    {component.photo_url && (
+                                        <img 
+                                            src={component.photo_url} 
+                                            alt={`${component.brand} ${component.model}`}
+                                            className="w-12 h-12 object-contain rounded border border-ocean-light-blue"
+                                            onError={(e) => {
+                                                e.currentTarget.style.display = 'none';
+                                            }}
+                                        />
+                                    )}
+                                    <div>
+                                        <div className="font-medium text-midnight-dark">
+                                            {component.brand} {component.model}
+                                        </div>
+                                        <div className="text-xs text-ocean-blue">
+                                            {component.condition}
                                         </div>
                                     </div>
-                                    <div className="font-semibold text-green-600">
-                                        {component.price.toLocaleString('pl-PL')} zł
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <button 
-                                            className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-sm font-medium transition-colors"
-                                            onClick={() => handleAddComponent(category.key)}
-                                            disabled={!selectedComputer}
-                                        >
-                                            Zmień
-                                        </button>
-                                        <button
-                                            onClick={() => removeComponentFromBuild(component.componentType)}
-                                            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium transition-colors"
-                                            disabled={!selectedComputer}
-                                        >
-                                            Usuń
-                                        </button>
-                                    </div>
-                                </>
-                            ) : (
-                                <>
-                                    <div className="text-gray-400 italic">Nie wybrano</div>
-                                    <div></div>
-                                    <div>
-                                        <button 
-                                            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md font-medium transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-                                            onClick={() => handleAddComponent(category.key)}
-                                            disabled={!selectedComputer}
-                                        >
-                                            + Dodaj
-                                        </button>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    );
-                })}
-
-                {/* Total Price Section */}
-                {selectedComputer && selectedComputer.components.length > 0 && (
-                    <div className="bg-gray-50 border-t-2 border-gray-300 p-4">
-                        <div className="flex justify-between items-center">
-                            <span className="text-lg font-medium text-gray-900">Łączna cena zestawu:</span>
-                            <span className="text-xl font-bold text-blue-600">
-                                {selectedComputer.price.toLocaleString('pl-PL')} zł
-                            </span>
-                        </div>
+                                </div>
+                                <div className="font-semibold text-ocean-blue">
+                                    {component.price.toLocaleString('pl-PL')} zł
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button 
+                                        className="bg-gradient-warning hover:bg-gradient-warning-hover text-white px-3 py-1 rounded text-sm font-medium transition-all duration-300 transform hover:scale-105"
+                                        onClick={() => handleAddComponent(category.key)}
+                                        disabled={!selectedComputer}
+                                    >
+                                        Zmień
+                                    </button>
+                                    <button
+                                        onClick={() => removeComponentFromBuild(component.componentType)}
+                                        className="bg-ocean-red hover:bg-red-600 text-white px-3 py-1 rounded text-sm font-medium transition-all duration-300 transform hover:scale-105"
+                                        disabled={!selectedComputer}
+                                    >
+                                        Usuń
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div className="text-ocean-blue italic">Nie wybrano</div>
+                                <div></div>
+                                <div>
+                                    <button 
+                                        className="bg-gradient-ocean hover:bg-gradient-ocean-hover text-white px-4 py-2 rounded-md font-medium transition-all duration-300 disabled:bg-ocean-light-blue disabled:cursor-not-allowed transform hover:scale-105"
+                                        onClick={() => handleAddComponent(category.key)}
+                                        disabled={!selectedComputer}
+                                    >
+                                        + Dodaj
+                                    </button>
+                                </div>
+                            </>
+                        )}
                     </div>
-                )}
-            </div>
+                );
+            })}
 
-            {!selectedComputer && (
-                <div className="mt-6 text-center p-8 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="text-yellow-800">
-                        Wybierz istniejący zestaw lub utwórz nowy, aby rozpocząć konfigurację
-                    </p>
+            {/* Total Price Section */}
+            {selectedComputer && selectedComputer.components.length > 0 && (
+                <div className="bg-gradient-gray border-t-2 border-ocean-blue p-4">
+                    <div className="flex justify-between items-center">
+                        <span className="text-lg font-medium text-midnight-dark">Łączna cena zestawu:</span>
+                        <span className="text-xl font-bold text-ocean-dark-blue">
+                            {selectedComputer.price.toLocaleString('pl-PL')} zł
+                        </span>
+                    </div>
                 </div>
             )}
         </div>
-    );
+
+        {!selectedComputer && (
+            <div className="mt-6 text-center p-8 bg-ocean-light-blue bg-opacity-20 border border-ocean-light-blue rounded-lg">
+                <p className="text-ocean-dark-blue">
+                    Wybierz istniejący zestaw lub utwórz nowy, aby rozpocząć konfigurację
+                </p>
+            </div>
+        )}
+
+        </div>
+);
 }
 export default Builds;

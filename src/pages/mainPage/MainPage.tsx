@@ -24,14 +24,14 @@ function mainPage() {
     ];
 
     return (
-        <div className="bg-gray-100 font-sans">
+        <div className="bg-gray-100">
 
             <SidePanelBuilds />
 
 
             <div className="flex justify-center gap-8 px-6 py-8">
                 <div
-                    className="flex flex-col items-center text-gray-800 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
+                    className="flex flex-col items-center  hover:text-ocean-blue transition-colors duration-200 cursor-pointer"
                     onClick={() => navigate("/components")}>
                     <div className="w-20 h-20">
                         <img
@@ -44,7 +44,7 @@ function mainPage() {
                 </div>
 
                 <div
-                    className="flex flex-col items-center text-gray-800 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
+                    className="flex flex-col items-center text-gray-800 hover:text-ocean-blue transition-colors duration-200 cursor-pointer"
                     onClick={() => navigate("/builds")}>
                     <div className="w-20 h-20">
                         <img
@@ -57,7 +57,7 @@ function mainPage() {
                 </div>
 
                 <div
-                    className="flex flex-col items-center text-gray-800 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
+                    className="flex flex-col items-center text-gray-800 hover:text-ocean-blue transition-colors duration-200 cursor-pointer"
                     onClick={() => navigate("/community")}>
                     <div className="w-20 h-20">
                         <img
@@ -70,7 +70,7 @@ function mainPage() {
                 </div>
 
                 <div
-                    className="flex flex-col items-center text-gray-800 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
+                    className="flex flex-col items-center text-gray-800 hover:text-ocean-blue transition-colors duration-200 cursor-pointer"
                     onClick={() => navigate("/check-games")}>
                     <div className="w-20 h-20">
                         <img
@@ -83,7 +83,7 @@ function mainPage() {
                 </div>
 
                 <div
-                    className="flex flex-col items-center text-gray-800 hover:text-indigo-600 transition-colors duration-200 cursor-pointer"
+                    className="flex flex-col items-center text-gray-800 hover:text-ocean-blue transition-colors duration-200 cursor-pointer"
                     onClick={() => navigate("/recommendations")}>
                     <div className="w-20 h-20">
                         <img
@@ -112,7 +112,7 @@ function mainPage() {
                         miejscu.
                     </p>
                     <button
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 py-3 rounded-full transition-colors duration-200">
+                        className="bg-ocean-blue hover:bg-ocean-dark-blue text-white font-semibold px-8 py-3 rounded-full transition-colors duration-200">
                         Sprawdź
                     </button>
                 </div>

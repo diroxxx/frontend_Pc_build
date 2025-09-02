@@ -57,7 +57,7 @@ export default function EdgeExpandButton() {
     setEditingName('');
   };
 
-  return (
+return (
     <div
       className="fixed right-0 top-1/2 -translate-y-1/2 z-50"
       onMouseEnter={() => setHovered(true)}
@@ -78,7 +78,7 @@ export default function EdgeExpandButton() {
         {/* Header button */}
         <button
           onClick={handleCreateNewComputer}
-          className="h-14 w-full flex items-center text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
+          className="h-14 w-full flex items-center text-white bg-gradient-ocean hover:bg-gradient-ocean-hover cursor-pointer"
           style={{
             borderRadius: hovered ? '12px 0 0 0' : '28px 0 0 28px',
             transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -130,7 +130,7 @@ export default function EdgeExpandButton() {
           <div className="p-4">
             {/* Computer selection */}
             <div className="mb-4">
-              <h3 className="text-sm font-medium text-gray-900 mb-2">
+              <h3 className="text-sm font-medium text-midnight-dark mb-2">
                 Wybierz komputer ({computers.length})
               </h3>
               
@@ -144,7 +144,7 @@ export default function EdgeExpandButton() {
                       onClick={() => handleSelectComputer(index)}
                       className={`flex items-center justify-between p-2 rounded cursor-pointer transition-colors ${
                         selectedComputerIndex === index
-                          ? 'bg-blue-100 border border-blue-300'
+                          ? 'bg-blue-50 border border-blue-200'
                           : 'bg-gray-50 hover:bg-gray-100'
                       }`}
                     >
@@ -159,12 +159,12 @@ export default function EdgeExpandButton() {
                               if (e.key === 'Enter') handleSaveRename();
                               if (e.key === 'Escape') handleCancelRename();
                             }}
-                            className="text-xs font-medium bg-white border border-gray-300 rounded px-1 py-0.5 w-full"
+                            className="text-xs font-medium bg-white border border-gray-300 rounded px-1 py-0.5 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                             autoFocus
                             onClick={(e) => e.stopPropagation()}
                           />
                         ) : (
-                          <p className="text-xs font-medium text-gray-900 truncate">
+                          <p className="text-xs font-medium text-midnight-dark truncate">
                             {computer.name}
                           </p>
                         )}
@@ -176,7 +176,7 @@ export default function EdgeExpandButton() {
                       <div className="flex items-center space-x-1 ml-2">
                         <button
                           onClick={(e) => handleStartRename(computer, index, e)}
-                          className="text-gray-400 hover:text-gray-600 p-1"
+                          className="text-gray-400 hover:text-gray-600 p-1 transition-colors duration-200"
                           title="Zmień nazwę"
                         >
                           <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
@@ -191,7 +191,7 @@ export default function EdgeExpandButton() {
                         </button>
                         <button
                           onClick={(e) => handleDeleteComputer(index, e)}
-                          className="text-red-400 hover:text-red-600 p-1"
+                          className="text-red-400 hover:text-red-600 p-1 transition-colors duration-200"
                           title="Usuń komputer"
                         >
                           <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
@@ -213,8 +213,8 @@ export default function EdgeExpandButton() {
 
             {/* Compatibility Issues Section */}
             {selectedComputer && compatibilityIssues.length > 0 && (
-              <div className="mb-4 border-t pt-4">
-                <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
+              <div className="mb-4 border-t border-gray-200 pt-4">
+                <h3 className="text-sm font-medium text-midnight-dark mb-2 flex items-center">
                   <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="mr-1 text-red-500">
                     <path
                       stroke="currentColor"
@@ -233,13 +233,13 @@ export default function EdgeExpandButton() {
                       key={index}
                       className={`p-2 rounded text-xs border ${
                         issue.type === 'error'
-                          ? 'bg-red-50 text-red-800 border-red-200'
+                          ? 'bg-red-50 text-red-700 border-red-200'
                           : 'bg-yellow-50 text-yellow-800 border-yellow-200'
                       }`}
                     >
                       <div className="flex items-start gap-1">
                         {issue.type === 'error' ? (
-                          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5 text-red-600">
+                          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5 text-red-500">
                             <path
                               stroke="currentColor"
                               strokeLinecap="round"
@@ -269,8 +269,8 @@ export default function EdgeExpandButton() {
 
             {/* Selected computer details */}
             {selectedComputer && selectedComputer.components.length > 0 && (
-              <div className="border-t pt-4">
-                <h3 className="text-sm font-medium text-gray-900 mb-2">
+              <div className="border-t border-gray-200 pt-4">
+                <h3 className="text-sm font-medium text-midnight-dark mb-2">
                   {selectedComputer.name} - Komponenty
                 </h3>
                 
@@ -281,7 +281,7 @@ export default function EdgeExpandButton() {
                       className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 transition-colors duration-200"
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-gray-900 truncate">
+                        <p className="text-xs font-medium text-midnight-dark truncate">
                           {component.brand} {component.model}
                         </p>
                         <p className="text-xs text-gray-500">
@@ -290,7 +290,7 @@ export default function EdgeExpandButton() {
                       </div>
                       <button
                         onClick={() => removeComponentFromBuild(component.componentType)}
-                        className="ml-2 text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors duration-200"
+                        className="ml-2 text-red-400 hover:text-red-600 p-1 rounded hover:bg-red-50 transition-colors duration-200"
                       >
                         <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
                           <path
@@ -308,8 +308,8 @@ export default function EdgeExpandButton() {
                 
                 <div className="mt-2 pt-2 border-t border-gray-200">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium text-gray-900">Łącznie:</span>
-                    <span className="text-xs font-bold text-blue-600">
+                    <span className="text-xs font-medium text-midnight-dark">Łącznie:</span>
+                    <span className="text-xs font-bold text-midnight-dark">
                       {selectedComputer.price.toLocaleString('pl-PL')}zł
                     </span>
                   </div>

@@ -1,23 +1,65 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Source+Code+Pro:wght@300;400;500;600&display=swap');
+
 @import "tailwindcss";
 
+
+/* dla tailwind */
+@theme {
+  --color-ocean-red: #e63946;
+  --color-ocean-light-blue: #A8DADC;
+  --color-ocean-blue: #457B9D;
+  --color-ocean-dark-blue: #1D3557;
+  --color-ocean-white: #F1FAEE;
+
+  --color-midnight-dark: #30343f;
+  
+  /* text color */
+  --color-text-ocean-red: #e63946;
+  --color-text-ocean-blue: #457B9D;
+  --color-text-ocean-white: #F1FAEE;
+    --color-text-midnight-dark: #30343f;
+
+      /* gradient */
+  --color-blue-light: #9bafd9;
+  --color-blue-dark: #103783;
+  --background-image-gradient-blue-horizontal: linear-gradient(90deg, #9bafd9 0%, #103783 100%);
+  --background-image-gradient-blue-vertical: linear-gradient(180deg, #9bafd9 0%, #103783 100%);
+  --background-image-gradient-gray: linear-gradient(90deg, hsla(186, 33%, 94%, 1) 0%, hsla(216, 41%, 79%, 1) 100%);
+
+  /* gradient hover */
+  --background-image-gradient-blue-horizontal-hover: linear-gradient(90deg, #8ca3d1 0%, #0e2f6b 100%);
+  
+  --background-image-gradient-warning: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+  --background-image-gradient-warning-hover: linear-gradient(90deg, #f7a925 0%, #dc7e1a 100%);
+
+  --background-image-gradient-ocean: linear-gradient(90deg, #A8DADC 0%, #457B9D 100%);
+  --background-image-gradient-ocean-hover: linear-gradient(90deg, #b5e1e4 0%, #5288ab 100%);
+  
+  --background-image-gradient-ocean-dark: linear-gradient(90deg, #457B9D 0%, #1D3557 100%);
+  --background-image-gradient-ocean-dark-hover: linear-gradient(90deg, #5288ab 0%, #2a4467 100%);
+
+
+}
+ /* css */
+ 
 body {
-  font-family: 'Inter', 'Segoe UI', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  /* font-family: 'Inter', 'Segoe UI', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif !important; */
+    /* font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important; */
+  /* font-family: 'Manrope', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important; */
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-  color: #1f2937; /* ciemniejszy tekst dla lepszej czytelności */
-}
-
-/* Font dla kodu - ważny w forum komputerowym */
-code, pre, .font-mono {
-  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace !important;
-  font-feature-settings: "liga" 1, "calt" 1; /* ligatures dla lepszego kodu */
+  color: #1f2937; 
 }
 
 /* Lepsze nagłówki */
-h1, h2, h3, h4, h5, h6 {
+h2, h3, h4, h5, h6 {
   font-weight: 600;
   line-height: 1.3;
   letter-spacing: -0.025em;

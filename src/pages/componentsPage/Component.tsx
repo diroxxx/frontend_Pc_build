@@ -43,7 +43,7 @@ function Component(props: ComponentDto) {
       case 'memory':
       case 'ram':
         if (props.ramCapacity) tags.push(`${props.ramCapacity}GB`);
-        if (props.ramSpeed) tags.push(props.ramSpeed);
+        if (props.ramSpeed) tags.push(`${props.ramSpeed}MHz`);
         if (props.ramType) tags.push(props.ramType);
         break;
       case 'storage':
@@ -82,14 +82,14 @@ function Component(props: ComponentDto) {
   const specTags = renderSpecTags();
 
   return (
-    <div className="bg-white border rounded-lg p-4 shadow-sm transition-shadow duration-200 mx-4 relative border-gray-200 hover:border-gray-300">
+    <div className="bg-gradient-gray border rounded-lg p-4 shadow-sm transition-all duration-300 mx-4 relative border-ocean-light-blue hover:border-ocean-blue hover:shadow-md">
       <div className="flex gap-6 min-h-[120px]">
         {/* Product image on the left */}
         <div className="w-32 h-32 flex-shrink-0">
           <img 
             src={props.photo_url} 
             alt={`${props.brand} ${props.model}`}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain transition-transform duration-200 hover:scale-105"
             onError={(e) => {
               e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zNSA0MEg2NVY2MEgzNVY0MFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTQ1IDQ1SDU1VjUwSDQ1VjQ1WiIgZmlsbD0iIzZCNzI4MCIvPgo8L3N2Zz4K';
               e.currentTarget.style.backgroundColor = '#f3f4f6';
@@ -100,18 +100,19 @@ function Component(props: ComponentDto) {
           />
         </div>
 
+
         {/* Content area */}
         <div className="flex-1 flex flex-col justify-between">
           {/* Top section - condition, model, and shop logo in one line */}
           <div className="flex items-center justify-between gap-2 mb-3">
             <div className="flex items-center gap-2">
               {props.condition.toLowerCase() === 'defective' && (
-                <span className="bg-red-100 text-red-700 text-sm px-3 py-1 rounded-full font-medium">
+                <span className="bg-red-100 text-ocean-red text-sm px-3 py-1 rounded-full font-medium">
                   Uszkodzony
                 </span>
               )}
               {props.condition.toLowerCase() === 'used' && (
-                <span className="bg-yellow-100 text-yellow-700 text-sm px-3 py-1 rounded-full font-medium">
+                <span className="bg-orange-100 text-orange-700 text-sm px-3 py-1 rounded-full font-medium">
                   Używany
                 </span>
               )}
@@ -120,12 +121,12 @@ function Component(props: ComponentDto) {
                   Nowy
                 </span>
               )}
-              <h3 className="text-lg font-medium text-gray-900 leading-tight">
+              <h3 className="text-lg font-medium text-midnight-dark leading-tight">
                 <a
                 href={props.website_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-blue-600 hover:underline transition-colors duration-200 cursor-pointer"
+                className="text-midnight-dark hover:text-ocean-blue hover:underline transition-colors duration-200 cursor-pointer"
                 >
                 {props.brand} {props.model}
               </a>
@@ -138,33 +139,33 @@ function Component(props: ComponentDto) {
                 <img 
                   src="allegro.png" 
                   alt="Allegro" 
-                  className="w-12 h-12 object-contain" 
+                  className="w-12 h-12" 
                 />
               )}
               {props.shop === 'olx' && (
                 <img 
                   src="olx.png" 
                   alt="OLX" 
-                  className="w-12 h-12 object-contain" 
+                  className="w-12 h-12" 
                 />
               )}
               {props.shop === 'allegro_lokalnie' && (
                 <img 
                   src="Allegro-Lokalnie.png" 
                   alt="Allegro Lokalnie" 
-                  className="w-12 h-12 object-contain" 
+                  className="w-12 h-12" 
                 />
               )}
             </div>
           </div>
 
-          {/* Specification tags */}
+           {/* Specification tags */}
           {specTags.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {specTags.map((tag, index) => (
                 <span 
                   key={index}
-                  className="bg-indigo-100 text-indigo-700 text-sm px-3 py-1 rounded border font-medium"
+                  className="bg-ocean-light-blue bg-opacity-20 text-ocean-dark-blue text-sm px-3 py-1 rounded border border-ocean-light-blue font-medium hover:bg-ocean-light-blue hover:bg-opacity-30 transition-colors duration-200"
                 >
                   {tag}
                 </span>
@@ -172,9 +173,9 @@ function Component(props: ComponentDto) {
             </div>
           )}
 
-          {/* Bottom section - price and buttons */}
+           {/* Bottom section - price and buttons */}
           <div className="flex justify-between items-center">
-            <span className="text-3xl font-bold text-gray-900">
+            <span className="text-3xl font-bold text-midnight-dark">
               {new Intl.NumberFormat('pl-PL', {
                 style: 'currency',
                 currency: 'PLN',
@@ -184,18 +185,17 @@ function Component(props: ComponentDto) {
             </span>
             
             <div className="flex gap-2">
-              
-              
               <button
                 onClick={handleAddToBuild}
-                className={`px-4 py-2 rounded-lg transition-colors ${
+                className={`px-4 py-2 rounded-lg font-medium  ${
                   isInBuild
-                    ? 'bg-orange-600 text-white hover:bg-orange-700'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                    ? 'bg-gradient-warning text-white hover:bg-gradient-warning-hover shadow-lg hover:shadow-xl'
+                    : 'bg-gradient-blue-horizontal text-white hover:bg-gradient-blue-horizontal-hover'
                 }`}
               >
                 {isInBuild 
-                  ? `Zamień ${props.componentType}` 
+                  ? `Zamień` 
+                  // ? `Zamień ${props.componentType}` 
                   : `Dodaj do zestawu`
                 }
               </button>
@@ -203,7 +203,7 @@ function Component(props: ComponentDto) {
           </div>
           
           {isInBuild && existingComponent && (
-            <p className="text-xs text-orange-600 mt-1">
+            <p className="text-xs text-orange-600 mt-1 font-medium">
               Zastąpi: {existingComponent.brand} {existingComponent.model}
             </p>
           )}
