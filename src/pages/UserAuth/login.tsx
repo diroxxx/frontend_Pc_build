@@ -1,5 +1,5 @@
 import {use, useState} from "react";
-import {setAuthToken, setRefreshToken} from "../../components/Auth.tsx";
+import {setAuthToken} from "../../components/Auth.tsx";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
 import {jwtDecode} from "jwt-decode";
 import { useAtom } from 'jotai';
@@ -18,13 +18,14 @@ function Login() {
 
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        fetch("http://localhost:8080/auth/login", {
+        fetch("http://localhost:8080/auth/login",  {
             method: "POST",
             headers: {"content-type": "application/json"},
             body: JSON.stringify({
                 login: login,
                 password: password
-                })
+                }),
+            credentials: 'include' // Include cookies in the request
         }).then(response => {
             if (response.status == 200) {
                 return response.json();
@@ -35,7 +36,6 @@ function Login() {
         }).then(data => {
             console.log(data);
             if (data !== null) {
-                setRefreshToken(data["refreshToken"]);
                 loginUser(data["accessToken"]);
                 navigate("/")
 

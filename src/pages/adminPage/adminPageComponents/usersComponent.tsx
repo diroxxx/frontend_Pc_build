@@ -1,15 +1,11 @@
 
 import { useEffect, useState } from "react";
 import instance from "../../../components/instance";
-
-interface User {
-    name: string;
-    email: string;
-    role: number;
-}
+import { usersListAtom } from "../../../atomContext/adminAtom";
+import { useAtom } from "jotai";
 
 const UsersComponent = () => {
-    const[ getUsers, setUsers ] = useState<User[]>([]);
+    const [getUsers, setUsers] = useAtom(usersListAtom);
 
     function fetchAllUsers() {
         instance.get("admin/users")

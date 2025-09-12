@@ -89,7 +89,7 @@ function Component(props: ComponentDto) {
           <img 
             src={props.photo_url} 
             alt={`${props.brand} ${props.model}`}
-            className="w-full h-full object-contain transition-transform duration-200 hover:scale-105"
+            className="w-full h-full object-contain"
             onError={(e) => {
               e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zNSA0MEg2NVY2MEgzNVY0MFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTQ1IDQ1SDU1VjUwSDQ1VjQ1WiIgZmlsbD0iIzZCNzI4MCIvPgo8L3N2Zz4K';
               e.currentTarget.style.backgroundColor = '#f3f4f6';

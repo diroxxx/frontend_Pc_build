@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { jwtDecode } from 'jwt-decode';
-import { setAuthToken, setRefreshToken } from '../components/Auth';
+import { setAuthToken } from '../components/Auth';
 import { userAtom, type User, type CustomJwtPayload } from './userAtom';
 
 export interface AuthState {
@@ -43,7 +43,6 @@ export const loginAtom = atom(
         
         // Store tokens
         setAuthToken(responseData.accessToken);
-        setRefreshToken(responseData.refreshToken);
         
         // Decode and set user data
         const decoded: CustomJwtPayload = jwtDecode(responseData.accessToken);

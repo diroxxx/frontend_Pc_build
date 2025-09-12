@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {setAuthToken, setRefreshToken} from "../../components/Auth.tsx";
+import {setAuthToken} from "../../components/Auth.tsx";
 import { useAtom } from 'jotai';
 import { loginAdminAtom, loginUserAtom } from '../../atomContext/userAtom';
 
@@ -34,7 +34,6 @@ const AdminLogin = () => {
            }).then(data => {
                console.log(data);
                if (data !== null) {
-                   setRefreshToken(data["refreshToken"]);
                    loginAdmin(data["accessToken"]);
                    navigate("/admin/controlPanel");
 
