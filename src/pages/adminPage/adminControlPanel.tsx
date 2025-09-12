@@ -1,12 +1,13 @@
 import { use, useState } from "react";
 import UsersComponent from "./adminPageComponents/usersComponent";
 import { useNavigate } from "react-router-dom";
-import { setAuthToken, setRefreshToken } from "../../components/Auth";
+import { setAuthToken } from "../../components/Auth";
 import { userAtom } from "../../atomContext/userAtom";
 import { useAtom } from "jotai";
 import { showToast } from "../../components/ui/ToastProvider/ToastContainer";
 import OffersComponent from "./adminPageComponents/offersComponent";
 import PcPartsComponent from "./adminPageComponents/pcPartsComponent";
+import GeneralInfo from "./adminPageComponents/generalInfo";
 const AdminControlPanel = () => {
         const [activeTab, setActiveTab] = useState("components");
         const navigate = useNavigate();
@@ -15,9 +16,7 @@ const AdminControlPanel = () => {
          const handleLogout = () => {
         try {
             // Wyczyść tokeny
-            setAuthToken(null);
-            setRefreshToken(null);
-            
+            setAuthToken(null);            
             setUser(null);
             navigate("/admin/login");
         } catch (error) {
@@ -28,7 +27,7 @@ const AdminControlPanel = () => {
     return (
         <div className="min-h-screen bg-gray-100 font-sans">
             {/* Header w stylu głównej strony */}
-           <div className="bg-gradient-blue-horizontal text-white py-6 mb-6 relative">
+            <div className="bg-gradient-blue-horizontal text-white py-6 mb-6 relative">
                 <button
                     onClick={handleLogout}
                     className="absolute top-3 right-4 bg-ocean-red hover:bg-oceane-red text-white px-3 py-1.5 rounded-lg transition-colors duration-200 flex items-center gap-2 font-medium text-sm"
@@ -38,7 +37,6 @@ const AdminControlPanel = () => {
                     </svg>
                     Wyloguj
                 </button>
-                
                 <div className="container mx-auto px-4">
                     <h1 className="text-text-ocean-white  text-2xl md:text-3xl font-bold text-center">
                         PANEL ADMINISTRATORA
@@ -49,55 +47,65 @@ const AdminControlPanel = () => {
                 </div>
             </div>
 
-            <div className="max-w-6xl mx-auto px-6">
-                {/* Navigation tabs w stylu podobnym do głównej strony */}
-                <div className="flex justify-center mb-8">
-                    <div className="bg-ocean-white rounded-lg p-2 flex shadow-md border border-gray-200">
-                        <button
-                            onClick={() => setActiveTab("offers")}
-                            className={`px-8 py-3 rounded-lg transition-all duration-200 font-medium ${
-                                activeTab === "offers"
-                                    ? "bg-ocean-dark-blue text-ocean-white shadow-sm"
-                                    : "text-gray-600 hover:text-ocean-dark-blue "
-                            }`}
-                        >
-                            Oferty
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("components")}
-                            className={`px-8 py-3 rounded-lg transition-all duration-200 font-medium ${
-                                activeTab === "components"
-                                    ? "bg-ocean-dark-blue text-ocean-white shadow-sm"
-                                    : "text-gray-600 hover:text-ocean-dark-blue "
-                            }`}
-                        >
-                            Komponenty
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("users")}
-                            className={`px-8 py-3 rounded-lg transition-all duration-200 font-medium ${
-                                activeTab === "users"
-                                    ? "bg-ocean-dark-blue text-ocean-white shadow-sm"
-                                    : "text-gray-600 hover:text-ocean-dark-blue"
-                            }`}
-                        >
-                            Zarządzaj użytkownikami
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("games")}
-                            className={`px-8 py-3 rounded-lg transition-all duration-200 font-medium ${
-                                activeTab === "games"
-                                    ? "bg-ocean-dark-blue text--ocean-white shadow-sm"
-                                    : "text-gray-600 hover:text-ocean-dark-blue"
-                            }`}
-                        >
-                            Gry
-                        </button>
-                    </div>
+            {/* Layout: nawigacja po lewej, content po prawej, pełna wysokość */}
+            <div className="flex min-h-[600px]">
+                {/* Navigation tabs po lewej stronie, pełna wysokość */}
+                <div className="flex flex-col w-64 bg-ocean-white rounded-lg shadow-md border border-gray-200 h-full">
+                    <button
+                        onClick={() => setActiveTab("general")}
+                        className={`mb-2 px-6 py-3 rounded-lg transition-all duration-200 font-medium ${
+                            activeTab === "general"
+                                ? "bg-ocean-dark-blue text-ocean-white shadow-sm"
+                                : "text-gray-600 hover:text-ocean-dark-blue "
+                        }`}
+                    >
+                        Ogólne
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("offers")}
+                        className={`mb-2 px-6 py-3 rounded-lg transition-all duration-200 font-medium ${
+                            activeTab === "offers"
+                                ? "bg-ocean-dark-blue text-ocean-white shadow-sm"
+                                : "text-gray-600 hover:text-ocean-dark-blue "
+                        }`}
+                    >
+                        Oferty
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("components")}
+                        className={`mb-2 px-6 py-3 rounded-lg transition-all duration-200 font-medium ${
+                            activeTab === "components"
+                                ? "bg-ocean-dark-blue text-ocean-white shadow-sm"
+                                : "text-gray-600 hover:text-ocean-dark-blue "
+                        }`}
+                    >
+                        Komponenty
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("users")}
+                        className={`mb-2 px-6 py-3 rounded-lg transition-all duration-200 font-medium ${
+                            activeTab === "users"
+                                ? "bg-ocean-dark-blue text-ocean-white shadow-sm"
+                                : "text-gray-600 hover:text-ocean-dark-blue"
+                        }`}
+                    >
+                        Zarządzaj użytkownikami
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("games")}
+                        className={`mb-2 px-6 py-3 rounded-lg transition-all duration-200 font-medium ${
+                            activeTab === "games"
+                                ? "bg-ocean-dark-blue text-ocean-white shadow-sm"
+                                : "text-gray-600 hover:text-ocean-dark-blue"
+                        }`}
+                    >
+                        Gry
+                    </button>
                 </div>
 
                 {/* Content area */}
-                <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+                <div className="flex-1 p-6">
+                    {activeTab === "general" && <GeneralInfo />}
                     {activeTab === "users" && <UsersComponent />}
                     {activeTab === "components" && <PcPartsComponent />}
                     {activeTab === "offers" && <OffersComponent />}

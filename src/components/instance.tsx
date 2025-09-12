@@ -1,11 +1,12 @@
 import axios from "axios";
-import { getAuthToken, getRefreshToken, setRefreshToken, setAuthToken } from "./Auth";
+import { getAuthToken, setAuthToken } from "./Auth";
 
 import { showToast } from '../components/ui/ToastProvider/ToastContainer';
 
 const instance = axios.create({
     baseURL: "http://localhost:8080",
     headers: { "Content-Type": "application/json" },
+    withCredentials: true,
 });
 
 instance.interceptors.request.use((config) => {
@@ -27,10 +28,12 @@ instance.interceptors.response.use(
 
             originalRequest._retry = true;
             try {
-                const refreshToken = getRefreshToken();
+                // const refreshToken = getRefreshToken();
                 const response = await axios.post("http://localhost:8080/auth/refresh", {
-                    refreshToken: refreshToken,
-                });
+                    // refreshToken: refreshToken,
+                }
+            , {withCredentials: true}
+        );
                 const newAccessToken = response.data.accessToken;
                 setAuthToken(newAccessToken);
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
@@ -38,9 +41,9 @@ instance.interceptors.response.use(
             } catch (refreshError) {
                 console.error("Refresh token failed:", refreshError);
                 setAuthToken(null);
-                setRefreshToken(null);
+                // setRefreshToken(null);
                 // showToast.error("Sesja wygasła. Zaloguj się ponownie.");
-                window.location.href = "/login";
+                // window.location.href = "/login";
                 return Promise.reject(refreshError);
             }
         }
@@ -53,7 +56,6 @@ instance.interceptors.response.use(
             const token = getAuthToken();
             if (!token) {
                 setAuthToken(null);
-                setRefreshToken(null);
                 window.location.href = "/login";
             }
             

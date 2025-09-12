@@ -29,6 +29,9 @@
   --background-image-gradient-blue-vertical: linear-gradient(180deg, #9bafd9 0%, #103783 100%);
   --background-image-gradient-gray: linear-gradient(90deg, hsla(186, 33%, 94%, 1) 0%, hsla(216, 41%, 79%, 1) 100%);
 
+  --background-image-gradient-admin-info: linear-gradient(90deg,rgba(48, 52, 63, 1) 0%, rgba(59, 89, 111, 1) 63%, rgba(48, 52, 63, 1) 100%);
+  --background-image-gradient-admin-info-hover: linear-gradient(90deg, hsla(186, 33%, 90%, 1) 0%, hsla(216, 41%, 75%, 1) 100%);
+
   /* gradient hover */
   --background-image-gradient-blue-horizontal-hover: linear-gradient(90deg, #8ca3d1 0%, #0e2f6b 100%);
   

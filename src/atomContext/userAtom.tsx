@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { jwtDecode } from 'jwt-decode';
-import { getAuthToken, setAuthToken, setRefreshToken } from '../components/Auth';
+import { getAuthToken, setAuthToken} from '../components/Auth';
 
 import { saveComputerToDbAtom, listOfComputers, retriveComputersFromDbAtom, migrateGuestDataAtom } from './computer';
 
@@ -68,7 +68,6 @@ export const logoutUserAtom = atom(
     
     console.log('Clearing tokens...');
     setAuthToken(null);
-    setRefreshToken(null);
     set(userAtom, null);
 
     localStorage.removeItem('computers');
@@ -117,7 +116,6 @@ export const logoutAdminAtom = atom(
   async (get, set) => {
 
     setAuthToken(null);
-    setRefreshToken(null);
     set(userAtom, null);
         
     console.log('Administrator wylogowany');
