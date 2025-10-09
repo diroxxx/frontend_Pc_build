@@ -1,8 +1,8 @@
 import { useAtom } from 'jotai';
 import { addComponentToBuildAtom, currentBuildAtom } from '../../atomContext/computer';
-import type { ComponentDto } from '../../atomContext/offerAtom';
+import type { ComponentOffer } from '../../atomContext/offerAtom';
 
-function Component(props: ComponentDto) {
+function Component(props: ComponentOffer) {
   const [, addComponentToBuild] = useAtom(addComponentToBuildAtom);
   const [currentBuild] = useAtom(currentBuildAtom);
 
@@ -16,63 +16,50 @@ function Component(props: ComponentDto) {
   const renderSpecTags = () => {
     const tags = [];
     
-    const componentType = props.componentType?.toLowerCase().replace(/\s+/g, '_');
-    
-    switch (componentType) {
-      case 'graphics_card':
-      case 'graphicscard':
-        if (props.gpuMemorySize) tags.push(`${props.gpuMemorySize}GB`);
-        if (props.gpuGddr) tags.push(props.gpuGddr);
-        if (props.gpuPowerDraw) tags.push(`${props.gpuPowerDraw}W TDP`);
+    switch (props.componentType) {
+      case 'graphicsCard':
+        tags.push(`${props.memorySize}GB`);
+        tags.push(props.gddr);
+        tags.push(`${props.powerDraw}W TDP`);
         break;
-      case 'processor':
-      case 'cpu':
-        if (props.cpuCores) tags.push(`${props.cpuCores} rdzeni`);
-        if (props.cpuThreads) tags.push(`${props.cpuThreads} wątków`);
-        if (props.cpuBase_clock) {
-          const baseClockValue = props.cpuBase_clock;
-          // Check if it already contains GHz, if not add it
-          if (baseClockValue.includes('GHz') || baseClockValue.includes('MHz')) {
-            tags.push(baseClockValue);
-          } else {
-            tags.push(`${baseClockValue} GHz`);
-          }
-        }
-        if (props.cpuSocketType) tags.push(props.cpuSocketType);
+        
+       case 'processor':
+        tags.push(`${props.cores} rdzeni`);
+        tags.push(`${props.threads} wątków`);
+        tags.push(props.baseClock);
+        tags.push(props.socketType);
         break;
+        
       case 'memory':
-      case 'ram':
-        if (props.ramCapacity) tags.push(`${props.ramCapacity}GB`);
-        if (props.ramSpeed) tags.push(`${props.ramSpeed}MHz`);
-        if (props.ramType) tags.push(props.ramType);
+        tags.push(`${props.capacity}GB`);
+        tags.push(`${props.speed}MHz`);
+        tags.push(props.type);
         break;
+
       case 'storage':
-      case 'ssd':
-      case 'hdd':
-        if (props.storageCapacity) tags.push(`${props.storageCapacity}GB`);
+        tags.push(`${props.capacity}GB`);
         break;
-      case 'power_supply':
-      case 'powersupply':
-        if (props.powerSupplyMaxPowerWatt) tags.push(`${props.powerSupplyMaxPowerWatt}W`);
+        
+      case 'powerSupply':
+        tags.push(`${props.maxPowerWatt}W`);
         break;
+        
       case 'motherboard':
-        if (props.boardSocketType) tags.push(props.boardSocketType);
-        if (props.boardChipset) tags.push(props.boardChipset);
-        if (props.boardFormat) tags.push(props.boardFormat);
+        tags.push(props.socketType);
+        tags.push(props.chipset);
+        tags.push(props.format);
         break;
+        
       case 'cooler':
-        if (props.coolerSocketsType) tags.push(...props.coolerSocketsType);
+        tags.push(...props.coolerSocketsType);
         break;
-      case 'case_pc':
-      case 'casepc':
-        if (props.caseFormat) tags.push(props.caseFormat);
+        
+      case 'casePc':
+        tags.push(props.format);
         break;
+        
       default:
-        if (props.brand) tags.push(props.brand);
-        if (props.gpuMemorySize) tags.push(`${props.gpuMemorySize}GB`);
-        if (props.cpuCores) tags.push(`${props.cpuCores} rdzeni`);
-        if (props.ramCapacity) tags.push(`${props.ramCapacity}GB`);
-        if (props.storageCapacity) tags.push(`${props.storageCapacity}GB`);
+        // Fallback - shouldn't happen with typed offers
         break;
     }
     
@@ -87,7 +74,7 @@ function Component(props: ComponentDto) {
         {/* Product image on the left */}
         <div className="w-32 h-32 flex-shrink-0">
           <img 
-            src={props.photo_url} 
+            src={props.photoUrl} 
             alt={`${props.brand} ${props.model}`}
             className="w-full h-full object-contain"
             onError={(e) => {
@@ -99,7 +86,6 @@ function Component(props: ComponentDto) {
             }}
           />
         </div>
-
 
         {/* Content area */}
         <div className="flex-1 flex flex-col justify-between">
@@ -123,7 +109,7 @@ function Component(props: ComponentDto) {
               )}
               <h3 className="text-lg font-medium text-midnight-dark leading-tight">
                 <a
-                href={props.website_url}
+                href={props.websiteUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-midnight-dark hover:text-ocean-blue hover:underline transition-colors duration-200 cursor-pointer"
@@ -195,7 +181,6 @@ function Component(props: ComponentDto) {
               >
                 {isInBuild 
                   ? `Zamień` 
-                  // ? `Zamień ${props.componentType}` 
                   : `Dodaj do zestawu`
                 }
               </button>
