@@ -11,13 +11,13 @@ import {
   removeComponentFromBuildAtom,
   compatibilityIssuesAtom,
   type CompatibilityIssue
-} from '../../atomContext/computer';
-import { categoriesAtom, selectedCategoryAtom } from '../../atomContext/offerAtom';
-import type { ComponentDto } from '../../atomContext/offerAtom';
-import ToastContainer from '../../components/ui/ToastProvider/ToastContainer';
+} from '../../../atomContext/computer.tsx';
+import { categoriesAtom, selectedCategoryAtom } from '../../../atomContext/offerAtom.tsx';
+import type { ComponentDto } from '../../../atomContext/offerAtom.tsx';
+import ToastContainer from '../../../components/ui/ToastProvider/ToastContainer.tsx';
 
 
-import { retriveComputersFromDbAtom } from '../../atomContext/computer';
+import { retriveComputersFromDbAtom } from '../../../atomContext/computer.tsx';
 // Import compatibility checking functions (same as in UserComputers)
 const checkSocketCompatibility = (components: ComponentDto[]): CompatibilityIssue[] => {
   const issues: CompatibilityIssue[] = [];

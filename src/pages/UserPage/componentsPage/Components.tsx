@@ -1,8 +1,8 @@
-import instance from '../../components/instance.tsx';
+import instance from '../../../components/instance.tsx';
 import {useEffect, useState, useRef} from "react";
 import { useAtom } from 'jotai';
-import Component from './Component';
-import SidePanelBuilds from '../builds/SidePanelBuilds';
+import Component from './Component.tsx';
+import SidePanelBuilds from '../builds/SidePanelBuilds.tsx';
 import {
   type ComponentOffer,
   offersAtom,
@@ -20,15 +20,15 @@ import {
   categoriesAtom,
   shopsAtom,
   clearFiltersAtom
-} from '../../atomContext/offerAtom';
-import { currentBuildAtom } from '../../atomContext/computer';
-import { compatibilityIssuesAtom, clearCompatibilityIssuesAtom } from '../../atomContext/computer';
-import ToastContainer from '../../components/ui/ToastProvider/ToastContainer.tsx';
+} from '../../../atomContext/offerAtom.tsx';
+import { currentBuildAtom } from '../../../atomContext/computer.tsx';
+import { compatibilityIssuesAtom, clearCompatibilityIssuesAtom } from '../../../atomContext/computer.tsx';
+import ToastContainer from '../../../components/ui/ToastProvider/ToastContainer.tsx';
 import { useNavigate } from 'react-router-dom';
 
 const getOffers = async (): Promise<ComponentOffer[]> => {
     try {
-        const response = await instance.get("/components"); // zmienione z /components na /offers
+        const response = await instance.get("/components");
         const data: Record<string, ComponentOffer[]> = response.data;
         
         console.log('Response structure:', Object.keys(data));

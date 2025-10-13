@@ -9,7 +9,7 @@ import {
   renameComputerAtom,
   removeComponentFromBuildAtom,
   compatibilityIssuesAtom
-} from '../../atomContext/computer';
+} from '../../../atomContext/computer.tsx';
 
 export default function EdgeExpandButton() {
   const [hovered, setHovered] = useState(false);

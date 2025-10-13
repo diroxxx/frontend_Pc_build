@@ -1,11 +1,11 @@
 import {use, useState} from "react";
-import {setAuthToken} from "../../components/Auth.tsx";
+import {setAuthToken} from "../../../components/Auth.tsx";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
 import {jwtDecode} from "jwt-decode";
 import { useAtom } from 'jotai';
-import { loginUserAtom } from '../../atomContext/userAtom.tsx';
-import { migrateGuestDataAtom } from '../../atomContext/computer.tsx';
-import { retriveComputersFromDbAtom } from "../../atomContext/computer.tsx";
+import { loginUserAtom } from '../../../atomContext/userAtom.tsx';
+import { migrateGuestDataAtom } from '../../../atomContext/computer.tsx';
+import { retriveComputersFromDbAtom } from "../../../atomContext/computer.tsx";
 
 function Login() {
     const navigate: NavigateFunction = useNavigate();

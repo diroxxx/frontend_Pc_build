@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
-import { addComponentToBuildAtom, currentBuildAtom } from '../../atomContext/computer';
-import type { ComponentOffer } from '../../atomContext/offerAtom';
+import { addComponentToBuildAtom, currentBuildAtom } from '../../../atomContext/computer.tsx';
+import type { ComponentOffer } from '../../../atomContext/offerAtom.tsx';
 
 function Component(props: ComponentOffer) {
   const [, addComponentToBuild] = useAtom(addComponentToBuildAtom);

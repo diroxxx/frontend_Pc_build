@@ -1,13 +1,13 @@
 import { use, useState } from "react";
-import UsersComponent from "./adminPageComponents/usersComponent";
+import UsersComponent from "./adminComponentsPage/usersComponent";
 import { useNavigate } from "react-router-dom";
 import { setAuthToken } from "../../components/Auth";
 import { userAtom } from "../../atomContext/userAtom";
 import { useAtom } from "jotai";
 import { showToast } from "../../components/ui/ToastProvider/ToastContainer";
-import OffersComponent from "./adminPageComponents/offersComponent";
-import PcPartsComponent from "./adminPageComponents/pcPartsComponent";
-import GeneralInfo from "./adminPageComponents/generalInfo";
+import OffersComponent from "./adminComponentsPage/offersComponent/offersComponent";
+import PcPartsComponent from "./adminComponentsPage/pcPartsComponent";
+import GeneralInfo from "./adminComponentsPage/generalInfo";
 const AdminControlPanel = () => {
         const [activeTab, setActiveTab] = useState("components");
         const navigate = useNavigate();
