@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-
+import instance from "../components/instance.tsx";
 // ===============================
 // COMPONENT SPECIFICATION TYPES
 // ===============================
@@ -178,23 +178,64 @@ export const isCaseSpec = (component: ComponentSpec): component is CaseSpec =>
 // STATE ATOMS - COMPONENT SPECS
 // ===============================
 
-/**
- * Main atom storing component specifications
- * Used by admin panel for managing component database
- */
+
 export const componentSpecsAtom = atom<ComponentSpec[]>([]);
 
-/**
- * Loading state atom for component specifications
- * true - loading in progress, false - loading completed
- */
-export const componentSpecsLoadingAtom = atom<boolean>(false);
+export const componentsByTypeAtom = atom<Record<string, ComponentSpec[]>>({});
+
+export const componentsLoadedAtom = atom<boolean>(false);
+
+export const componentsLoadingAtom = atom<boolean>(false);
 
 /**
- * Error state atom for component specification loading
- * null - no errors, string - error message
+ * Write-only atom for fetching component specifications from the API
+ * Pass true as parameter to force refresh and bypass cache
  */
-export const componentSpecsErrorAtom = atom<string | null>(null);
+export const fetchComponentSpecsAtom = atom(
+    null,
+    async (get, set, forceRefresh: boolean = false) => {
+        const isLoaded = get(componentsLoadedAtom);
+        const isLoading = get(componentsLoadingAtom);
+
+        if (isLoaded && !forceRefresh) {
+            console.log('Components already loaded, skipping fetch');
+            return;
+        }
+
+        if (isLoading) {
+            // console.log('Already loading components, skipping duplicate fetch');
+            return;
+        }
+        try {
+            set(componentsLoadingAtom, true);
+
+            const response = await instance.get<Record<string, ComponentSpec[]>>('/components');
+
+            // console.log('Backend response:', response.data);
+
+            set(componentsByTypeAtom, response.data);
+
+            const flatComponents = Object.values(response.data).flat();
+
+            // console.log('Flat components:', flatComponents);
+            // console.log('Components count:', flatComponents.length);
+
+            set(componentSpecsAtom, flatComponents);
+            set(componentsLoadedAtom, true);
+        } catch (error) {
+            console.error('Failed to fetch component specifications:', error);
+            throw error;
+        } finally {
+            set(componentsLoadingAtom, false);
+        }
+    }
+);
+export const refreshComponentsAtom = atom(
+    null,
+    async (get, set) => {
+        await set(fetchComponentSpecsAtom, true); // forceRefresh = true
+    }
+);
 
 // ===============================
 // DERIVED ATOMS - COMPONENT DATA
@@ -230,12 +271,3 @@ export const componentCategoriesAtom = atom((get) => {
  *   ...
  * }
  */
-export const componentsByTypeAtom = atom((get) => {
-  const specs = get(componentSpecsAtom);
-  return specs.reduce((acc, spec) => {
-    const type = spec.componentType;
-    if (!acc[type]) acc[type] = [];
-    acc[type].push(spec);
-    return acc;
-  }, {} as Record<string, ComponentSpec[]>);
-});

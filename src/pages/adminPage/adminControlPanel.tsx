@@ -6,17 +6,17 @@ import { userAtom } from "../../atomContext/userAtom";
 import { useAtom } from "jotai";
 import { showToast } from "../../components/ui/ToastProvider/ToastContainer";
 import OffersComponent from "./adminComponentsPage/offersComponent/offersComponent";
-import PcPartsComponent from "./adminComponentsPage/pcPartsComponent";
 import GeneralInfo from "./adminComponentsPage/generalInfo";
+import Components from "./adminComponentsPage/ComponentsComponent/components.tsx";
+
 const AdminControlPanel = () => {
-        const [activeTab, setActiveTab] = useState("components");
+        const [activeTab, setActiveTab] = useState("general");
         const navigate = useNavigate();
         const [getUser,setUser] = useAtom(userAtom);
 
          const handleLogout = () => {
         try {
-            // Wyczyść tokeny
-            setAuthToken(null);            
+            setAuthToken(null);
             setUser(null);
             navigate("/admin/login");
         } catch (error) {
@@ -26,7 +26,6 @@ const AdminControlPanel = () => {
     };
     return (
         <div className="min-h-screen bg-gray-100 font-sans">
-            {/* Header w stylu głównej strony */}
             <div className="bg-gradient-blue-horizontal text-white py-6 mb-6 relative">
                 <button
                     onClick={handleLogout}
@@ -47,9 +46,7 @@ const AdminControlPanel = () => {
                 </div>
             </div>
 
-            {/* Layout: nawigacja po lewej, content po prawej, pełna wysokość */}
             <div className="flex min-h-[600px]">
-                {/* Navigation tabs po lewej stronie, pełna wysokość */}
                 <div className="flex flex-col w-64 bg-ocean-white rounded-lg shadow-md border border-gray-200 h-full">
                     <button
                         onClick={() => setActiveTab("general")}
@@ -103,11 +100,10 @@ const AdminControlPanel = () => {
                     </button>
                 </div>
 
-                {/* Content area */}
                 <div className="flex-1 p-6">
                     {activeTab === "general" && <GeneralInfo />}
                     {activeTab === "users" && <UsersComponent />}
-                    {activeTab === "components" && <PcPartsComponent />}
+                    {activeTab === "components" && <Components />}
                     {activeTab === "offers" && <OffersComponent />}
                 </div>
             </div>

@@ -41,7 +41,6 @@ instance.interceptors.response.use(
             } catch (refreshError) {
                 console.error("Refresh token failed:", refreshError);
                 setAuthToken(null);
-                // setRefreshToken(null);
                 // showToast.error("Sesja wygasła. Zaloguj się ponownie.");
                 // window.location.href = "/login";
                 return Promise.reject(refreshError);
@@ -62,10 +61,14 @@ instance.interceptors.response.use(
             return Promise.reject(error);
         }
         
-        // 500 - Błąd serwera (usuń z odświeżania tokenów)
         if (error.response?.status === 500) {
-            console.error("Server error:", error.response.data);
-            showToast.error("Błąd serwera. Spróbuj ponownie później.");
+            showToast.error(error.response.data.message || "Error occurred on the server. Please try again later.");
+            return Promise.reject(error);
+        }
+
+        if (error.response?.status === 400) {
+            const message = error.response.data.message || "Nieprawidłowe dane";
+            showToast.error(message);
             return Promise.reject(error);
         }
         

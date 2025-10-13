@@ -38,7 +38,7 @@ export const offerUpdatesAtom = atom<OfferUpdate[]>([]);
 export const fetchOfferUpdatesAtom = atom(
   null, // Initial value (read-only)
   async (get, set) => {
-    const response = await instance.get('/admin/offer-updates');
-    set(offerUpdatesAtom, response.data);
+    // const response = await instance.get('/admin/offer-updates');
+    // set(offerUpdatesAtom, response.data);
   }
 );

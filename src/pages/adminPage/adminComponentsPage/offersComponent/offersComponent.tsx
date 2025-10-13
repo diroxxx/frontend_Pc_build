@@ -4,7 +4,7 @@ import { useWebSocketStomp } from '../../../../hooks/webSocketHook';
 import { useAtom } from 'jotai';
 import { fetchShopsAtom, shopsAtom } from '../../../../atomContext/shopAtom';
 import { fetchOfferUpdatesAtom, fetchOfferUpdateConfigAtom, type OfferUpdate, offerUpdateConfigAtom, offerUpdatesAtom, type OfferUpdateType } from '../../../../atomContext/adminAtom';
-
+import {showToast} from "../../../../components/ui/ToastProvider/ToastContainer.tsx";
 
 // Shop Selector Component
 interface ShopSelectorProps {
@@ -72,6 +72,29 @@ const OffersComponent = () => {
         fetchOfferUpdateConfig();
     }, [fetchShops, fetchOfferUpdateConfig]);
 
+
+    const saveOfferUpdateConfig = async () => {
+        try{
+            if (!offerUpdateConfig) {
+                showToast.error('No Configuration Found');
+            }
+            const configToSave = {
+                ...offerUpdateConfig,
+                intervalInMinutes: offerUpdateConfig?.type === 'MANUAL'
+                    ? null
+                    : offerUpdateConfig.intervalInMinutes,
+            };
+
+
+
+            const response = await instance.post('/admin/OfferUpdateConfig', configToSave);
+            showToast.success(response.data.message);
+        }catch (error) {
+            showToast.error('Error saving configuration');
+            return false;
+        }
+    }
+
     // Initialize offerUpdateConfig if it doesn't exist
     useEffect(() => {
         if (!offerUpdateConfig && shops.length > 0) {
@@ -88,7 +111,16 @@ interface WebSocketMessage {
     body: string;
 }
 
-const onWebSocketMessage = useCallback((message: WebSocketMessage) => {
+
+// interface OffersByShop {
+//     [shopName: string]: {
+//         [category: string]: number;
+//         []
+//     };
+// }
+
+
+const onWebSocketGetOffers = useCallback((message: WebSocketMessage) => {
     try {
         const parsed: Record<string, unknown> = JSON.parse(message.body);
         setMessages((prev: string[]) => [...prev, parsed as unknown as string]);
@@ -101,16 +133,27 @@ const onWebSocketMessage = useCallback((message: WebSocketMessage) => {
      const clientRef = useWebSocketStomp({
         url: webSocketUrl,
         topic: '/topic/offers',
-        onMessage: onWebSocketMessage,
+        onMessage: onWebSocketGetOffers,
     }); 
 
-    const handleFetchOffers = useCallback(() => {
-        setIsUpdating(true);
-        clientRef.current?.publish({
-            destination: '/app/offers',
-            body: '',
-        });
-    }, []);
+    const handleManualFetchOffers = useCallback(async () => {
+
+        try {
+
+            await saveOfferUpdateConfig();
+
+            setIsUpdating(true);
+            clientRef.current?.publish({
+                destination: '/app/offers',
+                body: JSON.stringify({
+                    shops: offerUpdateConfig?.shops?.map(shop => shop.name) || [],
+                }),
+            });
+        } catch (error) {
+            showToast.error('Error fetching offers');
+            setIsUpdating(false);
+        }
+    }, [offerUpdateConfig]);
 
 
 const handleShopSelection = useCallback((shopName: string) => {
@@ -123,7 +166,7 @@ const handleShopSelection = useCallback((shopName: string) => {
                 const shop = shops.find(shop => shop.name === shopName);
                 return {
                     type: updateType,
-                    intervalInMinutes: 60,
+                    intervalInMinutes: null,
                     shops: shop ? [shop] : []
                 };
             }
@@ -143,31 +186,6 @@ const handleShopSelection = useCallback((shopName: string) => {
             };
         });
     }, [shops, updateType]);
-
-    const clearMessages = () => {
-        setMessages([]);
-    };
-
-
-    const handleSaveConfig = async () => {
-    try {
-        if (!offerUpdateConfig) {
-            alert('Brak konfiguracji do zapisania');
-            return;
-        }
-
-        // console.log('Wysyłam konfigurację:', offerUpdateConfig);
-        
-        // const response = await instance.post('/admin/offer-update-config', offerUpdateConfig);
-        
-        // console.log('Odpowiedź z serwera:', response.data);
-        // alert('Ustawienia zostały zapisane pomyślnie!');
-        
-    } catch (error) {
-        console.error('Błąd podczas zapisywania:', error);
-        alert('Wystąpił błąd podczas zapisywania ustawień');
-    }
-};
 
     return (
         <div className="space-y-6 p-6">
@@ -234,7 +252,7 @@ const handleShopSelection = useCallback((shopName: string) => {
                     
                     <div className="flex gap-4">
                         <button
-                            onClick={handleFetchOffers}
+                            onClick={handleManualFetchOffers}
                             disabled={isUpdating}
                             className={`flex-1 py-4 px-6 rounded-lg font-semibold text-white transition-all duration-200 flex items-center justify-center gap-3 ${
                                 isUpdating
@@ -258,15 +276,6 @@ const handleShopSelection = useCallback((shopName: string) => {
                                 </>
                             )}
                         </button>
-
-                        {messages.length > 0 && (
-                            <button
-                                onClick={clearMessages}
-                                className="px-6 py-4 rounded-lg font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-all duration-200"
-                            >
-                                Wyczyść historię
-                            </button>
-                        )}
                     </div>
 
                     {/* Manual Results */}
@@ -351,7 +360,7 @@ const handleShopSelection = useCallback((shopName: string) => {
                                 Interwał aktualizacji
                             </label>
                             <select
-                                value={offerUpdateConfig?.intervalInMinutes || 60}
+                                value={offerUpdateConfig?.intervalInMinutes || undefined}
                                 onChange={(e) => {
                                     const newInterval = Number(e.target.value);
                                     if (offerUpdateConfig) {
@@ -392,11 +401,10 @@ const handleShopSelection = useCallback((shopName: string) => {
                             <button
                                 onClick={async () => {
                                     try {
-                                        // await instance.post('/admin/offer-update-config', offerUpdateConfig);
-                                        alert('Ustawienia zostały zapisane');
+                                        await saveOfferUpdateConfig();
+                                      showToast.success("Configuration saved successfully");
                                     } catch (error) {
-                                        console.error('Błąd podczas zapisywania ustawień:', error);
-                                        alert('Wystąpił błąd podczas zapisywania ustawień');
+                                        showToast.error('Error saving configuration');
                                     }
                                 }}
                                 className="w-full py-3 px-4 bg-gradient-blue-horizontal text-white rounded-lg hover:bg-gradient-blue-horizontal-hover font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
