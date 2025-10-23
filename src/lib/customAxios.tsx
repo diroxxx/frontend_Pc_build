@@ -1,15 +1,15 @@
 import axios from "axios";
-import { getAuthToken, setAuthToken } from "./Auth";
+import { getAuthToken, setAuthToken } from "./Auth.tsx";
 
-import { showToast } from '../components/ui/ToastProvider/ToastContainer';
+import { showToast } from './ToastContainer.tsx';
 
-const instance = axios.create({
+const customAxios = axios.create({
     baseURL: "http://localhost:8080",
     headers: { "Content-Type": "application/json" },
     withCredentials: true,
 });
 
-instance.interceptors.request.use((config) => {
+customAxios.interceptors.request.use((config) => {
     const token = getAuthToken();
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -17,7 +17,7 @@ instance.interceptors.request.use((config) => {
     return config;
 });
 
-instance.interceptors.response.use(
+customAxios.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
@@ -37,7 +37,7 @@ instance.interceptors.response.use(
                 const newAccessToken = response.data.accessToken;
                 setAuthToken(newAccessToken);
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-                return instance(originalRequest);
+                return customAxios(originalRequest);
             } catch (refreshError) {
                 console.error("Refresh token failed:", refreshError);
                 setAuthToken(null);
@@ -69,6 +69,7 @@ instance.interceptors.response.use(
         if (error.response?.status === 400) {
             const message = error.response.data.message || "Nieprawidłowe dane";
             showToast.error(message);
+            console.error("Bad Request:", message);
             return Promise.reject(error);
         }
         
@@ -76,4 +77,4 @@ instance.interceptors.response.use(
         return Promise.reject(error);
     }
 );
-export default instance;
+export default customAxios;

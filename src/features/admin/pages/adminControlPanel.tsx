@@ -1,13 +1,13 @@
-import { use, useState } from "react";
-import UsersComponent from "./adminComponentsPage/usersComponent";
+import {useState } from "react";
+import UsersComponent from "../hooks/usersComponent.tsx";
 import { useNavigate } from "react-router-dom";
-import { setAuthToken } from "../../components/Auth";
-import { userAtom } from "../../atomContext/userAtom";
+import { setAuthToken } from "../../../lib/Auth.tsx";
+import { userAtom } from "../../../atomContext/userAtom.tsx";
 import { useAtom } from "jotai";
-import { showToast } from "../../components/ui/ToastProvider/ToastContainer";
-import OffersComponent from "./adminComponentsPage/offersComponent/offersComponent";
-import GeneralInfo from "./adminComponentsPage/generalInfo";
-import Components from "./adminComponentsPage/ComponentsComponent/components.tsx";
+import { showToast } from "../../../lib/ToastContainer.tsx";
+import OffersComponent from "../components/offersComponent.tsx";
+import GeneralInfo from "./generalInfo.tsx";
+import Components from "../components/components.tsx";
 
 const AdminControlPanel = () => {
         const [activeTab, setActiveTab] = useState("general");
@@ -26,6 +26,7 @@ const AdminControlPanel = () => {
     };
     return (
         <div className="min-h-screen bg-gray-100 font-sans">
+            {/*<ToastContainer />*/}
             <div className="bg-gradient-blue-horizontal text-white py-6 mb-6 relative">
                 <button
                     onClick={handleLogout}
@@ -86,7 +87,7 @@ const AdminControlPanel = () => {
                                 : "text-gray-600 hover:text-ocean-dark-blue"
                         }`}
                     >
-                        Zarządzaj użytkownikami
+                        Uzytkownicy
                     </button>
                     <button
                         onClick={() => setActiveTab("games")}
@@ -101,7 +102,7 @@ const AdminControlPanel = () => {
                 </div>
 
                 <div className="flex-1 p-6">
-                    {activeTab === "general" && <GeneralInfo />}
+                    {activeTab === "general" && <GeneralInfo onNavigate={setActiveTab} />}
                     {activeTab === "users" && <UsersComponent />}
                     {activeTab === "components" && <Components />}
                     {activeTab === "offers" && <OffersComponent />}

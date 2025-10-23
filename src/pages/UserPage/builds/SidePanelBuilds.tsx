@@ -9,7 +9,7 @@ import {
   renameComputerAtom,
   removeComponentFromBuildAtom,
   compatibilityIssuesAtom
-} from '../../../atomContext/computer.tsx';
+} from '../../../atomContext/computerAtom.tsx';
 
 export default function EdgeExpandButton() {
   const [hovered, setHovered] = useState(false);
@@ -116,7 +116,7 @@ return (
           </div>
         </button>
 
-        {/* Computer list and selected computer details */}
+        {/* Computer list and selected computerAtom details */}
         <div 
           style={{
             height: hovered ? 'auto' : '0px',
@@ -138,8 +138,9 @@ return (
                 <p className="text-xs text-gray-500">Brak komputerów. Utwórz nowy powyżej.</p>
               ) : (
                 <div className="space-y-1 max-h-32 overflow-y-auto">
-                  {computers.map((computer, index) => (
-                    <div
+                        {(computers || []).map((computer, index) => (
+                            <div
+
                       key={index}
                       onClick={() => handleSelectComputer(index)}
                       className={`flex items-center justify-between p-2 rounded cursor-pointer transition-colors ${
@@ -169,7 +170,7 @@ return (
                           </p>
                         )}
                         <p className="text-xs text-gray-500">
-                          {computer.components.length} komponentów • {computer.price.toLocaleString('pl-PL')}zł
+                            {(computer.offers?.length || 0)} komponentów • {(computer.price ?? 0).toLocaleString('pl-PL')}zł
                         </p>
                       </div>
                       
@@ -267,15 +268,15 @@ return (
               </div>
             )}
 
-            {/* Selected computer details */}
-            {selectedComputer && selectedComputer.components.length > 0 && (
+            {/* Selected computerAtom details */}
+            {selectedComputer && selectedComputer.offers.length > 0 && (
               <div className="border-t border-gray-200 pt-4">
                 <h3 className="text-sm font-medium text-midnight-dark mb-2">
                   {selectedComputer.name} - Komponenty
                 </h3>
                 
                 <div className="space-y-1 max-h-40 overflow-y-auto">
-                  {selectedComputer.components.map((component, index) => (
+                  {selectedComputer.offers.map((component, index) => (
                     <div 
                       key={index} 
                       className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 transition-colors duration-200"

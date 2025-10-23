@@ -7,61 +7,71 @@ import {
   createNewEmptyComputerAtom,
   selectComputerAtom,
   deleteComputerAtom,
-  renameComputerAtom,
   removeComponentFromBuildAtom,
-  compatibilityIssuesAtom,
   type CompatibilityIssue
-} from '../../../atomContext/computer.tsx';
-import { categoriesAtom, selectedCategoryAtom } from '../../../atomContext/offerAtom.tsx';
-import type { ComponentDto } from '../../../atomContext/offerAtom.tsx';
-import ToastContainer from '../../../components/ui/ToastProvider/ToastContainer.tsx';
+} from '../../../atomContext/computerAtom.tsx';
+import {categoriesAtom, selectedCategoryAtom} from '../../../atomContext/offerAtom.tsx';
+import type {ComponentOffer,} from "../../../atomContext/offerAtom.tsx";
+import {isCaseOffer, isProcessorOffer, isMotherboardOffer, isCoolerOffer, isMemoryOffer, isGraphicsCardOffer,isPowerSupplyOffer} from "../../../atomContext/offerAtom.tsx";
 
+const checkSocketCompatibility = (offers: ComponentOffer[]): CompatibilityIssue[] => {
+    const issues: CompatibilityIssue[] = [];
 
-import { retriveComputersFromDbAtom } from '../../../atomContext/computer.tsx';
-// Import compatibility checking functions (same as in UserComputers)
-const checkSocketCompatibility = (components: ComponentDto[]): CompatibilityIssue[] => {
-  const issues: CompatibilityIssue[] = [];
-  
-  const cpu = components.find(c => c.componentType.toLowerCase().includes('processor') || c.componentType.toLowerCase().includes('cpu'));
-  const motherboard = components.find(c => c.componentType.toLowerCase().includes('motherboard'));
-  const cooler = components.find(c => c.componentType.toLowerCase().includes('cooler') || c.componentType.toLowerCase().includes('chlodzenie'));
-  
-  // Check CPU-Motherboard compatibility
-  if (cpu && motherboard && cpu.cpuSocketType && motherboard.boardSocketType) {
-    if (cpu.cpuSocketType !== motherboard.boardSocketType) {
-      issues.push({
-        type: 'error',
-        message: `Procesor (${cpu.cpuSocketType}) nie jest kompatybilny z płytą główną (${motherboard.boardSocketType})`,
-        affectedComponents: ['processor', 'motherboard']
-      });
+    const cpu = offers.find(isProcessorOffer);
+    const motherboard = offers.find(isMotherboardOffer);
+    const cooler = offers.find(isCoolerOffer);
+
+    // CPU-Motherboard
+    if (cpu && motherboard) {
+        if (isProcessorOffer(cpu)) {
+            if (motherboard && isMotherboardOffer(motherboard)) {
+                if (motherboard.socketType !== cpu.socketType) {
+                    issues.push({
+                        type: 'error',
+                        message: `Procesor (${cpu.socketType}) nie jest kompatybilny z płytą główną (${motherboard.socketType})`,
+                        affectedComponents: ['processor', 'motherboard']
+                    });
+                }
+            }
+        }
+        if (isMotherboardOffer(motherboard)) {
+            if (cpu && isProcessorOffer(cpu)) {
+                if (cpu.socketType !== motherboard.socketType) {
+                    issues.push({
+                        type: 'error',
+                        message: `Płyta główna (${motherboard.socketType}) nie jest kompatybilna z procesorem (${cpu.socketType})`,
+                        affectedComponents: ['motherboard', 'processor']
+                    });
+                }
+            }
+        }
     }
-  }
-  
-  // Check Cooler-CPU compatibility
-  if (cooler && cpu && cooler.coolerSocketsType && cpu.cpuSocketType) {
-    if (!cooler.coolerSocketsType.includes(cpu.cpuSocketType)) {
-      issues.push({
-        type: 'error',
-        message: `Chłodzenie nie obsługuje socketu procesora (${cpu.cpuSocketType})`,
-        affectedComponents: ['cooler', 'processor']
-      });
+
+    // Cooler-CPU
+    if (isCoolerOffer(cooler)) {
+        if (cpu && isProcessorOffer(cpu)) {
+            if (!cooler.coolerSocketsType.includes(cpu.socketType)) {
+                issues.push({
+                    type: 'error',
+                    message: `Chłodzenie nie obsługuje socketu procesora (${cpu.socketType})`,
+                    affectedComponents: ['cooler', 'processor']
+                });
+            }
+        }
     }
-  }
-  
-  return issues;
+    return issues;
 };
-
-const checkMemoryCompatibility = (components: ComponentDto[]): CompatibilityIssue[] => {
+const checkMemoryCompatibility = (components: ComponentOffer[]): CompatibilityIssue[] => {
   const issues: CompatibilityIssue[] = [];
   
-  const motherboard = components.find(c => c.componentType.toLowerCase().includes('motherboard'));
-  const ram = components.find(c => c.componentType.toLowerCase().includes('memory') || c.componentType.toLowerCase().includes('ram'));
+  const motherboard = components.find(isMotherboardOffer);
+  const memory = components.find(isMemoryOffer);
   
-  if (motherboard && ram && motherboard.boardMemoryType && ram.ramType) {
-    if (motherboard.boardMemoryType !== ram.ramType) {
+  if (motherboard && memory) {
+    if (motherboard.memoryType !== memory.type) {
       issues.push({
         type: 'error',
-        message: `Pamięć RAM (${ram.ramType}) nie jest kompatybilna z płytą główną (${motherboard.boardMemoryType})`,
+        message: `Pamięć RAM (${memory.type}) nie jest kompatybilna z płytą główną (${motherboard.memoryType})`,
         affectedComponents: ['memory', 'motherboard']
       });
     }
@@ -70,34 +80,36 @@ const checkMemoryCompatibility = (components: ComponentDto[]): CompatibilityIssu
   return issues;
 };
 
-const checkPowerRequirements = (components: ComponentDto[]): CompatibilityIssue[] => {
+const checkPowerRequirements = (components: ComponentOffer[]): CompatibilityIssue[] => {
   const issues: CompatibilityIssue[] = [];
   
-  const psu = components.find(c => c.componentType.toLowerCase().includes('power') || c.componentType.toLowerCase().includes('psu'));
+  const psu = components.find(isPowerSupplyOffer);
   
-  if (psu && psu.powerSupplyMaxPowerWatt) {
+  if (psu) {
     let estimatedPower = 0;
     
     components.forEach(comp => {
-      if (comp.componentType.toLowerCase().includes('graphics') || comp.componentType.toLowerCase().includes('gpu')) {
-        estimatedPower += comp.gpuPowerDraw || 200;
-      } else if (comp.componentType.toLowerCase().includes('processor') || comp.componentType.toLowerCase().includes('cpu')) {
-        estimatedPower += 100;
+        const gpu = components.find(isGraphicsCardOffer);
+      if (gpu) {
+        estimatedPower += gpu.powerDraw || 200;
       }
+      // else if (comp.componentType.toLowerCase().includes('processor') || comp.componentType.toLowerCase().includes('cpu')) {
+      //   estimatedPower += 100;
+      // }
     });
     
-    estimatedPower += 150; // Base system power
+    estimatedPower += 150;
     
-    if (estimatedPower > psu.powerSupplyMaxPowerWatt) {
+    if (estimatedPower > psu.maxPowerWatt) {
       issues.push({
         type: 'error',
-        message: `Zasilacz (${psu.powerSupplyMaxPowerWatt}W) może być za słaby. Szacowane zapotrzebowanie: ${estimatedPower}W`,
+        message: `Zasilacz (${psu.maxPowerWatt}W) może być za słaby. Szacowane zapotrzebowanie: ${estimatedPower}W`,
         affectedComponents: ['power_supply']
       });
-    } else if (estimatedPower > psu.powerSupplyMaxPowerWatt * 0.8) {
+    } else if (estimatedPower > psu.maxPowerWatt * 0.8) {
       issues.push({
         type: 'warning',
-        message: `Zasilacz będzie mocno obciążony. Szacowane zapotrzebowanie: ${estimatedPower}W z ${psu.powerSupplyMaxPowerWatt}W`,
+        message: `Zasilacz będzie mocno obciążony. Szacowane zapotrzebowanie: ${estimatedPower}W z ${psu.maxPowerWatt}W`,
         affectedComponents: ['power_supply']
       });
     }
@@ -106,7 +118,7 @@ const checkPowerRequirements = (components: ComponentDto[]): CompatibilityIssue[
   return issues;
 };
 
-const checkAllCompatibility = (components: ComponentDto[]): CompatibilityIssue[] => {
+const checkAllCompatibility = (components: ComponentOffer[]): CompatibilityIssue[] => {
   const issues: CompatibilityIssue[] = [];
   
   issues.push(...checkSocketCompatibility(components));
@@ -132,10 +144,9 @@ function Builds() {
     const navigate = useNavigate();
     const selectedComputer = selectedComputerIndex !== null ? computers[selectedComputerIndex] : null;
 
-    // Calculate compatibility issues for selected computer
-    const compatibilityIssues = selectedComputer ? checkAllCompatibility(selectedComputer.components) : [];
+    // Calculate compatibility issues for selected computerAtom
+    const compatibilityIssues = selectedComputer ? checkAllCompatibility(selectedComputer.offers) : [];
 
-    // Mapowanie nazw kategorii na polskie etykiety
     const categoryLabels: { [key: string]: string } = {
         'processor': 'CPU',
         'graphicsCard': 'GPU', 
@@ -146,12 +157,12 @@ function Builds() {
         'powerSupply': 'Zasilacz',
         'ssd': 'Dysk SSD',
         'hdd': 'Dysk HDD',
-        'storage': 'Pamięć masowa'
+        'storage': 'Pamięć'
     };
 
     const componentCategories = categories.map(category => ({
         key: category,
-        label: categoryLabels[category] || category // Fallback to original name if no mapping
+        label: categoryLabels[category] || category
     }));
 
     const handleAddComponent = (category: string) => {
@@ -170,7 +181,8 @@ function Builds() {
 
     const getComponentForCategory = (category: string) => {
         if (!selectedComputer) return null;
-        return selectedComputer.components.find(c => 
+        console.log('Komponenty dla kategorii:', category);
+        return selectedComputer.offers.find(c =>
             c.componentType === category
         );
     };
@@ -180,7 +192,6 @@ function Builds() {
 
 return (
     <div className="max-w-7xl mx-auto p-5  min-h-screen">            
-        <ToastContainer />
 
         {/* Header */}
         <div className="text-center mb-8">
@@ -194,7 +205,7 @@ return (
                 <h2 className="text-xl font-bold text-midnight-dark">Twoje zestawy</h2>
                 <button
                     onClick={handleCreateNewBuild}
-                    className="bg-gradient-ocean hover:bg-gradient-ocean-hover text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+                    className="bg-gradient-ocean hover:bg-gradient-ocean-hover text-white px-4 py-2 rounded-lg font-medium"
                 >
                     + Nowy zestaw
                 </button>
@@ -220,7 +231,7 @@ return (
                                 <div>
                                     <h3 className="font-medium text-midnight-dark">{computer.name}</h3>
                                     <p className="text-sm text-ocean-blue">
-                                        {(computer.components || []).length} komponentów • {computer.price.toLocaleString('pl-PL')} zł
+                                        {(computer.offers || []).length} komponentów • {computer.price.toLocaleString('pl-PL')} zł
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -340,9 +351,9 @@ return (
                         {component ? (
                             <>
                                 <div className="flex items-center gap-3">
-                                    {component.photo_url && (
+                                    {component.photoUrl && (
                                         <img 
-                                            src={component.photo_url} 
+                                            src={component.photoUrl}
                                             alt={`${component.brand} ${component.model}`}
                                             className="w-12 h-12 object-contain rounded border border-ocean-light-blue"
                                             onError={(e) => {
@@ -399,7 +410,7 @@ return (
             })}
 
             {/* Total Price Section */}
-            {selectedComputer && selectedComputer.components.length > 0 && (
+            {selectedComputer && selectedComputer.offers.length > 0 && (
                 <div className="bg-gradient-gray border-t-2 border-ocean-blue p-4">
                     <div className="flex justify-between items-center">
                         <span className="text-lg font-medium text-midnight-dark">Łączna cena zestawu:</span>

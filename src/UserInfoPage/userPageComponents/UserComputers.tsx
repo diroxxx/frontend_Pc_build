@@ -6,8 +6,8 @@ import {
   renameComputerAtom,
   toggleComputerVisibilityAtom,
   type CompatibilityIssue
-} from '../../atomContext/computer';
-import type { computer } from '../../atomContext/computer';
+} from '../../atomContext/computerAtom.tsx';
+import type { computerAtom } from '../../atomContext/computerAtom.tsx';
 import type { ComponentDto } from '../../atomContext/offerAtom';
 
 // Import compatibility checking functions
@@ -113,11 +113,11 @@ function UserComputers() {
   const [, deleteComputer] = useAtom(deleteComputerAtom);
   const [, renameComputer] = useAtom(renameComputerAtom);
   const [, toggleVisibilityAtom] = useAtom(toggleComputerVisibilityAtom);
-  const [selectedComputer, setSelectedComputer] = useState<computer | null>(null);
+  const [selectedComputer, setSelectedComputer] = useState<computerAtom | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingName, setEditingName] = useState('');
 
-  const handleViewDetails = (computer: computer) => {
+  const handleViewDetails = (computer: computerAtom) => {
     setSelectedComputer(computer);
   };
 
@@ -157,11 +157,11 @@ function UserComputers() {
     toggleVisibilityAtom(computerIndex);
   };
 
-  // Calculate compatibility issues for each computer
+  // Calculate compatibility issues for each computerAtom
   const computersWithCompatibility = useMemo(() => {
     return computers.map(computer => ({
       ...computer,
-      compatibilityIssues: checkAllCompatibility(computer.components)
+      compatibilityIssues: checkAllCompatibility(computer.offers)
     }));
   }, [computers]);
 
@@ -218,7 +218,7 @@ function UserComputers() {
                           d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
                         />
                       </svg>
-                      {computer.components.length} komponentów
+                      {computer.offers.length} komponentów
                     </span>
                     
                     <span className="flex items-center gap-1 font-medium text-green-600">
@@ -374,12 +374,12 @@ function UserComputers() {
               <div>
                 <h3 className="text-xl font-semibold text-gray-900">{selectedComputer.name}</h3>
                 <p className="text-sm text-gray-600 mt-1">
-                  {selectedComputer.components.length} komponentów • {selectedComputer.price.toLocaleString('pl-PL')} zł
+                  {selectedComputer.offers.length} komponentów • {selectedComputer.price.toLocaleString('pl-PL')} zł
                 </p>
                 
                 {/* Show compatibility issues in modal header */}
                 {(() => {
-                  const issues = checkAllCompatibility(selectedComputer.components);
+                  const issues = checkAllCompatibility(selectedComputer.offers);
                   if (issues.length > 0) {
                     return (
                       <div className="mt-2 flex items-center gap-1 text-sm text-red-600">
@@ -411,7 +411,7 @@ function UserComputers() {
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
               {/* Show detailed compatibility issues in modal */}
               {(() => {
-                const issues = checkAllCompatibility(selectedComputer.components);
+                const issues = checkAllCompatibility(selectedComputer.offers);
                 if (issues.length > 0) {
                   return (
                     <div className="mb-6">
@@ -471,7 +471,7 @@ function UserComputers() {
                 return null;
               })()}
 
-              {selectedComputer.components.length === 0 ? (
+              {selectedComputer.offers.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   Ten zestaw nie zawiera żadnych komponentów
                 </div>
@@ -484,7 +484,7 @@ function UserComputers() {
                     <div>Sklep</div>
                   </div>
 
-                  {selectedComputer.components.map((component, index) => (
+                  {selectedComputer.offers.map((component, index) => (
                     <div key={index} className="grid grid-cols-4 border-b border-gray-200 p-4 items-center last:border-b-0">
                       <div className="font-medium text-gray-700">{component.componentType}</div>
                       

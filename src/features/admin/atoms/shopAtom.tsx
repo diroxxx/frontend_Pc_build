@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import instance from "../components/instance"
+import customAxios from "../../../lib/customAxios.tsx"
 
 export type Shop = {
     name: string;
@@ -11,7 +11,7 @@ export const fetchShopsAtom = atom(
   async (_get, set) => {
     try {
 
-      const response = await instance.get('api/shops');
+      const response = await customAxios.get('api/shops');
       const shops: Shop[] = response.data;
 
       set(shopsAtom, shops);

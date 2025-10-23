@@ -1,5 +1,6 @@
 import { Toaster } from 'react-hot-toast';
 import toast from 'react-hot-toast';
+import React from "react";
 
 // Style definitions
 const glassmorphismStyle = {
@@ -113,18 +114,25 @@ export const showToast = {
   dismissAll: () => toast.dismiss(),
 };
 
-export default function ToastContainer() {
+type ToastProviderProps = {
+    children: React.ReactNode;
+};
+export function ToastProvider({ children }: ToastProviderProps) {
   return (
-    <Toaster
-      position="top-right"
-      gutter={8}
-      containerStyle={{
-        top: 20,
-        right: 20,
-      }}
-      toastOptions={{
-        style: glassmorphismStyle,
-      }}
-    />
+      <>
+          <Toaster
+              position="top-right"
+              gutter={8}
+              containerStyle={{
+                  top: 20,
+                  right: 20,
+              }}
+              toastOptions={{
+                  style: glassmorphismStyle,
+              }}
+          />
+          {children}
+      </>
+
   );
 }

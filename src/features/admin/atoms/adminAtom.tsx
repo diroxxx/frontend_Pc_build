@@ -1,16 +1,33 @@
-import { atom } from "jotai";
-import {type Shop } from "./shopAtom";
-import instance from "../components/instance";
+import {atom, useSetAtom} from "jotai";
+import {type Shop } from "./shopAtom.tsx";
+import customAxios from "../../../lib/customAxios.tsx";
+import {useCallback} from "react";
 export type User =  {
-    name: string;
+    username: string;
     email: string;
-    role: number;
+    role: string;
 }
+// import {type User} from "./userAtom.tsx";
 
 export const usersListAtom = atom<User[]>([]);
 
-export type OfferUpdateType = 'MANUAL' | 'AUTOMATIC';
+export const useFetchAllUsers = () => {
+    const setUsers = useSetAtom(usersListAtom);
 
+    return useCallback( async () => {
+       await customAxios.get("admin/users")
+            .then(response => {
+                console.log("Fetched users:", response.data);
+                setUsers(response.data);
+            })
+            .catch(error => {
+                console.error("Error fetching users:", error);
+            });
+    }, [setUsers]);
+};
+
+
+export type OfferUpdateType = 'MANUAL' | 'AUTOMATIC';
 export type OfferUpdateConfigAtom = {
     intervalInMinutes: number | null;
     type: OfferUpdateType;

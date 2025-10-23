@@ -1,8 +1,8 @@
 import {Navigate} from "react-router-dom";
 import type {JSX} from "react";
-import {getAuthToken} from "./Auth.tsx";
+import {getAuthToken} from "../../lib/Auth.tsx";
 import {jwtDecode} from "jwt-decode";
-import type {CustomJwtPayload} from "../atomContext/userAtom.tsx";
+import type {CustomJwtPayload} from "../../atomContext/userAtom.tsx";
 
 export const RoleProtectedRoute = ({
                                        children,

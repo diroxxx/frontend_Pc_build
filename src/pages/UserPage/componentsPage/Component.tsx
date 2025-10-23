@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { addComponentToBuildAtom, currentBuildAtom } from '../../../atomContext/computer.tsx';
+import { addComponentToBuildAtom, currentBuildAtom } from '../../../atomContext/computerAtom.tsx';
 import type { ComponentOffer } from '../../../atomContext/offerAtom.tsx';
 
 function Component(props: ComponentOffer) {
@@ -59,7 +59,6 @@ function Component(props: ComponentOffer) {
         break;
         
       default:
-        // Fallback - shouldn't happen with typed offers
         break;
     }
     

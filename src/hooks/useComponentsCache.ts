@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import instance from '../components/instance';
+import customAxios from '../lib/customAxios.tsx';
 import type { ComponentDto } from '../atomContext/offerAtom';
 
 const CACHE_KEY = 'components_cache';
@@ -29,7 +29,7 @@ export const useComponentsCache = () => {
             }
 
             // Fetch fresh data
-            const response = await instance.get("/components");
+            const response = await customAxios.get("/components");
             const data = response.data;
             
             // Cache data

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import instance from '../../components/instance';
+import customAxios from '../../lib/customAxios.tsx';
 import { useAtom } from 'jotai';
 import { userAtom, logoutUserAtom } from '../../atomContext/userAtom';
 import toast from 'react-hot-toast';
@@ -27,7 +27,7 @@ function UserProfile(){
         setIsVerifying(true);
 
         try {
-            const response = await instance.post('/auth/verify-password', {
+            const response = await customAxios.post('/auth/verify-password', {
                 currentPassword: currentPassword
             });
 
@@ -60,7 +60,7 @@ function UserProfile(){
         }
 
         try {
-            const response = await instance.put('/auth/change-password', {
+            const response = await customAxios.put('/auth/change-password', {
                 currentPassword: newPassword
             });
 

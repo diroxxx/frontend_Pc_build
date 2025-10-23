@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {setAuthToken} from "../../components/Auth.tsx";
+import {setAuthToken} from "../../../lib/Auth.tsx";
 import { useAtom } from 'jotai';
-import { loginAdminAtom, loginUserAtom } from '../../atomContext/userAtom';
+import { loginAdminAtom, loginUserAtom } from '../../../atomContext/userAtom.tsx';
 
 const AdminLogin = () => {
 

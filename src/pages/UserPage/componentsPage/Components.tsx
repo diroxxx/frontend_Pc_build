@@ -1,4 +1,4 @@
-import instance from '../../../components/instance.tsx';
+import customAxios from '../../../lib/customAxios.tsx';
 import {useEffect, useState, useRef} from "react";
 import { useAtom } from 'jotai';
 import Component from './Component.tsx';
@@ -21,14 +21,14 @@ import {
   shopsAtom,
   clearFiltersAtom
 } from '../../../atomContext/offerAtom.tsx';
-import { currentBuildAtom } from '../../../atomContext/computer.tsx';
-import { compatibilityIssuesAtom, clearCompatibilityIssuesAtom } from '../../../atomContext/computer.tsx';
-import ToastContainer from '../../../components/ui/ToastProvider/ToastContainer.tsx';
+import { currentBuildAtom } from '../../../atomContext/computerAtom.tsx';
+import { compatibilityIssuesAtom, clearCompatibilityIssuesAtom } from '../../../atomContext/computerAtom.tsx';
+// import ToastContainer from '../../../components/ui/ToastProvider/ToastContainer.tsx';
 import { useNavigate } from 'react-router-dom';
 
 const getOffers = async (): Promise<ComponentOffer[]> => {
     try {
-        const response = await instance.get("/components");
+        const response = await customAxios.get("/components");
         const data: Record<string, ComponentOffer[]> = response.data;
         
         console.log('Response structure:', Object.keys(data));
@@ -239,8 +239,7 @@ function Components() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Toast Container */}
-            <ToastContainer />
+            {/*<ToastContainer />*/}
             
             {/* Side Panel */}
             <SidePanelBuilds />

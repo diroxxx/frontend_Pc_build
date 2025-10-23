@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { jwtDecode } from 'jwt-decode';
-import { setAuthToken } from '../components/Auth';
+import { setAuthToken } from '../lib/Auth.tsx';
 import { userAtom, type User, type CustomJwtPayload } from './userAtom';
 
 export interface AuthState {

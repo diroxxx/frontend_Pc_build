@@ -1,5 +1,6 @@
-import { atom } from 'jotai';
-import instance from "../components/instance.tsx";
+import {atom, useSetAtom} from 'jotai';
+import customAxios from "../lib/customAxios.tsx";
+import {useCallback} from "react";
 // ===============================
 // COMPONENT SPECIFICATION TYPES
 // ===============================
@@ -96,7 +97,7 @@ export interface StorageSpec extends BaseComponentSpec {
  */
 export interface CaseSpec extends BaseComponentSpec {
   componentType: 'casePc';
-  format: string;       // Compatible motherboard form factors
+  format: string;
 }
 
 /**
@@ -116,7 +117,7 @@ export type ComponentSpec = ProcessorSpec | CoolerSpec | GraphicsCardSpec |
  * @returns true if component is a ProcessorSpec
  */
 export const isProcessorSpec = (component: ComponentSpec): component is ProcessorSpec => 
-  component.componentType === 'processor';
+  component.componentType.toLowerCase() === 'processor';
 
 /**
  * Type guard for cooler components
@@ -124,7 +125,7 @@ export const isProcessorSpec = (component: ComponentSpec): component is Processo
  * @returns true if component is a CoolerSpec
  */
 export const isCoolerSpec = (component: ComponentSpec): component is CoolerSpec => 
-  component.componentType === 'cooler';
+  component.componentType.toLowerCase() === 'cooler';
 
 /**
  * Type guard for graphics card components
@@ -132,7 +133,7 @@ export const isCoolerSpec = (component: ComponentSpec): component is CoolerSpec 
  * @returns true if component is a GraphicsCardSpec
  */
 export const isGraphicsCardSpec = (component: ComponentSpec): component is GraphicsCardSpec => 
-  component.componentType === 'graphicsCard';
+  component.componentType.toLowerCase() === 'graphicsCard';
 
 /**
  * Type guard for memory components
@@ -183,59 +184,21 @@ export const componentSpecsAtom = atom<ComponentSpec[]>([]);
 
 export const componentsByTypeAtom = atom<Record<string, ComponentSpec[]>>({});
 
-export const componentsLoadedAtom = atom<boolean>(false);
+export const useFetchComponentSpecs = () => {
+    const setComponents = useSetAtom(componentSpecsAtom);
 
-export const componentsLoadingAtom = atom<boolean>(false);
-
-/**
- * Write-only atom for fetching component specifications from the API
- * Pass true as parameter to force refresh and bypass cache
- */
-export const fetchComponentSpecsAtom = atom(
-    null,
-    async (get, set, forceRefresh: boolean = false) => {
-        const isLoaded = get(componentsLoadedAtom);
-        const isLoading = get(componentsLoadingAtom);
-
-        if (isLoaded && !forceRefresh) {
-            console.log('Components already loaded, skipping fetch');
-            return;
-        }
-
-        if (isLoading) {
-            // console.log('Already loading components, skipping duplicate fetch');
-            return;
-        }
+    return useCallback( async () => {
         try {
-            set(componentsLoadingAtom, true);
-
-            const response = await instance.get<Record<string, ComponentSpec[]>>('/components');
-
-            // console.log('Backend response:', response.data);
-
-            set(componentsByTypeAtom, response.data);
-
+            const response = await customAxios.get<Record<string, ComponentSpec[]>>('/components');
             const flatComponents = Object.values(response.data).flat();
-
-            // console.log('Flat components:', flatComponents);
-            // console.log('Components count:', flatComponents.length);
-
-            set(componentSpecsAtom, flatComponents);
-            set(componentsLoadedAtom, true);
+            console.log('Fetched component specifications:', flatComponents);
+            setComponents(flatComponents);
         } catch (error) {
             console.error('Failed to fetch component specifications:', error);
             throw error;
-        } finally {
-            set(componentsLoadingAtom, false);
         }
-    }
-);
-export const refreshComponentsAtom = atom(
-    null,
-    async (get, set) => {
-        await set(fetchComponentSpecsAtom, true); // forceRefresh = true
-    }
-);
+    }, [setComponents]);
+};
 
 // ===============================
 // DERIVED ATOMS - COMPONENT DATA
@@ -258,16 +221,3 @@ export const componentCategoriesAtom = atom((get) => {
   const specs = get(componentSpecsAtom);
   return [...new Set(specs.map(spec => spec.componentType).filter(Boolean))].sort();
 });
-
-/**
- * Atom organizing components by their type
- * Returns a record where keys are component types and values are arrays of components
- * Used for efficient component lookup and categorization
- * 
- * @example
- * {
- *   "processor": [ProcessorSpec, ProcessorSpec, ...],
- *   "graphicsCard": [GraphicsCardSpec, GraphicsCardSpec, ...],
- *   ...
- * }
- */

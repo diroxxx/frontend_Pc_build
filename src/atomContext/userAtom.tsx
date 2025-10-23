@@ -1,10 +1,10 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { jwtDecode } from 'jwt-decode';
-import { getAuthToken, setAuthToken} from '../components/Auth';
+import { getAuthToken, setAuthToken} from '../lib/Auth.tsx';
 
-import { saveComputerToDbAtom, listOfComputers, retriveComputersFromDbAtom, migrateGuestDataAtom } from './computer';
-
+import { saveComputerToDbAtom, listOfComputers, retriveComputersFromDbAtom, migrateGuestDataAtom } from './computerAtom.tsx';
+import customAxios from '../lib/customAxios.tsx';
 export interface User {
   email: string;
   role: string;
@@ -19,10 +19,13 @@ export interface CustomJwtPayload {
 }
 
 export const userAtom = atomWithStorage<User | null>('user', null);
+
 export const isAuthenticatedAtom = atom<boolean>((get) => {
   const user = get(userAtom);
   return user !== null;
 });
+
+
 
 export const loginUserAtom = atom(
   null,

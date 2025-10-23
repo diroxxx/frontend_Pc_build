@@ -1,6 +1,5 @@
 import { atom } from 'jotai';
-import type { 
-  ComponentSpec,
+import type {
   ProcessorSpec, 
   CoolerSpec, 
   GraphicsCardSpec,
@@ -20,11 +19,11 @@ import type {
  * This data is added to component specifications during web scraping
  */
 export interface OfferData {
-  condition: string;    // Product condition (new, used, defective, refurbished)
-  photoUrl: string;     // URL to product image
-  websiteUrl: string;   // Link to the offer in the shop
-  price: number;        // Price in PLN
-  shop: string;         // Shop name (allegro, olx, allegro_lokalnie, etc.)
+  condition: string;
+  photoUrl: string;
+  websiteUrl: string;
+  price: number;
+  shop: string;
 }
 
 /**
@@ -47,33 +46,29 @@ export interface CaseOffer extends CaseSpec, OfferData {}
 export type ComponentOffer = ProcessorOffer | CoolerOffer | GraphicsCardOffer | 
   MemoryOffer | MotherboardOffer | PowerSupplyOffer | StorageOffer | CaseOffer;
 
-// ===============================
-// UTILITY FUNCTIONS
-// ===============================
 
-/**
- * Creates a complete offer by combining component specification with commercial data
- * Used during web scraping to merge database component data with scraped shop data
- * 
- * @param componentSpec - Component specification from database
- * @param offerData - Commercial data scraped from shop
- * @returns Complete offer ready for display
- * 
- * @example
- * const offer = createOffer(processorFromDB, {
- *   condition: "new",
- *   photoUrl: "https://...",
- *   websiteUrl: "https://allegro.pl/...",
- *   price: 1299,
- *   shop: "allegro"
- * });
- */
-export const createOffer = <T extends ComponentSpec>(
-  componentSpec: T, 
-  offerData: OfferData
-): ComponentOffer => {
-  return { ...componentSpec, ...offerData } as ComponentOffer;
-};
+export const isProcessorOffer = (component: ComponentOffer | undefined): component is ProcessorOffer =>
+    !!component && component.componentType?.toLowerCase() === 'processor';
+
+export const isMotherboardOffer = (component: ComponentOffer | undefined): component is MotherboardOffer =>
+    !!component && component.componentType?.toLowerCase() === 'motherboard';
+
+export const isCoolerOffer = (component: ComponentOffer | undefined): component is CoolerOffer =>
+     !!component && component.componentType.toLowerCase() === 'cooler';
+
+export const isCaseOffer = (component: ComponentOffer): component is CaseOffer =>
+    component.componentType.toLowerCase() === 'casePc';
+
+export const isMemoryOffer = (component: ComponentOffer): component is MemoryOffer =>
+    component.componentType.toLowerCase() === 'memory';
+
+export const isPowerSupplyOffer = (component: ComponentOffer): component is PowerSupplyOffer =>
+    component.componentType.toLowerCase() === 'powerSupply';
+
+export const isGraphicsCardOffer = (component: ComponentOffer): component is GraphicsCardOffer =>
+    component.componentType.toLowerCase() === 'graphicsCard';
+
+
 
 // ===============================
 // STATE ATOMS - OFFERS
