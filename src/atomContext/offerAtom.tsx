@@ -195,7 +195,7 @@ export const shopsAtom = atom((get) => {
 /**
  * Primary offer filtering atom
  * Automatically reacts to filter changes and returns filtered offers
- * Used in Components.tsx to display search results
+ * Used in Offers.tsx to display search results
  * 
  * Applies the following filters:
  * - Price range filtering

@@ -1,8 +1,8 @@
 import {useFetchAllUsers, usersListAtom} from "../atoms/adminAtom.tsx";
 import { useAtomValue } from "jotai";
-import { componentSpecsAtom } from "../../../atomContext/componentAtom.tsx";
 import {useEffect} from "react";
-import {useFetchComponentSpecs} from "../../../atomContext/componentAtom.tsx";
+import {useFetchOffersSpecs} from "../../../atomContext/componentAtom.tsx";
+import {useFetchComponents} from "../hooks/useFetchComponents.ts";
 
 interface GeneralInfoProps {
     onNavigate: (tab: string) => void;
@@ -10,18 +10,20 @@ interface GeneralInfoProps {
 
 const GeneralInfo = ({ onNavigate }: GeneralInfoProps) => {
     const users = useAtomValue(usersListAtom);
-    const components = useAtomValue(componentSpecsAtom);
     const fetchAllUsers = useFetchAllUsers();
-    const fetchComponentSpecs = useFetchComponentSpecs();
+    const fetchOffersSpecs = useFetchOffersSpecs();
+    const { data: components = [], isLoading, error } = useFetchComponents();
 
+
+    useFetchComponents();
 
     useEffect(() => {
         fetchAllUsers();
     }, [fetchAllUsers]);
 
     useEffect(() => {
-        fetchComponentSpecs();
-    }, [fetchComponentSpecs]);
+        fetchOffersSpecs();
+    }, [fetchOffersSpecs]);
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -261,7 +261,7 @@ return (
             )}
         </div>
 
-        {/* Component Configuration */}
+        {/* Offer Configuration */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden border border-ocean-light-blue">
             <div className="bg-gradient-ocean-dark text-white p-4">
                 <h2 className="text-xl font-bold">

@@ -5,7 +5,7 @@ import {Routes, Route } from "react-router-dom";
 import Unauthorized from "../pages/Unauthorized.tsx";
 import Register from "../pages/UserPage/UserAuth/Register.tsx";
 import Layout from "../pageComponents/Layout.tsx";
-import Components from "../pages/UserPage/componentsPage/Components.tsx";
+import Offers from "../pages/UserPage/componentsPage/Offers.tsx";
 import UserPage from "../UserInfoPage/UserPage.tsx";
 import Community from "../pages/UserPage/Community/community.tsx";
 import Builds from "../pages/UserPage/builds/builds.tsx";
@@ -28,7 +28,7 @@ function App() {
                 <Route path="/unauthorized" element={<Unauthorized />} />
                 <Route element={<Layout/>}>
                     <Route path="/" element={<MainPage />} />
-                    <Route path="/components" element={<Components />} />
+                    <Route path="/components" element={<Offers />} />
                     <Route path="/builds" element={<Builds />} />
                     <Route path="/community" element={<Community/>} />
 

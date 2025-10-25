@@ -5,6 +5,7 @@ import { getAuthToken, setAuthToken} from '../lib/Auth.tsx';
 
 import { saveComputerToDbAtom, listOfComputers, retriveComputersFromDbAtom, migrateGuestDataAtom } from './computerAtom.tsx';
 import customAxios from '../lib/customAxios.tsx';
+import {useQueryClient} from "@tanstack/react-query";
 export interface User {
   email: string;
   role: string;
@@ -58,6 +59,9 @@ export const loginUserAtom = atom(
 export const logoutUserAtom = atom(
   null,
   async (get, set) => {
+
+      const queryClient = useQueryClient();
+
     const user = get(userAtom);
     if (user) {
       try {
@@ -72,7 +76,7 @@ export const logoutUserAtom = atom(
     console.log('Clearing tokens...');
     setAuthToken(null);
     set(userAtom, null);
-
+    queryClient.clear();
     localStorage.removeItem('computers');
     localStorage.removeItem('computers_last_sync');
     localStorage.removeItem('selectedComputerId');

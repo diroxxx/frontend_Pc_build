@@ -5,15 +5,17 @@ import { fetchOfferUpdates } from "../api/offerUpdateApi.ts";
 import {type OfferUpdateInfo } from '../../../types/OfferUpdateInfo.ts'
 import { useWebSocketStomp } from '../../../hooks/webSocketHook';
 import { showToast } from "../../../lib/ToastContainer";
+// import SockJS from "sockjs-client";
 
 export function useOfferUpdates() {
     const queryClient = useQueryClient();
     const webSocketUrl = "ws://localhost:8080/offers";
+    // const socket = new SockJS("http://localhost:8080/offers");
 
     const query = useQuery<OfferUpdateInfo[]>({
         queryKey: ["offersUpdates"],
         queryFn: fetchOfferUpdates,
-        staleTime: 10_000,
+        // staleTime: 10_000,
     });
 
     const client = useWebSocketStomp({

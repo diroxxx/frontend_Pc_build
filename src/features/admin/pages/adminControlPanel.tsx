@@ -1,5 +1,5 @@
 import {useState } from "react";
-import UsersComponent from "../hooks/usersComponent.tsx";
+import UsersComponent from "./usersComponent.tsx";
 import { useNavigate } from "react-router-dom";
 import { setAuthToken } from "../../../lib/Auth.tsx";
 import { userAtom } from "../../../atomContext/userAtom.tsx";
@@ -7,7 +7,7 @@ import { useAtom } from "jotai";
 import { showToast } from "../../../lib/ToastContainer.tsx";
 import OffersComponent from "../components/offersComponent.tsx";
 import GeneralInfo from "./generalInfo.tsx";
-import Components from "../components/components.tsx";
+import ComponentsPage from "./componentsPage.tsx";
 
 const AdminControlPanel = () => {
         const [activeTab, setActiveTab] = useState("general");
@@ -104,7 +104,7 @@ const AdminControlPanel = () => {
                 <div className="flex-1 p-6">
                     {activeTab === "general" && <GeneralInfo onNavigate={setActiveTab} />}
                     {activeTab === "users" && <UsersComponent />}
-                    {activeTab === "components" && <Components />}
+                    {activeTab === "components" && <ComponentsPage />}
                     {activeTab === "offers" && <OffersComponent />}
                 </div>
             </div>

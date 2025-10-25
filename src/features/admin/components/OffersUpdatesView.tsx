@@ -66,6 +66,7 @@ const OffersUpdatesView = () => {
 
                         <div className="text-sm text-gray-600 mt-3">
                             <strong>Start:</strong> {started.toLocaleString()}
+                            {/*<strong>End:</strong> {finished?.toLocaleString()}*/}
                         </div>
 
                         {update.shops?.length ? (

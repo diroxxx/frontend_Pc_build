@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import {useOfferUpdates} from "../hooks/useOffersUpdates.ts";
 import OffersUpdatesView from "./OffersUpdatesView.tsx";
 
-// Shop Selector Component
+// Shop Selector Offer
 interface Shop {
     name: string;
     [key: string]: any;

@@ -2,7 +2,7 @@ import { useAtom } from 'jotai';
 import { addComponentToBuildAtom, currentBuildAtom } from '../../../atomContext/computerAtom.tsx';
 import type { ComponentOffer } from '../../../atomContext/offerAtom.tsx';
 
-function Component(props: ComponentOffer) {
+function Offer(props: ComponentOffer) {
   const [, addComponentToBuild] = useAtom(addComponentToBuildAtom);
   const [currentBuild] = useAtom(currentBuildAtom);
 
@@ -197,4 +197,4 @@ function Component(props: ComponentOffer) {
   );
 }
 
-export default Component;
+export default Offer;

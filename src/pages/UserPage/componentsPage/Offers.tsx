@@ -1,7 +1,7 @@
 import customAxios from '../../../lib/customAxios.tsx';
 import {useEffect, useState, useRef} from "react";
 import { useAtom } from 'jotai';
-import Component from './Component.tsx';
+import Offer from './Offer.tsx';
 import SidePanelBuilds from '../builds/SidePanelBuilds.tsx';
 import {
   type ComponentOffer,
@@ -28,7 +28,7 @@ import { useNavigate } from 'react-router-dom';
 
 const getOffers = async (): Promise<ComponentOffer[]> => {
     try {
-        const response = await customAxios.get("/components");
+        const response = await customAxios.get("/offers");
         const data: Record<string, ComponentOffer[]> = response.data;
         
         console.log('Response structure:', Object.keys(data));
@@ -52,7 +52,7 @@ const getOffers = async (): Promise<ComponentOffer[]> => {
     }
 };
 
-function Components() {
+function Offers() {
     // Atom state - zmienione na oferty
     const [offers, setOffers] = useAtom(offersAtom);
     const [loading, setLoading] = useAtom(offersLoadingAtom);
@@ -420,7 +420,7 @@ function Components() {
                     {/* Lista ofert */}
                     <div className={`space-y-4 transition-opacity duration-300 ${isLoading ? 'opacity-30' : 'opacity-100'}`}>
                         {currentPageOffers.map((offer, index) => (
-                            <Component key={`offer-${startIndex + index}`} {...offer} />
+                            <Offer key={`offer-${startIndex + index}`} {...offer} />
                         ))}
                     </div>
                     
@@ -533,4 +533,4 @@ function Components() {
     );
 }
 
-export default Components;
+export default Offers;

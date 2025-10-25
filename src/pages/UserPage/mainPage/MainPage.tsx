@@ -36,7 +36,7 @@ function mainPage() {
                     <div className="w-20 h-20">
                         <img
                             src="/components_mainPage.png"
-                            alt="Components"
+                            alt="Offers"
                             className="w-full h-full object-cover rounded shadow-md hover:shadow-lg transition-shadow duration-200"
                         />
                         <p className="mt-2 text-sm font-medium">Komponenty</p>
