@@ -3,6 +3,7 @@ import { Client } from "@stomp/stompjs";
 import type { StompSubscription } from "@stomp/stompjs";
 import type { IMessage } from "@stomp/stompjs";
 import { getAuthToken } from '../lib/Auth.tsx';
+import SockJS from "sockjs-client";
 
 
 type UseWebSocketOptions = {
@@ -20,7 +21,7 @@ export function useWebSocketStomp({ url, topic, onMessage }: UseWebSocketOptions
     useEffect(() => {
         if (!globalClient) {
             globalClient = new Client({
-                brokerURL: url,
+                webSocketFactory: () => new SockJS(url),
                 connectHeaders: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -54,7 +55,7 @@ export function useWebSocketStomp({ url, topic, onMessage }: UseWebSocketOptions
                 console.warn("Nie udało się odsubskrybować (brak połączenia):", err);
             }
         };
-    }, [url, topic, onMessage]);
+    }, [url, topic, onMessage,token]);
 
     return globalClient;
 }

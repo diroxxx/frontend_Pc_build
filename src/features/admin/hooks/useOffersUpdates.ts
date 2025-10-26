@@ -9,8 +9,8 @@ import { showToast } from "../../../lib/ToastContainer";
 
 export function useOfferUpdates() {
     const queryClient = useQueryClient();
-    const webSocketUrl = "ws://localhost:8080/offers";
-    // const socket = new SockJS("http://localhost:8080/offers");
+    // const webSocketUrl = "ws://localhost:8080/offers";
+    const webSocketUrl = "http://localhost:8080/offers";
 
     const query = useQuery<OfferUpdateInfo[]>({
         queryKey: ["offersUpdates"],

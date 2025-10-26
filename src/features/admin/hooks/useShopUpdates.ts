@@ -8,7 +8,8 @@ import type {IMessage} from "@stomp/stompjs";
 export function useShopOfferUpdates(updateId: number, isActive: boolean) {
     const queryClient = useQueryClient();
     const topic = `/topic/offers/${updateId}`;
-    const url = "ws://localhost:8080/offers";
+    // const url = "ws://localhost:8080/offers";
+    const url = "http://localhost:8080/offers";
 
     const onMessage = useCallback((msg: IMessage) => {
         try {

@@ -7,7 +7,8 @@ import { fetchOfferUpdatesAtom, fetchOfferUpdateConfigAtom, offerUpdateConfigAto
 import { showToast } from "../../../lib/ToastContainer.tsx";
 import toast from "react-hot-toast";
 import {useOfferUpdates} from "../hooks/useOffersUpdates.ts";
-import OffersUpdatesView from "./OffersUpdatesView.tsx";
+import OffersUpdatesView from "../components/OffersUpdatesView.tsx";
+import {LoadingSpinner} from "../../../assets/components/ui/LoadingSpinner.tsx";
 
 // Shop Selector Offer
 interface Shop {
@@ -63,7 +64,7 @@ const OffersComponent = () => {
     const [selectedShopNames, setSelectedShopNames] = useState<string[]>([]);
     const [intervalInMinutes, setIntervalInMinutes] = useState<number>(60);
 
-    const { data, isLoading, error, handleManualFetchOffers } = useOfferUpdates();
+    const { data: updates, isLoading, error, handleManualFetchOffers } = useOfferUpdates();
 
 
     useEffect(() => {
@@ -76,6 +77,31 @@ const OffersComponent = () => {
             setSelectedShopNames(offerUpdateConfig.shops.map(s => s.name));
         }
     }, [offerUpdateConfig]);
+
+
+    useEffect(() => {
+        const saved = localStorage.getItem("selectedShops");
+        if (saved) {
+            setSelectedShopNames(JSON.parse(saved));
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem("selectedShops", JSON.stringify(selectedShopNames));
+    }, [selectedShopNames]);
+
+    const hasOngoingUpdate = useMemo(() => {
+        if (!updates) return false;
+        return updates.some(
+            (update) =>
+                !update.finishedAt &&
+                update.shops?.some((s) =>
+                    selectedShopNames.includes(s.shopName)
+                )
+        );
+    }, [updates, selectedShopNames]);
+
+
 
     const handleUpdateTypeToggle = useCallback(() => {
         setUpdateType(prev => prev === 'AUTOMATIC' ? 'MANUAL' : 'AUTOMATIC');
@@ -173,29 +199,24 @@ const OffersComponent = () => {
                     <div className="flex gap-4">
                         <button
                             onClick={() => handleManualFetchOffers(selectedShopNames)}
-                            disabled={isUpdating}
+                            disabled={hasOngoingUpdate || selectedShopNames.length === 0}
                             className={`flex-1 py-4 px-6 rounded-lg font-semibold text-white transition-all duration-200 flex items-center justify-center gap-3 ${
-                                isUpdating
-                                    ? 'bg-gray-400 cursor-not-allowed'
-                                    : 'bg-gradient-blue-horizontal hover:bg-gradient-blue-horizontal-hover shadow-lg hover:shadow-xl'
+                                hasOngoingUpdate
+                                    ? "bg-gray-400 cursor-not-allowed"
+                                    : "bg-gradient-blue-horizontal hover:bg-gradient-blue-horizontal-hover shadow-lg hover:shadow-xl"
                             }`}
                         >
-                            {isUpdating ? (
+                            {hasOngoingUpdate ? (
                                 <>
-                                    <svg className="animate-spin w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                    </svg>
-                                    Pobieranie ofert...
+                                    <LoadingSpinner size={32} />
                                 </>
                             ) : (
                                 <>
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                    </svg>
                                     Pobierz oferty
                                 </>
                             )}
                         </button>
+
                     </div>
                     {/*<OffersUpdatesView/>*/}
                 </div>
