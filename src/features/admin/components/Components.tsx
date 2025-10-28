@@ -1,12 +1,18 @@
 import {useFetchComponents} from "../hooks/useFetchComponents.ts";
 import {Component} from "./component.tsx";
-import type {ComponentItem} from "../../../types/BaseItemDto.ts";
+// import type {ComponentItem} from "../../../types/BaseItemDto.ts";
+import {useState} from "react";
+import ReactPaginate from "react-paginate";
+
 
 const Components = () => {
-    const { data: components = [], isLoading, error } = useFetchComponents();
+    const [page, setPage] = useState(1);
+    const { data, isLoading, error, isFetching, isPlaceholderData } = useFetchComponents(page);
 
     if (isLoading) return <p className="p-4 text-midnight-dark">Ładowanie komponentów...</p>;
     if (error) return <p className="p-4 text-ocean-red">Błąd podczas pobierania danych.</p>;
+
+    const components = data?.items ?? [];
 
     return (
         <div className="space-y-4">
@@ -14,16 +20,14 @@ const Components = () => {
             <div className="rounded-lg shadow-sm border border-gray-200 p-4">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold text-midnight-dark">Lista komponentów</h2>
-                    <button className="px-3 py-1.5 bg-ocean-dark-blue text-ocean-white rounded hover:bg-ocean-blue text-sm font-medium transition-colors flex items-center gap-1">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        Dodaj komponent
-                    </button>
                 </div>
-
                 <div className="flex items-center gap-3 text-xs text-midnight-dark">
-                    <span>Wyświetlono: <strong>{components.length}</strong></span>
+          <span>
+            Wyświetlono: <strong>{components.length}</strong>
+          </span>
+                    <span>
+            Strona: <strong>{page + 1}</strong>
+          </span>
                 </div>
             </div>
 
@@ -53,7 +57,21 @@ const Components = () => {
                     </tbody>
                 </table>
             </div>
+
+            <ReactPaginate
+                breakLabel="..."
+                nextLabel="→"
+                onPageChange={(e) => setPage(e.selected)}
+                pageRangeDisplayed={3}
+                marginPagesDisplayed={1}
+                pageCount={data?.totalPages ?? 1}
+                previousLabel="←"
+                containerClassName="flex justify-center gap-1 py-4"
+                pageClassName="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200"
+                activeClassName="bg-ocean-dark-blue text-white font-semibold"
+            />
         </div>
     );
 };
+
 export default Components;

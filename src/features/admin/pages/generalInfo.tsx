@@ -12,10 +12,8 @@ const GeneralInfo = ({ onNavigate }: GeneralInfoProps) => {
     const users = useAtomValue(usersListAtom);
     const fetchAllUsers = useFetchAllUsers();
     const fetchOffersSpecs = useFetchOffersSpecs();
-    const { data: components = [], isLoading, error } = useFetchComponents();
+    const { data: components} = useFetchComponents(0);
 
-
-    useFetchComponents();
 
     useEffect(() => {
         fetchAllUsers();
@@ -50,7 +48,7 @@ const GeneralInfo = ({ onNavigate }: GeneralInfoProps) => {
                 <h2 className="text-text-ocean-white text-lg font-semibold mb-2">
                     Komponenty
                 </h2>
-                <span className="text-text-ocean-white text-4xl font-bold mb-2">{components.length}</span>
+                <span className="text-text-ocean-white text-4xl font-bold mb-2">{components?.totalElements ?? 0}</span>
                 <p
                     onClick={() => onNavigate("components")}
                     className="text-text-ocean-white text-sm cursor-pointer hover:underline hover:text-ocean-light-blue transition-colors"

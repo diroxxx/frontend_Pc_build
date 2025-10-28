@@ -13,10 +13,14 @@ import {
 } from "../../../atomContext/componentAtom.tsx";
 import {useAtomValue} from "jotai";
 import Components from "../components/Components.tsx";
+import {useFetchComponents} from "../hooks/useFetchComponents.ts";
+
 const ComponentsPage = () => {
     const componentList = useAtomValue(componentSpecsAtom);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState<string>('all');
+
+    const {refetch} = useFetchComponents();
 
 
     const filteredComponents = componentList.filter(component => {
@@ -50,7 +54,7 @@ const ComponentsPage = () => {
                     <h2 className="text-xl font-bold text-midnight-dark">Komponenty PC</h2>
                     <div className="flex gap-2">
                         <button
-                            // onClick={handleRefresh}
+                            onClick={ () => refetch()}
                             className="px-3 py-1.5 bg-white border border-ocean-blue text-ocean-blue rounded hover:bg-ocean-light-blue text-sm font-medium transition-colors flex items-center gap-1"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

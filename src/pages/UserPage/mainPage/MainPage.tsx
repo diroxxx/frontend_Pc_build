@@ -4,7 +4,6 @@ import SidePanelBuilds from "../builds/SidePanelBuilds.tsx";
 function mainPage() {
     const navigate = useNavigate();
 
-      // Dane sklepów (są to przykładowe ręcznie wprowadzone dane). do implementacji wyswietlanie dostepnych sklepów z bazy.
     const partnerStores = [
         {
             name: "Allegro",
