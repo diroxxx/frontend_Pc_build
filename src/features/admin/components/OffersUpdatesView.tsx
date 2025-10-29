@@ -6,6 +6,7 @@ import {useShopOfferUpdates} from "../hooks/useShopUpdates.ts";
 import { ArrowUp, ArrowDown } from "lucide-react";
 import { formatDistanceStrict } from "date-fns";
 import { pl } from "date-fns/locale";
+import LoadingSpinner from "../../../components/ui/LoadingSpinner.tsx";
 
 
 function ShopUpdateSubscriber({ updateId, isActive }: { updateId: number; isActive: boolean }) {
@@ -16,7 +17,7 @@ function ShopUpdateSubscriber({ updateId, isActive }: { updateId: number; isActi
 const OffersUpdatesView = () => {
     const { data: updates = [], isLoading, error } = useOfferUpdates();
 
-    if (isLoading) return <p>Ładowanie aktualizacji...</p>;
+    if (isLoading) return <LoadingSpinner className="w-10 h-10" />;
     if (error) return <p>Błąd podczas pobierania danych.</p>;
     if (!updates.length) return <p>Brak aktualizacji.</p>;
 

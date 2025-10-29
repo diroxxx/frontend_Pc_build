@@ -1,27 +1,27 @@
 
 import {useState} from "react";
 import {
-    componentSpecsAtom,
-    isProcessorSpec,
-    isCoolerSpec,
-    isGraphicsCardSpec,
-    isMemorySpec,
-    isMotherboardSpec,
-    isPowerSupplySpec,
-    isStorageSpec,
-    isCaseSpec
+    componentSpecsAtom
 } from "../../../atomContext/componentAtom.tsx";
 import {useAtomValue} from "jotai";
-import Components from "../components/Components.tsx";
+import Components from "../components/ComponentsList.tsx";
 import {useFetchComponents} from "../hooks/useFetchComponents.ts";
-
+import ReactPaginate from "react-paginate";
+import  { ItemType } from "../../../types/BaseItemDto.ts";
+import { useFetchBrands } from "../hooks/useFetchBrands.ts";
+import {LeftArrow} from "../../../assets/icons/leftArrow.tsx";
+import {RightArrow} from "../../../assets/icons/rightArrow.tsx";
 const ComponentsPage = () => {
     const componentList = useAtomValue(componentSpecsAtom);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState<string>('all');
 
-    const {refetch} = useFetchComponents();
+    const { data: brandsData, isLoading: isLoadingBrands } = useFetchBrands();
+    console.log('getBrandsApi:', brandsData?.length);
+    const [page, setPage] = useState<number>(0);
+    const [filters, setFilters] = useState<{ itemType: ItemType | undefined; brand: string }>({ itemType: undefined, brand: "" });
 
+    const { data, isLoading, error, isFetching, isPlaceholderData } = useFetchComponents(page, filters);
 
     const filteredComponents = componentList.filter(component => {
         const matchesSearch =
@@ -53,15 +53,6 @@ const ComponentsPage = () => {
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold text-midnight-dark">Komponenty PC</h2>
                     <div className="flex gap-2">
-                        <button
-                            onClick={ () => refetch()}
-                            className="px-3 py-1.5 bg-white border border-ocean-blue text-ocean-blue rounded hover:bg-ocean-light-blue text-sm font-medium transition-colors flex items-center gap-1"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
-                            Odśwież
-                        </button>
                         <button className="px-3 py-1.5 bg-ocean-dark-blue text-white rounded hover:bg-ocean-blue text-sm font-medium transition-colors flex items-center gap-1">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -86,27 +77,55 @@ const ComponentsPage = () => {
                     </div>
 
                     <select
-                        value={filterType}
-                        onChange={(e) => setFilterType(e.target.value)}
-                        className="px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-ocean-blue"
-                    >
-                        <option value="all">Wszystkie</option>
-                        {uniqueTypes.map(type => (
-                            <option key={type} value={type}>
-                                {componentTypeNames[type] || type}
-                            </option>
-                        ))}
-                    </select>
+                         value={filters.itemType}
+                         onChange={(e) => setFilters((prev) => ({ ...prev, itemType: e.target.value as ItemType | undefined }))}
+                         className="border border-gray-300 rounded p-2 text-sm"
+                     >
+                         <option value="">-- wybierz typ --</option>
+                         {Object.values(ItemType).map((type) => (
+                             <option key={type} value={type}>
+                                 {type.replaceAll("_", " ")}
+                             </option>
+                         ))}
+                     </select>
+
+                      <select
+    value={filters.brand}
+    onChange={(e) => setFilters(prev => ({ ...prev, brand: e.target.value }))}
+    className="border border-gray-300 rounded p-2 text-sm"
+    disabled={isLoadingBrands}
+>
+    <option value="">
+        {isLoadingBrands ? "Ładowanie marek..." : "Wszystkie marki"}
+    </option>
+    {brandsData?.map((brand) => ( 
+        <option key={brand} value={brand}>{brand}</option>
+    ))}
+</select>
                 </div>
 
                 <div className="flex items-center gap-3 text-xs text-gray-600">
-                    <span>Wyświetlono: <strong>{filteredComponents.length}</strong></span>
-                    <span>•</span>
-                    <span>Łącznie: <strong>{componentList.length}</strong></span>
+                    
                 </div>
             </div>
 
-            <Components/>
+            <Components page={page} filters={filters} />
+                <ReactPaginate
+                breakLabel="..."
+                nextLabel={<RightArrow/>}
+                previousLabel={<LeftArrow/>}
+                onPageChange={(e) => setPage(e.selected + 1)}
+                pageRangeDisplayed={3}
+                marginPagesDisplayed={1}
+                pageCount={data?.totalPages ?? 1}
+                containerClassName="flex justify-center gap-1 py-4"
+                pageClassName=""
+                pageLinkClassName="px-3 py-1 block rounded bg-gray-100 cursor-pointer"
+                activeLinkClassName="bg-ocean-dark-blue text-white font-semibold"
+                previousLinkClassName="px-3 py-1 block rounded hover:bg-gray-200 cursor-pointer"
+                nextLinkClassName="px-3 py-1 block rounded hover:bg-gray-200 cursor-pointer"
+            />
+
         </div>
     );
 }

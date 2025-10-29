@@ -4,7 +4,7 @@ import {setAuthToken} from "../../../lib/Auth.tsx";
 import { useAtom } from 'jotai';
 import { loginAdminAtom, loginUserAtom } from '../../../atomContext/userAtom.tsx';
 
-const AdminLogin = () => {
+const adminLogin = () => {
 
     const [, loginUser] = useAtom(loginUserAtom);
     const [, loginAdmin] = useAtom(loginAdminAtom);
@@ -58,7 +58,6 @@ const AdminLogin = () => {
                 </div>
             </div>
 
-            {/* Formularz logowania */}
             <div className="max-w-md mx-auto px-4">
                 <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8">
                     <form className="space-y-6" onSubmit={handleSubmit}>
@@ -115,4 +114,4 @@ const AdminLogin = () => {
     );
 };
 
-export default AdminLogin;
+export default adminLogin;
