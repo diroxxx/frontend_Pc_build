@@ -7,6 +7,7 @@ import { saveComputerToDbAtom, listOfComputers, retriveComputersFromDbAtom, migr
 import customAxios from '../lib/customAxios.tsx';
 import {useQueryClient} from "@tanstack/react-query";
 export interface User {
+    // id: number;
   email: string;
   role: string;
   nickname: string;
