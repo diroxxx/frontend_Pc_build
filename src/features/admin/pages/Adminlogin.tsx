@@ -4,7 +4,7 @@ import {setAuthToken} from "../../../lib/Auth.tsx";
 import { useAtom } from 'jotai';
 import { loginAdminAtom, loginUserAtom } from '../../../atomContext/userAtom.tsx';
 
-const adminLogin = () => {
+const AdminLogin = () => {
 
     const [, loginUser] = useAtom(loginUserAtom);
     const [, loginAdmin] = useAtom(loginAdminAtom);
@@ -114,4 +114,4 @@ const adminLogin = () => {
     );
 };
 
-export default adminLogin;
+export default AdminLogin;
