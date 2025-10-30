@@ -8,7 +8,7 @@ interface GeneralInfoProps {
     onNavigate: (tab: string) => void;
 }
 
-const GeneralInfo = ({ onNavigate }: GeneralInfoProps) => {
+const GeneralPage = ({ onNavigate }: GeneralInfoProps) => {
     const users = useAtomValue(usersListAtom);
     const fetchAllUsers = useFetchAllUsers();
     const fetchOffersSpecs = useFetchOffersSpecs();
@@ -76,4 +76,4 @@ const GeneralInfo = ({ onNavigate }: GeneralInfoProps) => {
     );
 }
 
-export default GeneralInfo;
+export default GeneralPage;

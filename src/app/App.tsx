@@ -10,7 +10,7 @@ import UserPage from "../UserInfoPage/UserPage.tsx";
 import Community from "../pages/UserPage/Community/community.tsx";
 import Builds from "../pages/UserPage/builds/builds.tsx";
 
-import AdminLogin from "../features/admin/pages/adminLogin.tsx";
+import AdminLoginPage from "../features/admin/pages/adminLoginPage.tsx";
 import AdminControlPanel from "../features/admin/pages/adminControlPanel.tsx";
 import {ToastProvider} from "../lib/ToastContainer.tsx";
 import {queryClient} from "./store/queryClient.ts";
@@ -42,7 +42,7 @@ function App() {
                     />
                 </Route>
 
-                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin/login" element={<AdminLoginPage />} />
 
                 <Route
                     path="/admin/controlPanel"

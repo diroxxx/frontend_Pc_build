@@ -1,0 +1,1 @@
+export enum ItemConditionEnum { NEW = 'NEW', USED = 'USED', DEFECTIVE = 'DEFECTIVE' }

@@ -44,8 +44,6 @@ const ComponentsPage = () => {
         casePc: 'Obudowa'
     };
 
-    const uniqueTypes = [...new Set(componentList.map(c => c.componentType))];
-
     return (
         <div className="space-y-4">
             {/* Header */}

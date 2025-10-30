@@ -1,14 +1,14 @@
 import {useState } from "react";
-import UsersComponent from "./usersComponent.tsx";
+import UsersPage from "./usersPage.tsx";
 import { useNavigate } from "react-router-dom";
 import { setAuthToken } from "../../../lib/Auth.tsx";
 import { userAtom } from "../../../atomContext/userAtom.tsx";
 import { useAtom } from "jotai";
 import { showToast } from "../../../lib/ToastContainer.tsx";
 import OffersComponent from "./offersUpdatePage.tsx";
-import GeneralInfo from "./generalInfo.tsx";
+import GeneralPage from "./generalPage.tsx";
 import ComponentsPage from "./componentsPage.tsx";
-
+import OffersPage from "./OffersPage.tsx";
 const AdminControlPanel = () => {
         const [activeTab, setActiveTab] = useState("general");
         const navigate = useNavigate();
@@ -60,6 +60,16 @@ const AdminControlPanel = () => {
                         Ogólne
                     </button>
                     <button
+                        onClick={() => setActiveTab("offersUpdate")}
+                        className={`mb-2 px-6 py-3 rounded-lg transition-all duration-200 font-medium ${
+                            activeTab === "offers"
+                                ? "bg-ocean-dark-blue text-ocean-white shadow-sm"
+                                : "text-gray-600 hover:text-ocean-dark-blue "
+                        }`}
+                    >
+                        Aktualizacje ofert
+                    </button>
+                    <button
                         onClick={() => setActiveTab("offers")}
                         className={`mb-2 px-6 py-3 rounded-lg transition-all duration-200 font-medium ${
                             activeTab === "offers"
@@ -67,7 +77,7 @@ const AdminControlPanel = () => {
                                 : "text-gray-600 hover:text-ocean-dark-blue "
                         }`}
                     >
-                        Oferty
+                        oferty
                     </button>
                     <button
                         onClick={() => setActiveTab("components")}
@@ -102,10 +112,11 @@ const AdminControlPanel = () => {
                 </div>
 
                 <div className="flex-1 p-6">
-                    {activeTab === "general" && <GeneralInfo onNavigate={setActiveTab} />}
-                    {activeTab === "users" && <UsersComponent />}
+                    {activeTab === "general" && <GeneralPage onNavigate={setActiveTab} />}
+                    {activeTab === "users" && <UsersPage />}
                     {activeTab === "components" && <ComponentsPage />}
-                    {activeTab === "offers" && <OffersComponent />}
+                    {activeTab === "offersUpdate" && <OffersComponent />}
+                    {activeTab === "offers" && <OffersPage />}
                 </div>
             </div>
         </div>

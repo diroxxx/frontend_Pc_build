@@ -6,9 +6,6 @@ import type { ItemType } from "../../../types/BaseItemDto.ts";
 export const useFetchComponents = (page: number, filters?: {itemType?: ItemType; brand?: string}) => {
     const queryClient = useQueryClient();
 
-
-
-
     const query = useQuery({
         queryKey: ["components", page, filters],
         queryFn: () => getComponentsApi(page, filters),

@@ -3,7 +3,7 @@ import customAxios from "../../../lib/customAxios.tsx";
 import { usersListAtom } from "../atoms/adminAtom.tsx";
 import { useAtom } from "jotai";
 import {RemoveIcon} from "../../../assets/icons/removeIcon.tsx"
-const UsersComponent = () => {
+const UsersPage = () => {
     const [getUsers, setUsers] = useAtom(usersListAtom);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterRole, setFilterRole] = useState<string>('all');
@@ -126,4 +126,4 @@ const UsersComponent = () => {
     );
 };
 
-export default UsersComponent;
+export default UsersPage;

@@ -66,51 +66,51 @@ export interface CaseSpec extends BaseComponentSpec {
   format: string;
 }
 
-export type ComponentSpec = ProcessorSpec | CoolerSpec | GraphicsCardSpec | 
+export type OfferSpec = ProcessorSpec | CoolerSpec | GraphicsCardSpec |
   MemorySpec | MotherboardSpec | PowerSupplySpec | StorageSpec | CaseSpec;
 
-export const isProcessorSpec = (component: ComponentSpec): component is ProcessorSpec => 
+export const isProcessorSpec = (component: OfferSpec): component is ProcessorSpec =>
   component.componentType.toLowerCase() === 'processor';
 
 
-export const isCoolerSpec = (component: ComponentSpec): component is CoolerSpec => 
+export const isCoolerSpec = (component: OfferSpec): component is CoolerSpec =>
   component.componentType.toLowerCase() === 'cooler';
 
 
-export const isGraphicsCardSpec = (component: ComponentSpec): component is GraphicsCardSpec => 
+export const isGraphicsCardSpec = (component: OfferSpec): component is GraphicsCardSpec =>
   component.componentType.toLowerCase() === 'graphicsCard';
 
 
-export const isMemorySpec = (component: ComponentSpec): component is MemorySpec => 
+export const isMemorySpec = (component: OfferSpec): component is MemorySpec =>
   component.componentType === 'memory';
 
 
-export const isMotherboardSpec = (component: ComponentSpec): component is MotherboardSpec => 
+export const isMotherboardSpec = (component: OfferSpec): component is MotherboardSpec =>
   component.componentType === 'motherboard';
 
 
-export const isPowerSupplySpec = (component: ComponentSpec): component is PowerSupplySpec => 
+export const isPowerSupplySpec = (component: OfferSpec): component is PowerSupplySpec =>
   component.componentType === 'powerSupply';
 
 
-export const isStorageSpec = (component: ComponentSpec): component is StorageSpec => 
+export const isStorageSpec = (component: OfferSpec): component is StorageSpec =>
   component.componentType === 'storage';
 
 
-export const isCaseSpec = (component: ComponentSpec): component is CaseSpec => 
+export const isCaseSpec = (component: OfferSpec): component is CaseSpec =>
   component.componentType === 'casePc';
 
 
-export const componentSpecsAtom = atom<ComponentSpec[]>([]);
+export const componentSpecsAtom = atom<OfferSpec[]>([]);
 
-export const componentsByTypeAtom = atom<Record<string, ComponentSpec[]>>({});
+export const componentsByTypeAtom = atom<Record<string, OfferSpec[]>>({});
 
 export const useFetchOffersSpecs = () => {
     const setComponents = useSetAtom(componentSpecsAtom);
 
     return useCallback( async () => {
         try {
-            const response = await customAxios.get<Record<string, ComponentSpec[]>>('/offers');
+            const response = await customAxios.get<Record<string, OfferSpec[]>>('/offers');
             const flatComponents = Object.values(response.data).flat();
             console.log('Fetched component specifications:', flatComponents);
             setComponents(flatComponents);

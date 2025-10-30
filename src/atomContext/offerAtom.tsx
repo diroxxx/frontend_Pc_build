@@ -8,16 +8,8 @@ import type {
   PowerSupplySpec,
   StorageSpec,
   CaseSpec
-} from '../atomContext/componentAtom';
+} from './componentAtom.tsx';
 
-// ===============================
-// OFFER TYPES & INTERFACES
-// ===============================
-
-/**
- * Interface for offer-specific data (pricing, condition, shop information)
- * This data is added to component specifications during web scraping
- */
 export interface OfferData {
   condition: string;
   photoUrl: string;
@@ -26,10 +18,6 @@ export interface OfferData {
   shop: string;
 }
 
-/**
- * Complete offer interfaces combining component specifications with commercial data
- * These types are used for displaying offers to users
- */
 export interface ProcessorOffer extends ProcessorSpec, OfferData {}
 export interface CoolerOffer extends CoolerSpec, OfferData {}
 export interface GraphicsCardOffer extends GraphicsCardSpec, OfferData {}
