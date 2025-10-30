@@ -124,8 +124,8 @@ return (
                     )}
 
                     <div>
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             disabled={isLoading}
                             className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-ocean-dark hover:bg-gradient-ocean-dark-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ocean-blue transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
@@ -138,14 +138,22 @@ return (
                     <div className="text-center">
                         <span className="text-sm text-gray-600">
                             Masz już konto?{' '}
-                            <a 
-                                href="/login" 
+                            <a
+                                href="/login"
                                 className="font-medium text-ocean-blue hover:text-ocean-dark-blue transition-colors duration-200"
                             >
                                 Zaloguj się
                             </a>
                         </span>
                     </div>
+                </div>
+                <div className="text-center mt-6">
+                    <a
+                        href="/"
+                        className="text-sm text-ocean-blue hover:text-ocean-dark-blue transition-colors duration-200"
+                    >
+                        Wróć na strone główną
+                    </a>
                 </div>
             </div>
         </div>

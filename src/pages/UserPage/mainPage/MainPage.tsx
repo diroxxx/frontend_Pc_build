@@ -128,34 +128,56 @@ function mainPage() {
                             Automatycznie zbieramy oferty z popularnych platform sprzedażowych
                         </p>
                     </div>
-                    
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 items-center">
-                        {partnerStores.map((store, index) => (
-                            <div
-                                key={index}
-                                className="group flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
-                                onClick={() => window.open(store.website, '_blank')}
-                            >
-                                <div className="w-16 h-16 mb-3 flex items-center justify-center">
-                                    <img
-                                        src={store.logo}
-                                        alt={`${store.name} logo`}
-                                        className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-200"
-                                    />
-                                    <div 
-                                        className="hidden text-xs font-medium text-gray-700 text-center"
-                                        style={{ display: 'none' }}
-                                    >
-                                            {store.name}
+
+                    {/*<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 items-center">*/}
+                    {/*    {partnerStores.map((store, index) => (*/}
+                    {/*        <div*/}
+                    {/*            key={index}*/}
+                    {/*            className="group flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200 cursor-pointer"*/}
+                    {/*            onClick={() => window.open(store.website, '_blank')}*/}
+                    {/*        >*/}
+                    {/*            <div className="w-16 h-16 mb-3 flex items-center justify-center">*/}
+                    {/*                <img*/}
+                    {/*                    src={store.logo}*/}
+                    {/*                    alt={`${store.name} logo`}*/}
+                    {/*                    className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-200"*/}
+                    {/*                />*/}
+                    {/*                <div */}
+                    {/*                    className="hidden text-xs font-medium text-gray-700 text-center"*/}
+                    {/*                    style={{ display: 'none' }}*/}
+                    {/*                >*/}
+                    {/*                        {store.name}*/}
+                    {/*                </div>*/}
+                    {/*            </div>*/}
+                    {/*            <p className="text-xs font-medium text-gray-700 text-center">*/}
+                    {/*                {store.name}*/}
+                    {/*            </p>*/}
+                    {/*        </div>*/}
+                    {/*    ))}*/}
+                    {/*</div>  */}
+                    <div className="w-full px-4">
+                        <div className="grid grid-cols-3 md:grid-cols-6 gap-136 w-full">
+                            {partnerStores.map((store, index) => (
+                                <div
+                                    key={index}
+                                    className="group flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
+                                    onClick={() => window.open(store.website, '_blank')}
+                                >
+                                    <div className="w-32 h-20 mb-3 flex items-center justify-center">
+                                        <img
+                                            src={store.logo}
+                                            alt={`${store.name} logo`}
+                                            className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-200"
+                                        />
                                     </div>
+                                    <p className="text-xs font-medium text-gray-700 text-center">
+                                        {store.name}
+                                    </p>
                                 </div>
-                                <p className="text-xs font-medium text-gray-700 text-center">
-                                    {store.name}
-                                </p>
-                            </div>
-                        ))}
-                    </div>  
-                           <div className="text-center mt-8">
+                            ))}
+                        </div>
+                    </div>
+                    <div className="text-center mt-8">
                         <p className="text-sm text-gray-500">
                             * Oferty aktualizowane są na bieżąco
                         </p>

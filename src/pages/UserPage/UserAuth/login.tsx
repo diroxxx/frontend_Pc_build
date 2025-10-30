@@ -1,7 +1,6 @@
 import {use, useState} from "react";
 import {setAuthToken} from "../../../lib/Auth.tsx";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
-import {jwtDecode} from "jwt-decode";
 import { useAtom } from 'jotai';
 import { loginUserAtom } from '../../../atomContext/userAtom.tsx';
 import { migrateGuestDataAtom } from '../../../atomContext/computerAtom.tsx';
@@ -88,8 +87,8 @@ return (
                     </div>
 
                     <div>
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-ocean-dark hover:bg-gradient-ocean-dark-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ocean-blue "
                         >
                             Zaloguj się
@@ -97,8 +96,8 @@ return (
                     </div>
 
                     <div className="text-center">
-                        <a 
-                            href="#" 
+                        <a
+                            href="#"
                             className="text-sm text-ocean-blue hover:text-ocean-dark-blue transition-colors duration-200"
                         >
                             Zapomniałeś swojego hasła?
@@ -110,8 +109,8 @@ return (
                     <div className="text-center">
                         <span className="text-sm text-gray-600">
                             Nie masz jeszcze konta?{' '}
-                            <a 
-                                href="/register" 
+                            <a
+                                href="/register"
                                 className="font-medium text-ocean-blue hover:text-ocean-dark-blue transition-colors duration-200"
                             >
                                 Zarejestruj się
@@ -119,9 +118,18 @@ return (
                         </span>
                     </div>
                 </div>
+                <div className="text-center mt-6">
+                    <a
+                        href="/"
+                        className="text-sm text-ocean-blue hover:text-ocean-dark-blue transition-colors duration-200"
+                    >
+                        Wróć na strone główną
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 );
 }
+
 export default Login;
