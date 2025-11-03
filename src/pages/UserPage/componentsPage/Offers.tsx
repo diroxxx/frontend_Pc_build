@@ -33,7 +33,6 @@ const getOffers = async (): Promise<ComponentOffer[]> => {
         
         console.log('Response structure:', Object.keys(data));
         
-        // Flatten all offer arrays from different categories
         const allOffers: ComponentOffer[] = [];
         Object.values(data).forEach(offerArray => {
             if (Array.isArray(offerArray)) {
@@ -53,7 +52,6 @@ const getOffers = async (): Promise<ComponentOffer[]> => {
 };
 
 function Offers() {
-    // Atom state - zmienione na oferty
     const [offers, setOffers] = useAtom(offersAtom);
     const [loading, setLoading] = useAtom(offersLoadingAtom);
     const [error, setError] = useAtom(offersErrorAtom);
@@ -69,14 +67,12 @@ function Offers() {
     const [, clearFilters] = useAtom(clearFiltersAtom);
     const [, clearCompatibilityIssues] = useAtom(clearCompatibilityIssuesAtom);
 
-    // Derived state - zmienione na oferty
     const [filteredOffers] = useAtom(filteredOffersAtom);
     const [manufacturers] = useAtom(manufacturersAtom);
     const [conditions] = useAtom(conditionsAtom);
     const [categories] = useAtom(categoriesAtom);
     const [shops] = useAtom(shopsAtom);
 
-    // Local state for pagination and loading
     const [currentPage, setCurrentPage] = useState(1);
     const [sortBy, setSortBy] = useState('');
     const componentsPerPage = 25;
@@ -103,7 +99,6 @@ function Offers() {
         });
     };
 
-    // useEffect zmieniony na oferty
     useEffect(() => {
         if (offers.length === 0) {
             getOffers()
@@ -123,13 +118,11 @@ function Offers() {
         }
     }, [offers.length, setOffers, setLoading, setError]);
 
-    // Reset to first page when filters change
     useEffect(() => {
         setCurrentPage(1);
     }, [filteredOffers.length]);
 
-    // Sort filtered offers - zmienione na oferty
-    const sortedOffers = sortBy === '' 
+    const sortedOffers = sortBy === ''
         ? filteredOffers
         : [...filteredOffers].sort((a, b) => {
             switch (sortBy) {
@@ -157,11 +150,9 @@ function Offers() {
         </div>
     );
 
-    // Calculate total pages for filtered offers - zmienione na oferty
     const totalOffers = sortedOffers.length;
     const totalPages = Math.ceil(totalOffers / componentsPerPage);
     
-    // Get offers for current page - zmienione na oferty
     const startIndex = (currentPage - 1) * componentsPerPage;
     const endIndex = startIndex + componentsPerPage;
     const currentPageOffers = sortedOffers.slice(startIndex, endIndex);

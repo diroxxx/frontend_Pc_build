@@ -61,24 +61,24 @@ const checkSocketCompatibility = (offers: ComponentOffer[]): CompatibilityIssue[
     }
     return issues;
 };
-const checkMemoryCompatibility = (components: ComponentOffer[]): CompatibilityIssue[] => {
-  const issues: CompatibilityIssue[] = [];
-  
-  const motherboard = components.find(isMotherboardOffer);
-  const memory = components.find(isMemoryOffer);
-  
-  if (motherboard && memory) {
-    if (motherboard.memoryType !== memory.type) {
-      issues.push({
-        type: 'error',
-        message: `Pamięć RAM (${memory.type}) nie jest kompatybilna z płytą główną (${motherboard.memoryType})`,
-        affectedComponents: ['memory', 'motherboard']
-      });
-    }
-  }
-  
-  return issues;
-};
+// const checkMemoryCompatibility = (components: ComponentOffer[]): CompatibilityIssue[] => {
+//   const issues: CompatibilityIssue[] = [];
+//
+//   const motherboard = components.find(isMotherboardOffer);
+//   const memory = components.find(isMemoryOffer);
+//
+//   if (motherboard && memory) {
+//     if (motherboard.memoryType !== memory.type) {
+//       issues.push({
+//         type: 'error',
+//         message: `Pamięć RAM (${memory.type}) nie jest kompatybilna z płytą główną (${motherboard.memoryType})`,
+//         affectedComponents: ['memory', 'motherboard']
+//       });
+//     }
+//   }
+//
+//   return issues;
+// };
 
 const checkPowerRequirements = (components: ComponentOffer[]): CompatibilityIssue[] => {
   const issues: CompatibilityIssue[] = [];
@@ -118,15 +118,15 @@ const checkPowerRequirements = (components: ComponentOffer[]): CompatibilityIssu
   return issues;
 };
 
-const checkAllCompatibility = (components: ComponentOffer[]): CompatibilityIssue[] => {
-  const issues: CompatibilityIssue[] = [];
-  
-  issues.push(...checkSocketCompatibility(components));
-  issues.push(...checkMemoryCompatibility(components));
-  issues.push(...checkPowerRequirements(components));
-  
-  return issues;
-};
+// const checkAllCompatibility = (components: ComponentOffer[]): CompatibilityIssue[] => {
+//   const issues: CompatibilityIssue[] = [];
+//
+//   issues.push(...checkSocketCompatibility(components));
+//   issues.push(...checkMemoryCompatibility(components));
+//   issues.push(...checkPowerRequirements(components));
+//
+//   return issues;
+// };
 
 function Builds() {
 
@@ -145,7 +145,7 @@ function Builds() {
     const selectedComputer = selectedComputerIndex !== null ? computers[selectedComputerIndex] : null;
 
     // Calculate compatibility issues for selected computerAtom
-    const compatibilityIssues = selectedComputer ? checkAllCompatibility(selectedComputer.offers) : [];
+    // const compatibilityIssues = selectedComputer ? checkAllCompatibility(selectedComputer.offers) : [];
 
     const categoryLabels: { [key: string]: string } = {
         'processor': 'CPU',
@@ -275,60 +275,60 @@ return (
             </div>
 
             {/* Compatibility Issues Section */}
-            {selectedComputer && compatibilityIssues.length > 0 && (
-                <div className="bg-red-50 border-b border-red-200 p-4">
-                    <h3 className="text-sm font-medium text-ocean-red mb-2 flex items-center">
-                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="mr-1 text-ocean-red">
-                            <path
-                                stroke="currentColor"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                            />
-                        </svg>
-                        Problemy z kompatybilnością ({compatibilityIssues.length})
-                    </h3>
-                    
-                    <div className="space-y-2">
-                        {compatibilityIssues.map((issue, index) => (
-                            <div
-                                key={index}
-                                className={`p-3 rounded-lg border ${
-                                    issue.type === 'error'
-                                        ? 'bg-red-100 text-ocean-red border-red-300'
-                                        : 'bg-yellow-100 text-yellow-800 border-yellow-300'
-                                }`}
-                            >
-                                <div className="flex items-start gap-2">
-                                    {issue.type === 'error' ? (
-                                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5 text-ocean-red">
-                                            <path
-                                                stroke="currentColor"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M6 18L18 6M6 6l12 12"
-                                            />
-                                        </svg>
-                                    ) : (
-                                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5 text-yellow-600">
-                                            <path
-                                                stroke="currentColor"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                                            />
-                                        </svg>
-                                    )}
-                                    <span className="text-sm">{issue.message}</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
+            {/*{selectedComputer && compatibilityIssues.length > 0 && (*/}
+            {/*    <div className="bg-red-50 border-b border-red-200 p-4">*/}
+            {/*        <h3 className="text-sm font-medium text-ocean-red mb-2 flex items-center">*/}
+            {/*            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="mr-1 text-ocean-red">*/}
+            {/*                <path*/}
+            {/*                    stroke="currentColor"*/}
+            {/*                    strokeLinecap="round"*/}
+            {/*                    strokeLinejoin="round"*/}
+            {/*                    strokeWidth={2}*/}
+            {/*                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"*/}
+            {/*                />*/}
+            {/*            </svg>*/}
+            {/*            Problemy z kompatybilnością ({compatibilityIssues.length})*/}
+            {/*        </h3>*/}
+            {/*        */}
+            {/*        <div className="space-y-2">*/}
+            {/*            {compatibilityIssues.map((issue, index) => (*/}
+            {/*                <div*/}
+            {/*                    key={index}*/}
+            {/*                    className={`p-3 rounded-lg border ${*/}
+            {/*                        issue.type === 'error'*/}
+            {/*                            ? 'bg-red-100 text-ocean-red border-red-300'*/}
+            {/*                            : 'bg-yellow-100 text-yellow-800 border-yellow-300'*/}
+            {/*                    }`}*/}
+            {/*                >*/}
+            {/*                    <div className="flex items-start gap-2">*/}
+            {/*                        {issue.type === 'error' ? (*/}
+            {/*                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5 text-ocean-red">*/}
+            {/*                                <path*/}
+            {/*                                    stroke="currentColor"*/}
+            {/*                                    strokeLinecap="round"*/}
+            {/*                                    strokeLinejoin="round"*/}
+            {/*                                    strokeWidth={2}*/}
+            {/*                                    d="M6 18L18 6M6 6l12 12"*/}
+            {/*                                />*/}
+            {/*                            </svg>*/}
+            {/*                        ) : (*/}
+            {/*                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5 text-yellow-600">*/}
+            {/*                                <path*/}
+            {/*                                    stroke="currentColor"*/}
+            {/*                                    strokeLinecap="round"*/}
+            {/*                                    strokeLinejoin="round"*/}
+            {/*                                    strokeWidth={2}*/}
+            {/*                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"*/}
+            {/*                                />*/}
+            {/*                            </svg>*/}
+            {/*                        )}*/}
+            {/*                        <span className="text-sm">{issue.message}</span>*/}
+            {/*                    </div>*/}
+            {/*                </div>*/}
+            {/*            ))}*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+            {/*)}*/}
 
             <div className="grid grid-cols-4 bg-gradient-gray border-b border-ocean-light-blue font-bold p-4 text-midnight-dark">
                 <div>Komponent</div>

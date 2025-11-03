@@ -10,7 +10,7 @@ import type {
   CaseSpec
 } from './componentAtom.tsx';
 
-export interface OfferData {
+export interface OfferBase {
   condition: string;
   photoUrl: string;
   websiteUrl: string;
@@ -18,20 +18,16 @@ export interface OfferData {
   shop: string;
 }
 
-export interface ProcessorOffer extends ProcessorSpec, OfferData {}
-export interface CoolerOffer extends CoolerSpec, OfferData {}
-export interface GraphicsCardOffer extends GraphicsCardSpec, OfferData {}
-export interface MemoryOffer extends MemorySpec, OfferData {}
-export interface MotherboardOffer extends MotherboardSpec, OfferData {}
-export interface PowerSupplyOffer extends PowerSupplySpec, OfferData {}
-export interface StorageOffer extends StorageSpec, OfferData {}
-export interface CaseOffer extends CaseSpec, OfferData {}
+export interface ProcessorOffer extends ProcessorSpec, OfferBase {}
+export interface CoolerOffer extends CoolerSpec, OfferBase {}
+export interface GraphicsCardOffer extends GraphicsCardSpec, OfferBase {}
+export interface MemoryOffer extends MemorySpec, OfferBase {}
+export interface MotherboardOffer extends MotherboardSpec, OfferBase {}
+export interface PowerSupplyOffer extends PowerSupplySpec, OfferBase {}
+export interface StorageOffer extends StorageSpec, OfferBase {}
+export interface CaseOffer extends CaseSpec, OfferBase {}
 
-/**
- * Union type for all offer types
- * Used in components to display offers to users
- */
-export type ComponentOffer = ProcessorOffer | CoolerOffer | GraphicsCardOffer | 
+export type ComponentOffer = ProcessorOffer | CoolerOffer | GraphicsCardOffer |
   MemoryOffer | MotherboardOffer | PowerSupplyOffer | StorageOffer | CaseOffer;
 
 
@@ -164,6 +160,7 @@ export const conditionsAtom = atom((get) => {
  */
 export const categoriesAtom = atom((get) => {
   const offers = get(offersAtom);
+  console.log(offers.map(offer => offer.componentType).filter(Boolean));
   return [...new Set(offers.map(offer => offer.componentType).filter(Boolean))].sort();
 });
 
@@ -205,30 +202,30 @@ export const filteredOffersAtom = atom((get) => {
   return offers.filter(offer => {
     // Price range filtering
     const priceMatch = offer.price >= priceRange.min && offer.price <= priceRange.max;
-    
+
     // Manufacturer filtering
     const manufacturerMatch = !selectedManufacturer || offer.brand === selectedManufacturer;
-    
+
     // Condition filtering
     const conditionMatch = !selectedCondition || offer.condition === selectedCondition;
-    
+
     // Category filtering
     const categoryMatch = !selectedCategory || offer.componentType === selectedCategory;
-    
+
     // Shop filtering
     const shopMatch = !selectedShop || offer.shop === selectedShop;
-    
+
     // Prepare data for text search
     const brand = offer.brand || '';
     const model = offer.model || '';
     const componentType = offer.componentType || '';
-    
+
     // Text search (case-insensitive)
     const searchMatch = !searchText ||
       brand.toLowerCase().includes(searchText.toLowerCase()) ||
       model.toLowerCase().includes(searchText.toLowerCase()) ||
       componentType.toLowerCase().includes(searchText.toLowerCase());
-    
+
     // Return true only if all filters match
     return priceMatch && manufacturerMatch && conditionMatch && categoryMatch && shopMatch && searchMatch;
   });

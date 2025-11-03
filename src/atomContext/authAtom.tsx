@@ -19,13 +19,11 @@ export interface RegisterData {
   password: string;
 }
 
-// Auth state atom
 export const authStateAtom = atom<AuthState>({
   isLoading: false,
   error: null
 });
 
-// Login action atom
 export const loginAtom = atom(
   null,
   async (get, set, data: LoginData) => {

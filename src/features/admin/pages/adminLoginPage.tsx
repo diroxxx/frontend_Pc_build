@@ -5,8 +5,6 @@ import { useAtom } from 'jotai';
 import { loginAdminAtom, loginUserAtom } from '../../../atomContext/userAtom.tsx';
 
 const AdminLoginPage = () => {
-
-    const [, loginUser] = useAtom(loginUserAtom);
     const [, loginAdmin] = useAtom(loginAdminAtom);
 
     const [credentials, setCredentials] = useState({
@@ -17,7 +15,7 @@ const AdminLoginPage = () => {
 
    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
            event.preventDefault();
-           fetch("http://localhost:8080/auth/login", {
+           fetch("http://localhost:8080/auth/login/admin", {
                method: "POST",
                headers: {"content-type": "application/json"},
                body: JSON.stringify({

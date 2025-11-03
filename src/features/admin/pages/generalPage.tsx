@@ -3,6 +3,7 @@ import { useAtomValue } from "jotai";
 import {useEffect} from "react";
 import {useFetchOffersSpecs} from "../../../atomContext/componentAtom.tsx";
 import {useFetchComponents} from "../hooks/useFetchComponents.ts";
+import {useOffersCount} from "../../../hooks/useOffersCount.ts";
 
 interface GeneralInfoProps {
     onNavigate: (tab: string) => void;
@@ -13,7 +14,7 @@ const GeneralPage = ({ onNavigate }: GeneralInfoProps) => {
     const fetchAllUsers = useFetchAllUsers();
     const fetchOffersSpecs = useFetchOffersSpecs();
     const { data: components} = useFetchComponents(0);
-
+    const {data: offersCount} = useOffersCount();
 
     useEffect(() => {
         fetchAllUsers();
@@ -64,7 +65,7 @@ const GeneralPage = ({ onNavigate }: GeneralInfoProps) => {
                 <h2 className="text-text-ocean-white text-lg font-semibold mb-2">
                     Oferty
                 </h2>
-                <span className="text-text-ocean-white text-4xl font-bold mb-2">0</span>
+                <span className="text-text-ocean-white text-4xl font-bold mb-2">{offersCount?.toLocaleString() ?? 0}</span>
                 <p
                     onClick={() => onNavigate("offers")}
                     className="text-text-ocean-white text-sm cursor-pointer hover:underline hover:text-ocean-light-blue transition-colors"

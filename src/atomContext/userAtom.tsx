@@ -1,11 +1,10 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { jwtDecode } from 'jwt-decode';
-import { getAuthToken, setAuthToken} from '../lib/Auth.tsx';
+import {setAuthToken} from '../lib/Auth.tsx';
 
-import { saveComputerToDbAtom, listOfComputers, retriveComputersFromDbAtom, migrateGuestDataAtom } from './computerAtom.tsx';
-import customAxios from '../lib/customAxios.tsx';
-import {useQueryClient} from "@tanstack/react-query";
+import {retriveComputersFromDbAtom, migrateGuestDataAtom } from './computerAtom.tsx';
+
 export interface User {
     // id: number;
   email: string;
@@ -26,8 +25,6 @@ export const isAuthenticatedAtom = atom<boolean>((get) => {
   const user = get(userAtom);
   return user !== null;
 });
-
-
 
 export const loginUserAtom = atom(
   null,
@@ -57,41 +54,10 @@ export const loginUserAtom = atom(
   }
 );
 
-export const logoutUserAtom = atom(
-  null,
-  async (get, set) => {
-
-      const queryClient = useQueryClient();
-
-    const user = get(userAtom);
-    if (user) {
-      try {
-        console.log('Saving computers before logout...');
-        await set(saveComputerToDbAtom); 
-        console.log('Computers saved successfully');
-      } catch (error) {
-        console.error('Error saving computers before logout:', error);
-      }
-    }
-    
-    console.log('Clearing tokens...');
-    setAuthToken(null);
-    set(userAtom, null);
-    queryClient.clear();
-    localStorage.removeItem('computers');
-    localStorage.removeItem('computers_last_sync');
-    localStorage.removeItem('selectedComputerId');
-  }
-);
-
-
-// Computed atom to check if user can save computers
 export const canSaveComputersAtom = atom<boolean>((get) => {
   const user = get(userAtom);
   return user !== null; 
 });
-
-
 
 export const loginAdminAtom = atom(
   null,

@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import customAxios from '../../lib/customAxios.tsx';
 import { useAtom } from 'jotai';
-import { userAtom, logoutUserAtom } from '../../atomContext/userAtom';
+import { userAtom } from '../../atomContext/userAtom';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import {useLogout} from "../../hooks/useLogout.ts";
 
 function UserProfile(){
     const [user, setUser] = useAtom(userAtom);
-    const [, logout] = useAtom(logoutUserAtom);
     const navigate = useNavigate();
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -17,7 +17,7 @@ function UserProfile(){
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+    const logout = useLogout();
     const verifyCurrentPassword = async () => {
         if (!currentPassword) {
             toast.error('Please enter your current password');
@@ -71,12 +71,10 @@ function UserProfile(){
                 
                 // Reset form
                 resetPasswordForm();
-                
-                // Logout user after 2 seconds
                 setTimeout(() => {
                     logout();
                     navigate('/login');
-                }, 2000);
+                }, 1000);
             }
         } catch (error: any) {
             toast.error(error.response?.data?.message || 'Failed to change password');

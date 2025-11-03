@@ -1,21 +1,21 @@
 import {useNavigate, useLocation} from "react-router-dom";
 import {useState, useEffect, useRef} from "react";
 import { useAtom } from 'jotai';
-import { userAtom, logoutUserAtom } from '../atomContext/userAtom';
+import { userAtom } from '../atomContext/userAtom';
+import {useLogout} from "../hooks/useLogout.ts";
 
 export default function Navbar() {
     const navigate = useNavigate();
     const location = useLocation();
     const [user] = useAtom(userAtom);
-    const [, logout] = useAtom(logoutUserAtom);
+    // const [, logout] = useAtom(logoutUserAtom);
     const [showDropdown, setShowDropdown] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-
+    const logout = useLogout();
     useEffect(() => {
         const handleScroll = () => {
             const scrollTop = window.scrollY;
-            // Pokazuj sticky navbar po przescrollowaniu 100px
             setIsScrolled(scrollTop > 100);
         };
 
@@ -41,9 +41,7 @@ export default function Navbar() {
 
 return (
     <>
-        {/* Główny navbar */}
         <header className="bg-gradient-blue-horizontal text-white">
-            {/* Top section - Logo i User */}
             <div className="px-6 py-4 flex justify-between items-center">
                 <h1 className="text-ocean-white text-3xl font-bold" style={{fontFamily: "'Space Grotesk', sans-serif"}}>
                     Pc-Build

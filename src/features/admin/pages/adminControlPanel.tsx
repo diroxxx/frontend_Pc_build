@@ -9,16 +9,19 @@ import OffersComponent from "./offersUpdatePage.tsx";
 import GeneralPage from "./generalPage.tsx";
 import ComponentsPage from "./componentsPage.tsx";
 import OffersPage from "./OffersPage.tsx";
+import {useQueryClient} from "@tanstack/react-query";
 const AdminControlPanel = () => {
         const [activeTab, setActiveTab] = useState("general");
         const navigate = useNavigate();
         const [getUser,setUser] = useAtom(userAtom);
+        const queryClient = useQueryClient();
 
-         const handleLogout = () => {
-        try {
-            setAuthToken(null);
-            setUser(null);
-            navigate("/admin/login");
+        const handleLogout = () => {
+            try {
+                setAuthToken(null);
+                queryClient.clear();
+                setUser(null);
+                navigate("/admin/login");
         } catch (error) {
             console.error("Błąd podczas wylogowania:", error);
                     showToast.error("Błąd podczas wylogowania");
@@ -62,7 +65,7 @@ const AdminControlPanel = () => {
                     <button
                         onClick={() => setActiveTab("offersUpdate")}
                         className={`mb-2 px-6 py-3 rounded-lg transition-all duration-200 font-medium ${
-                            activeTab === "offers"
+                            activeTab === "offersUpdate"
                                 ? "bg-ocean-dark-blue text-ocean-white shadow-sm"
                                 : "text-gray-600 hover:text-ocean-dark-blue "
                         }`}
@@ -77,7 +80,7 @@ const AdminControlPanel = () => {
                                 : "text-gray-600 hover:text-ocean-dark-blue "
                         }`}
                     >
-                        oferty
+                        Oferty
                     </button>
                     <button
                         onClick={() => setActiveTab("components")}

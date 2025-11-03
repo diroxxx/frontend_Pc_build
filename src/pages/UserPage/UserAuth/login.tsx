@@ -1,30 +1,25 @@
-import {use, useState} from "react";
+import  {type FormEvent, useState} from "react";
 import {setAuthToken} from "../../../lib/Auth.tsx";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
 import { useAtom } from 'jotai';
 import { loginUserAtom } from '../../../atomContext/userAtom.tsx';
-import { migrateGuestDataAtom } from '../../../atomContext/computerAtom.tsx';
-import { retriveComputersFromDbAtom } from "../../../atomContext/computerAtom.tsx";
 
 function Login() {
     const navigate: NavigateFunction = useNavigate();
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
-    const [nickname, setNickname] = useState("");
     const [, loginUser] = useAtom(loginUserAtom);
-    const [, migrateGuestData] = useAtom(migrateGuestDataAtom);
-    const [,retriveComputersFromDb] = useAtom(retriveComputersFromDbAtom);
 
-    const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const onSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        fetch("http://localhost:8080/auth/login",  {
+        fetch("http://localhost:8080/auth/login/user",  {
             method: "POST",
             headers: {"content-type": "application/json"},
             body: JSON.stringify({
                 login: login,
                 password: password
                 }),
-            credentials: 'include' // Include cookies in the request
+            credentials: 'include'
         }).then(response => {
             if (response.status == 200) {
                 return response.json();
