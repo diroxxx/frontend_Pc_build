@@ -6,9 +6,9 @@ import {
   renameComputerAtom,
   toggleComputerVisibilityAtom,
   type CompatibilityIssue
-} from '../../atomContext/computerAtom.tsx';
-import type { computerAtom } from '../../atomContext/computerAtom.tsx';
-import type { ComponentDto } from '../../atomContext/offerAtom';
+} from '../../../../atomContext/computerAtom.tsx';
+import type { computerAtom } from '../../../../atomContext/computerAtom.tsx';
+import type { ComponentDto } from '../../../../atomContext/offerAtom.tsx';
 
 // Import compatibility checking functions
 const checkSocketCompatibility = (components: ComponentDto[]): CompatibilityIssue[] => {

@@ -9,7 +9,7 @@ import {
   renameComputerAtom,
   removeComponentFromBuildAtom,
   compatibilityIssuesAtom
-} from '../../../atomContext/computerAtom.tsx';
+} from '../../../../atomContext/computerAtom.tsx';
 
 export default function EdgeExpandButton() {
   const [hovered, setHovered] = useState(false);
@@ -24,6 +24,7 @@ export default function EdgeExpandButton() {
   const [, createNewEmptyComputer] = useAtom(createNewEmptyComputerAtom);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingName, setEditingName] = useState('');
+
 
   const handleCreateNewComputer = () => {
     createNewEmptyComputer();

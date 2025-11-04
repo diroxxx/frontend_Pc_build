@@ -1,14 +1,14 @@
-import Login from "../pages/UserPage/UserAuth/login.tsx";
-import MainPage from "../pages/UserPage/mainPage/MainPage.tsx";
+import Login from "../features/user/pages/UserAuth/login.tsx";
+import MainPage from "../pages/MainPage.tsx";
 import {RoleProtectedRoute} from "./router/RoleProtectedRoute.tsx";
 import {Routes, Route } from "react-router-dom";
 import Unauthorized from "../pages/Unauthorized.tsx";
-import Register from "../pages/UserPage/UserAuth/Register.tsx";
+import Register from "../features/user/pages/UserAuth/Register.tsx";
 import Layout from "../pageComponents/Layout.tsx";
-import Offers from "../pages/UserPage/componentsPage/Offers.tsx";
-import UserPage from "../UserInfoPage/UserPage.tsx";
+import OffersUserPage from "../features/user/pages/OffersUserPage.tsx";
+import UserPage from "../features/user/pages/UserPage.tsx";
 import Community from "../pages/UserPage/Community/community.tsx";
-import Builds from "../pages/UserPage/builds/builds.tsx";
+import Builds from "../features/user/components/builds/builds.tsx";
 
 import AdminLoginPage from "../features/admin/pages/adminLoginPage.tsx";
 import AdminControlPanel from "../features/admin/pages/adminControlPanel.tsx";
@@ -28,7 +28,7 @@ function App() {
                 <Route path="/unauthorized" element={<Unauthorized />} />
                 <Route element={<Layout/>}>
                     <Route path="/" element={<MainPage />} />
-                    <Route path="/components" element={<Offers />} />
+                    <Route path="/components" element={<OffersUserPage />} />
                     <Route path="/builds" element={<Builds />} />
                     <Route path="/community" element={<Community/>} />
 

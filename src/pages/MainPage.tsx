@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import SidePanelBuilds from "../builds/SidePanelBuilds.tsx";
+import SidePanelBuilds from "../features/user/components/builds/SidePanelBuilds.tsx";
 
 function mainPage() {
     const navigate = useNavigate();
@@ -35,7 +35,7 @@ function mainPage() {
                     <div className="w-20 h-20">
                         <img
                             src="/components_mainPage.png"
-                            alt="Offers"
+                            alt="OffersUserPage"
                             className="w-full h-full object-cover rounded shadow-md hover:shadow-lg transition-shadow duration-200"
                         />
                         <p className="mt-2 text-sm font-medium">Komponenty</p>

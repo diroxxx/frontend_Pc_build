@@ -10,7 +10,7 @@ import {RightArrow} from "../../../assets/icons/rightArrow.tsx";
 import {LeftArrow} from "../../../assets/icons/leftArrow.tsx";
 import LoadingSpinner from "../../../components/ui/LoadingSpinner.tsx";
 
-const OffersPage = () => {
+const OffersAdminPage = () => {
 
     const [filters, setFilters] = useState<{ itemType: ItemType | undefined; brand: string; minPrize: number; maxPrize:number; itemCondition: ItemConditionEnum | undefined }>({ itemType: undefined, brand: "", minPrize: 0, maxPrize: 99999, itemCondition: undefined });
     const [page, setPage] = useState<number>(0);
@@ -43,4 +43,4 @@ const OffersPage = () => {
     )
 
 };
-export default OffersPage;
+export default OffersAdminPage;

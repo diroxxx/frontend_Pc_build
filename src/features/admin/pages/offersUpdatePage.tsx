@@ -10,7 +10,7 @@ import {useOfferUpdates} from "../hooks/useOffersUpdates.ts";
 import OffersUpdatesView from "../components/OffersUpdatesView.tsx";
 import {LoadingSpinner} from "../../../assets/components/ui/LoadingSpinner.tsx";
 
-// Shop Selector Offer
+// Shop Selector OfferCard
 interface Shop {
     name: string;
     [key: string]: any;

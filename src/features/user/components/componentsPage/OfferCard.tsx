@@ -1,63 +1,68 @@
 import { useAtom } from 'jotai';
-import { addComponentToBuildAtom, currentBuildAtom } from '../../../atomContext/computerAtom.tsx';
-import type { ComponentOffer } from '../../../atomContext/offerAtom.tsx';
+import { addComponentToBuildAtom, currentBuildAtom } from '../../../../atomContext/computerAtom.tsx';
+import type {ComponentOffer} from "../../../../types/OfferBase.ts";
+import type {FC} from "react";
 
-function Offer(props: ComponentOffer) {
+interface Props {
+    offer: ComponentOffer;
+}
+
+const OfferCard: FC<Props> = ( {offer})=> {
   const [, addComponentToBuild] = useAtom(addComponentToBuildAtom);
   const [currentBuild] = useAtom(currentBuildAtom);
 
-  const isInBuild = currentBuild.some(c => c.componentType === props.componentType);
-  const existingComponent = currentBuild.find(c => c.componentType === props.componentType);
+  const isInBuild = currentBuild.some(c => c.componentType === offer.componentType);
+  const existingComponent = currentBuild.find(c => c.componentType === offer.componentType);
 
   const handleAddToBuild = () => {
-    addComponentToBuild(props);
+    addComponentToBuild(offer);
   };
 
   const renderSpecTags = () => {
     const tags = [];
     
-    switch (props.componentType) {
-      case 'graphicsCard':
-        tags.push(`${props.memorySize}GB`);
-        tags.push(props.gddr);
-        tags.push(`${props.powerDraw}W TDP`);
+    switch (offer.componentType) {
+      case 'GRAPHICS_CARD':
+        tags.push(`${offer.memorySize}GB`);
+        tags.push(offer.gddr);
+        tags.push(`${offer.powerDraw}W TDP`);
         break;
         
-       case 'processor':
-        tags.push(`${props.cores} rdzeni`);
-        tags.push(`${props.threads} wątków`);
-        tags.push(props.baseClock);
-        tags.push(props.socketType);
+       case 'PROCESSOR':
+        tags.push(`${offer.cores} rdzeni`);
+        tags.push(`${offer.threads} wątków`);
+        tags.push(offer.baseClock);
+        tags.push(offer.socketType);
         break;
         
-      case 'memory':
-        tags.push(`${props.capacity}GB`);
-        tags.push(`${props.speed}MHz`);
-        tags.push(props.type);
+      case 'MEMORY':
+        tags.push(`${offer.capacity}GB`);
+        tags.push(`${offer.speed}MHz`);
+        tags.push(offer.type);
         break;
 
-      case 'storage':
-        tags.push(`${props.capacity}GB`);
+      case 'STORAGE':
+        tags.push(`${offer.capacity}GB`);
         break;
         
-      case 'powerSupply':
-        tags.push(`${props.maxPowerWatt}W`);
+      case 'POWER_SUPPLY':
+        tags.push(`${offer.maxPowerWatt}W`);
         break;
         
-      case 'motherboard':
-        tags.push(props.socketType);
-        tags.push(props.chipset);
-        tags.push(props.format);
+      case 'MOTHERBOARD':
+        tags.push(offer.socketType);
+        tags.push(offer.chipset);
+        tags.push(offer.format);
         break;
         
-      case 'cooler':
-        tags.push(...props.coolerSocketsType);
+      case 'CPU_COOLER':
+        tags.push(...offer.coolerSocketsType);
         break;
         
-      case 'casePc':
-        tags.push(props.format);
+      case 'CASE_PC':
+        tags.push(offer.format);
         break;
-        
+
       default:
         break;
     }
@@ -73,8 +78,8 @@ function Offer(props: ComponentOffer) {
         {/* Product image on the left */}
         <div className="w-32 h-32 flex-shrink-0">
           <img 
-            src={props.photoUrl} 
-            alt={`${props.brand} ${props.model}`}
+            src={offer.photoUrl}
+            alt={`${offer.brand} ${offer.model}`}
             className="w-full h-full object-contain"
             onError={(e) => {
               e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zNSA0MEg2NVY2MEgzNVY0MFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTQ1IDQ1SDU1VjUwSDQ1VjQ1WiIgZmlsbD0iIzZCNzI4MCIvPgo8L3N2Zz4K';
@@ -91,50 +96,50 @@ function Offer(props: ComponentOffer) {
           {/* Top section - condition, model, and shop logo in one line */}
           <div className="flex items-center justify-between gap-2 mb-3">
             <div className="flex items-center gap-2">
-              {props.condition.toLowerCase() === 'defective' && (
+              {offer.condition.toLowerCase() === 'defective' && (
                 <span className="bg-red-100 text-ocean-red text-sm px-3 py-1 rounded-full font-medium">
                   Uszkodzony
                 </span>
               )}
-              {props.condition.toLowerCase() === 'used' && (
+              {offer.condition.toLowerCase() === 'used' && (
                 <span className="bg-orange-100 text-orange-700 text-sm px-3 py-1 rounded-full font-medium">
                   Używany
                 </span>
               )}
-              {props.condition.toLowerCase() === 'new' && (
+              {offer.condition.toLowerCase() === 'new' && (
                 <span className="bg-green-100 text-green-700 text-sm px-3 py-1 rounded-full font-medium">
                   Nowy
                 </span>
               )}
               <h3 className="text-lg font-medium text-midnight-dark leading-tight">
                 <a
-                href={props.websiteUrl}
+                href={offer.websiteUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-midnight-dark hover:text-ocean-blue hover:underline transition-colors duration-200 cursor-pointer"
                 >
-                {props.brand} {props.model}
+                {offer.brand} {offer.model}
               </a>
               </h3>
             </div>
             
             {/* Shop logo */}
             <div className="flex-shrink-0">
-              {props.shop === 'allegro' && (
+              {offer.shopName === 'allegro' && (
                 <img 
                   src="allegro.png" 
                   alt="Allegro" 
                   className="w-12 h-12" 
                 />
               )}
-              {props.shop === 'olx' && (
+              {offer.shopName === 'olx' && (
                 <img 
                   src="olx.png" 
                   alt="OLX" 
                   className="w-12 h-12" 
                 />
               )}
-              {props.shop === 'allegro_lokalnie' && (
+              {offer.shopName === 'allegro_lokalnie' && (
                 <img 
                   src="Allegro-Lokalnie.png" 
                   alt="Allegro Lokalnie" 
@@ -166,7 +171,7 @@ function Offer(props: ComponentOffer) {
                 currency: 'PLN',
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 2
-              }).format(props.price).replace('PLN', 'zł')}
+              }).format(offer.price).replace('PLN', 'zł')}
             </span>
             
             <div className="flex gap-2">
@@ -197,4 +202,4 @@ function Offer(props: ComponentOffer) {
   );
 }
 
-export default Offer;
+export default OfferCard;

@@ -3,6 +3,7 @@ import {useState, useEffect, useRef} from "react";
 import { useAtom } from 'jotai';
 import { userAtom } from '../atomContext/userAtom';
 import {useLogout} from "../hooks/useLogout.ts";
+import {useQueryClient} from "@tanstack/react-query";
 
 export default function Navbar() {
     const navigate = useNavigate();
@@ -13,6 +14,8 @@ export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const logout = useLogout();
+    const queryClient = useQueryClient();
+
     useEffect(() => {
         const handleScroll = () => {
             const scrollTop = window.scrollY;
@@ -73,6 +76,7 @@ return (
                                     <button
                                         onClick={() => {
                                             logout();
+                                            queryClient.clear();
                                             setShowDropdown(false);
                                             navigate("/")
                                         }}

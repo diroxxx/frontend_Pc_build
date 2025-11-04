@@ -9,10 +9,10 @@ import {
   deleteComputerAtom,
   removeComponentFromBuildAtom,
   type CompatibilityIssue
-} from '../../../atomContext/computerAtom.tsx';
-import {categoriesAtom, selectedCategoryAtom} from '../../../atomContext/offerAtom.tsx';
-import type {ComponentOffer,} from "../../../atomContext/offerAtom.tsx";
-import {isCaseOffer, isProcessorOffer, isMotherboardOffer, isCoolerOffer, isMemoryOffer, isGraphicsCardOffer,isPowerSupplyOffer} from "../../../atomContext/offerAtom.tsx";
+} from '../../../../atomContext/computerAtom.tsx';
+import {categoriesAtom, selectedCategoryAtom} from '../../../../atomContext/offerAtom.tsx';
+import type {ComponentOffer,} from "../../../../atomContext/offerAtom.tsx";
+import {isCaseOffer, isProcessorOffer, isMotherboardOffer, isCoolerOffer, isMemoryOffer, isGraphicsCardOffer,isPowerSupplyOffer} from "../../../../atomContext/offerAtom.tsx";
 
 const checkSocketCompatibility = (offers: ComponentOffer[]): CompatibilityIssue[] => {
     const issues: CompatibilityIssue[] = [];
@@ -261,7 +261,7 @@ return (
             )}
         </div>
 
-        {/* Offer Configuration */}
+        {/* OfferCard Configuration */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden border border-ocean-light-blue">
             <div className="bg-gradient-ocean-dark text-white p-4">
                 <h2 className="text-xl font-bold">

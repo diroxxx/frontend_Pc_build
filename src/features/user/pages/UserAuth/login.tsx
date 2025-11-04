@@ -1,8 +1,8 @@
 import  {type FormEvent, useState} from "react";
-import {setAuthToken} from "../../../lib/Auth.tsx";
+import {setAuthToken} from "../../../../lib/Auth.tsx";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
 import { useAtom } from 'jotai';
-import { loginUserAtom } from '../../../atomContext/userAtom.tsx';
+import { loginUserAtom } from '../../../../atomContext/userAtom.tsx';
 
 function Login() {
     const navigate: NavigateFunction = useNavigate();
@@ -115,7 +115,7 @@ return (
                 </div>
                 <div className="text-center mt-6">
                     <a
-                        href="/"
+                        href="/public"
                         className="text-sm text-ocean-blue hover:text-ocean-dark-blue transition-colors duration-200"
                     >
                         Wróć na strone główną

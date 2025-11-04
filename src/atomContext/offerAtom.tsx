@@ -70,15 +70,7 @@ export const offersAtom = atom<ComponentOffer[]>([]);
  */
 export const offersLoadingAtom = atom<boolean>(true);
 
-/**
- * Error state atom for offer loading
- * null - no errors, string - error message
- */
-export const offersErrorAtom = atom<string | null>(null);
 
-// ===============================
-// FILTER ATOMS
-// ===============================
 
 /**
  * Price range atom for filtering offers
@@ -136,14 +128,6 @@ export const maxPriceAtom = atom((get) => {
   return Math.max(...offers.map(offer => offer.price));
 });
 
-/**
- * Atom returning unique manufacturers from offers
- * Used to populate manufacturer filter dropdown
- */
-export const manufacturersAtom = atom((get) => {
-  const offers = get(offersAtom);
-  return [...new Set(offers.map(offer => offer.brand).filter(Boolean))].sort();
-});
 
 /**
  * Atom returning unique product conditions from offers
@@ -180,7 +164,7 @@ export const shopsAtom = atom((get) => {
 /**
  * Primary offer filtering atom
  * Automatically reacts to filter changes and returns filtered offers
- * Used in Offers.tsx to display search results
+ * Used in OffersUserPage.tsx to display search results
  * 
  * Applies the following filters:
  * - Price range filtering

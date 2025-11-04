@@ -8,7 +8,7 @@ import { showToast } from "../../../lib/ToastContainer.tsx";
 import OffersComponent from "./offersUpdatePage.tsx";
 import GeneralPage from "./generalPage.tsx";
 import ComponentsPage from "./componentsPage.tsx";
-import OffersPage from "./OffersPage.tsx";
+import OffersAdminPage from "./OffersAdminPage.tsx";
 import {useQueryClient} from "@tanstack/react-query";
 const AdminControlPanel = () => {
         const [activeTab, setActiveTab] = useState("general");
@@ -119,7 +119,7 @@ const AdminControlPanel = () => {
                     {activeTab === "users" && <UsersPage />}
                     {activeTab === "components" && <ComponentsPage />}
                     {activeTab === "offersUpdate" && <OffersComponent />}
-                    {activeTab === "offers" && <OffersPage />}
+                    {activeTab === "offers" && <OffersAdminPage />}
                 </div>
             </div>
         </div>

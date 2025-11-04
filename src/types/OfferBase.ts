@@ -13,7 +13,7 @@ export interface OfferBase {
     photoUrl: string;
     websiteUrl: string;
     price: number;
-    shop: string;
+    shopName: string;
 }
 
 

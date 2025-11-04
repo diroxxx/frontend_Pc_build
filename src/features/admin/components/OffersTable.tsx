@@ -1,7 +1,6 @@
 import OfferComponent from "./OfferComponent.tsx";
 import type {ComponentOffer} from "../../../types/OfferBase.ts";
-import LoadingSpinner from "../../../components/ui/LoadingSpinner.tsx";
-import React, {useState} from "react";
+import {type FC, useState} from "react";
 import OfferEditCard from "./OfferEditCard.tsx";
 
 interface OffersTableProps {
@@ -10,7 +9,7 @@ interface OffersTableProps {
     isLoading: boolean;
 }
 
-const OffersTable: React.FC<OffersTableProps> = ({ offers, isFetching, isLoading }) => {
+const OffersTable: FC<OffersTableProps> = ({ offers, isFetching, isLoading }) => {
     const [selectedOffer, setSelectedOffer] = useState<ComponentOffer | null>(null);
     const [isEditCardOpen, setIsEditCardOpen] = useState(false);
 

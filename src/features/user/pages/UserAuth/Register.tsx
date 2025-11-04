@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
-import AuthLayout from '../../../components/auth/AuthLayout.tsx';
-import FormField from '../../../components/auth/FormField.tsx';
-import PasswordField from '../../../components/auth/PasswordField.tsx';
-import Button from '../../../components/ui/Button.tsx';
-import ErrorMessage from '../../../components/ui/ErrorMessage.tsx';
-import AuthNavigation from '../../../components/auth/AuthNavigation.tsx';
-import useFormValidation, { validationRules } from '../../../hooks/useFormValidation.tsx';
-import useAuth from '../../../hooks/useAuth.tsx';
+import AuthLayout from '../../../../components/auth/AuthLayout.tsx';
+import FormField from '../../../../components/auth/FormField.tsx';
+import PasswordField from '../../../../components/auth/PasswordField.tsx';
+import Button from '../../../../components/ui/Button.tsx';
+import ErrorMessage from '../../../../components/ui/ErrorMessage.tsx';
+import AuthNavigation from '../../../../components/auth/AuthNavigation.tsx';
+import useFormValidation, { validationRules } from '../../../../hooks/useFormValidation.tsx';
+import useAuth from '../../../../hooks/useAuth.tsx';
 
 function Register() {
     const { data, errors, handleChange, handleBlur, validateAllFields } = useFormValidation(
@@ -149,7 +149,7 @@ return (
                 </div>
                 <div className="text-center mt-6">
                     <a
-                        href="/"
+                        href="/public"
                         className="text-sm text-ocean-blue hover:text-ocean-dark-blue transition-colors duration-200"
                     >
                         Wróć na strone główną
