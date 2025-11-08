@@ -1,9 +1,9 @@
 import {keepPreviousData, useQuery, useQueryClient} from "@tanstack/react-query";
 import {getComponentsApi} from "../api/getComponentsApi.ts";
 import {useEffect} from "react";
-import type { ItemType } from "../../../types/BaseItemDto.ts";
+import type { ComponentTypeEnum } from "../../../types/BaseItemDto.ts";
 
-export const useFetchComponents = (page: number, filters?: {itemType?: ItemType; brand?: string}) => {
+export const useFetchComponents = (page: number, filters?: {itemType?: ComponentTypeEnum; brand?: string}) => {
     const queryClient = useQueryClient();
 
     const query = useQuery({

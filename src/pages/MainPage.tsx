@@ -1,8 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import SidePanelBuilds from "../features/user/components/builds/SidePanelBuilds.tsx";
+import {usePrefetchComputers} from "../hooks/usePrefetchComputers.ts";
 
-function mainPage() {
+function MainPage() {
     const navigate = useNavigate();
+
+    usePrefetchComputers()
+
 
     const partnerStores = [
         {
@@ -26,7 +30,6 @@ function mainPage() {
         <div className="bg-gray-100">
 
             <SidePanelBuilds />
-
 
             <div className="flex justify-center gap-8 px-6 py-8">
                 <div
@@ -128,33 +131,6 @@ function mainPage() {
                             Automatycznie zbieramy oferty z popularnych platform sprzedażowych
                         </p>
                     </div>
-
-                    {/*<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 items-center">*/}
-                    {/*    {partnerStores.map((store, index) => (*/}
-                    {/*        <div*/}
-                    {/*            key={index}*/}
-                    {/*            className="group flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200 cursor-pointer"*/}
-                    {/*            onClick={() => window.open(store.website, '_blank')}*/}
-                    {/*        >*/}
-                    {/*            <div className="w-16 h-16 mb-3 flex items-center justify-center">*/}
-                    {/*                <img*/}
-                    {/*                    src={store.logo}*/}
-                    {/*                    alt={`${store.name} logo`}*/}
-                    {/*                    className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-200"*/}
-                    {/*                />*/}
-                    {/*                <div */}
-                    {/*                    className="hidden text-xs font-medium text-gray-700 text-center"*/}
-                    {/*                    style={{ display: 'none' }}*/}
-                    {/*                >*/}
-                    {/*                        {store.name}*/}
-                    {/*                </div>*/}
-                    {/*            </div>*/}
-                    {/*            <p className="text-xs font-medium text-gray-700 text-center">*/}
-                    {/*                {store.name}*/}
-                    {/*            </p>*/}
-                    {/*        </div>*/}
-                    {/*    ))}*/}
-                    {/*</div>  */}
                     <div className="w-full px-4">
                         <div className="grid grid-cols-3 md:grid-cols-6 gap-136 w-full">
                             {partnerStores.map((store, index) => (
@@ -188,4 +164,4 @@ function mainPage() {
     );
 }
 
-export default mainPage;
+export default MainPage;

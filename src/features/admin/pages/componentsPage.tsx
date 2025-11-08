@@ -7,7 +7,7 @@ import {useAtomValue} from "jotai";
 import Components from "../components/ComponentsList.tsx";
 import {useFetchComponents} from "../hooks/useFetchComponents.ts";
 import ReactPaginate from "react-paginate";
-import  { ItemType } from "../../../types/BaseItemDto.ts";
+import  { ComponentTypeEnum } from "../../../types/BaseItemDto.ts";
 import { useFetchBrands } from "../hooks/useFetchBrands.ts";
 import {LeftArrow} from "../../../assets/icons/leftArrow.tsx";
 import {RightArrow} from "../../../assets/icons/rightArrow.tsx";
@@ -19,7 +19,7 @@ const ComponentsPage = () => {
     const { data: brandsData, isLoading: isLoadingBrands } = useFetchBrands();
     console.log('getBrandsApi:', brandsData?.length);
     const [page, setPage] = useState<number>(0);
-    const [filters, setFilters] = useState<{ itemType: ItemType | undefined; brand: string }>({ itemType: undefined, brand: "" });
+    const [filters, setFilters] = useState<{ itemType: ComponentTypeEnum | undefined; brand: string }>({ itemType: undefined, brand: "" });
 
     const { data, isLoading, error, isFetching, isPlaceholderData } = useFetchComponents(page, filters);
 
@@ -76,11 +76,11 @@ const ComponentsPage = () => {
 
                     <select
                          value={filters.itemType}
-                         onChange={(e) => setFilters((prev) => ({ ...prev, itemType: e.target.value as ItemType | undefined }))}
+                         onChange={(e) => setFilters((prev) => ({ ...prev, itemType: e.target.value as ComponentTypeEnum | undefined }))}
                          className="border border-gray-300 rounded p-2 text-sm"
                      >
                          <option value="">-- wybierz typ --</option>
-                         {Object.values(ItemType).map((type) => (
+                         {Object.values(ComponentTypeEnum).map((type) => (
                              <option key={type} value={type}>
                                  {type.replaceAll("_", " ")}
                              </option>

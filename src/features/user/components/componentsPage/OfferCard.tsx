@@ -1,22 +1,40 @@
-import { useAtom } from 'jotai';
-import { addComponentToBuildAtom, currentBuildAtom } from '../../../../atomContext/computerAtom.tsx';
 import type {ComponentOffer} from "../../../../types/OfferBase.ts";
-import type {FC} from "react";
+import {type FC} from "react";
+import { useAtomValue} from "jotai";
+import {showToast} from "../../../../lib/ToastContainer.tsx";
+import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
+import {useUpdateOffersToComputer} from "../../../admin/hooks/useUpdateOffersToComputer.ts";
+import {validateCompatibility} from "../../hooks/validateCompatibility.ts";
 
 interface Props {
     offer: ComponentOffer;
 }
 
 const OfferCard: FC<Props> = ( {offer})=> {
-  const [, addComponentToBuild] = useAtom(addComponentToBuildAtom);
-  const [currentBuild] = useAtom(currentBuildAtom);
+    const selectedComputer = useAtomValue(selectedComputerAtom)
+    const updateMutation = useUpdateOffersToComputer();
 
-  const isInBuild = currentBuild.some(c => c.componentType === offer.componentType);
-  const existingComponent = currentBuild.find(c => c.componentType === offer.componentType);
 
-  const handleAddToBuild = () => {
-    addComponentToBuild(offer);
-  };
+    async function updateComputer() {
+        if (!selectedComputer) {
+            showToast.warning("Najpierw wybierz zestaw komputerowy");
+            return;
+        }
+
+        const error = validateCompatibility(selectedComputer, offer);
+
+        if (error) {
+            showToast.error(error);
+            return;
+        }
+
+        updateMutation.mutate({
+            computerId: selectedComputer.id,
+            offerUrl: offer.websiteUrl,
+        });
+
+        showToast.success("Podzespół został dodany do zestawu!");
+    }
 
   const renderSpecTags = () => {
     const tags = [];
@@ -72,11 +90,35 @@ const OfferCard: FC<Props> = ( {offer})=> {
 
   const specTags = renderSpecTags();
 
+
+
   return (
-    <div className="bg-gradient-gray border rounded-lg p-4 shadow-sm transition-all duration-300 mx-4 relative border-ocean-light-blue hover:border-ocean-blue hover:shadow-md">
+    <div
+        className="relative group bg-gradient-gray border rounded-lg p-2 sm:p-3 shadow-sm transition-all duration-300 mx-4 border-ocean-light-blue hover:border-ocean-blue hover:shadow-md">
       <div className="flex gap-6 min-h-[120px]">
-        {/* Product image on the left */}
-        <div className="w-32 h-32 flex-shrink-0">
+          <button
+              onClick={updateComputer}
+              className={`absolute top-2 right-2 z-10 p-2 rounded-full border bg-ocean-white text-ocean-blue border-ocean-light-blue 
+            transition-all duration-200 shadow-sm hover:shadow-md hover:bg-ocean-light-blue hover:text-ocean-dark-blue`}
+              aria-label="Dodaj do zestawu"
+          >
+              <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+              >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+          </button>
+
+
+
+
+          {/* Product image on the left */}
+        <div className="w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0">
           <img 
             src={offer.photoUrl}
             alt={`${offer.brand} ${offer.model}`}
@@ -125,21 +167,21 @@ const OfferCard: FC<Props> = ( {offer})=> {
             
             {/* Shop logo */}
             <div className="flex-shrink-0">
-              {offer.shopName === 'allegro' && (
+              {offer.shopName?.toLowerCase() === 'allegro' && (
                 <img 
                   src="allegro.png" 
                   alt="Allegro" 
                   className="w-12 h-12" 
                 />
               )}
-              {offer.shopName === 'olx' && (
+              {offer.shopName?.toLowerCase() === 'olx' && (
                 <img 
                   src="olx.png" 
                   alt="OLX" 
                   className="w-12 h-12" 
                 />
               )}
-              {offer.shopName === 'allegro_lokalnie' && (
+              {offer.shopName?.toLowerCase() === 'allegrolokalnie' && (
                 <img 
                   src="Allegro-Lokalnie.png" 
                   alt="Allegro Lokalnie" 
@@ -173,29 +215,9 @@ const OfferCard: FC<Props> = ( {offer})=> {
                 maximumFractionDigits: 2
               }).format(offer.price).replace('PLN', 'zł')}
             </span>
-            
-            <div className="flex gap-2">
-              <button
-                onClick={handleAddToBuild}
-                className={`px-4 py-2 rounded-lg font-medium  ${
-                  isInBuild
-                    ? 'bg-gradient-warning text-white hover:bg-gradient-warning-hover shadow-lg hover:shadow-xl'
-                    : 'bg-gradient-blue-horizontal text-white hover:bg-gradient-blue-horizontal-hover'
-                }`}
-              >
-                {isInBuild 
-                  ? `Zamień` 
-                  : `Dodaj do zestawu`
-                }
-              </button>
-            </div>
+
           </div>
-          
-          {isInBuild && existingComponent && (
-            <p className="text-xs text-orange-600 mt-1 font-medium">
-              Zastąpi: {existingComponent.brand} {existingComponent.model}
-            </p>
-          )}
+
         </div>
       </div>
     </div>

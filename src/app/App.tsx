@@ -8,7 +8,7 @@ import Layout from "../pageComponents/Layout.tsx";
 import OffersUserPage from "../features/user/pages/OffersUserPage.tsx";
 import UserPage from "../features/user/pages/UserPage.tsx";
 import Community from "../pages/UserPage/Community/community.tsx";
-import Builds from "../features/user/components/builds/builds.tsx";
+import Builds from "../features/user/components/builds/Builds.tsx";
 
 import AdminLoginPage from "../features/admin/pages/adminLoginPage.tsx";
 import AdminControlPanel from "../features/admin/pages/adminControlPanel.tsx";
@@ -17,7 +17,6 @@ import {queryClient} from "./store/queryClient.ts";
 import {QueryClientProvider} from "@tanstack/react-query";
 
 function App() {
-
     return(
     <div>
         <QueryClientProvider client={queryClient}>

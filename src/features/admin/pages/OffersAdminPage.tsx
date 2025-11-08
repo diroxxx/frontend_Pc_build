@@ -1,6 +1,6 @@
 import {useFetchOffers} from "../../../hooks/useFetchOffers.ts";
 import {useState} from "react";
-import {ItemType} from "../../../types/BaseItemDto.ts";
+import {ComponentTypeEnum} from "../../../types/BaseItemDto.ts";
 import type {ItemConditionEnum} from "../../../types/ItemConditionEnum.ts";
 
 import OffersTable from "../components/OffersTable.tsx";
@@ -12,7 +12,7 @@ import LoadingSpinner from "../../../components/ui/LoadingSpinner.tsx";
 
 const OffersAdminPage = () => {
 
-    const [filters, setFilters] = useState<{ itemType: ItemType | undefined; brand: string; minPrize: number; maxPrize:number; itemCondition: ItemConditionEnum | undefined }>({ itemType: undefined, brand: "", minPrize: 0, maxPrize: 99999, itemCondition: undefined });
+    const [filters, setFilters] = useState<{ itemType: ComponentTypeEnum | undefined; brand: string; minPrize: number; maxPrize:number; itemCondition: ItemConditionEnum | undefined }>({ itemType: undefined, brand: "", minPrize: 0, maxPrize: 99999, itemCondition: undefined });
     const [page, setPage] = useState<number>(0);
 
     const {data, isLoading, error, isFetching} = useFetchOffers(page, filters);

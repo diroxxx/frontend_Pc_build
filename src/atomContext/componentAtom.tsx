@@ -1,7 +1,7 @@
 import {atom, useSetAtom} from 'jotai';
 import customAxios from "../lib/customAxios.tsx";
 import {useCallback} from "react";
-import {ItemType} from "../types/BaseItemDto.ts";
+import {ComponentTypeEnum} from "../types/BaseItemDto.ts";
 
 
 
@@ -12,7 +12,7 @@ export interface BaseComponentSpec {
 }
 
 export interface ProcessorSpec extends BaseComponentSpec {
-  componentType: ItemType.PROCESSOR;
+  componentType: ComponentTypeEnum.PROCESSOR;
   cores: number;
   threads: number;
   socketType: string;
@@ -21,20 +21,20 @@ export interface ProcessorSpec extends BaseComponentSpec {
 
 
 export interface CoolerSpec extends BaseComponentSpec {
-  componentType: ItemType.CPU_COOLER;
+  componentType: ComponentTypeEnum.CPU_COOLER;
   coolerSocketsType: string[];
 }
 
 
 export interface GraphicsCardSpec extends BaseComponentSpec {
-  componentType: ItemType.GRAPHICS_CARD;
+  componentType: ComponentTypeEnum.GRAPHICS_CARD;
   memorySize: number;
   gddr: string;
   powerDraw: number;
 }
 
 export interface MemorySpec extends BaseComponentSpec {
-  componentType: ItemType.MEMORY;
+  componentType: ComponentTypeEnum.MEMORY;
   type: string;
   capacity: number;
   speed: string;
@@ -43,7 +43,7 @@ export interface MemorySpec extends BaseComponentSpec {
 
 
 export interface MotherboardSpec extends BaseComponentSpec {
-  componentType: ItemType.MOTHERBOARD;
+  componentType: ComponentTypeEnum.MOTHERBOARD;
   chipset: string;
   socketType: string;
   memoryType: string;
@@ -54,17 +54,17 @@ export interface MotherboardSpec extends BaseComponentSpec {
 
 
 export interface PowerSupplySpec extends BaseComponentSpec {
-  componentType: ItemType.POWER_SUPPLY;
+  componentType: ComponentTypeEnum.POWER_SUPPLY;
   maxPowerWatt: number; // Maximum power output in watts
 }
 
 export interface StorageSpec extends BaseComponentSpec {
-  componentType: ItemType.STORAGE;
+  componentType: ComponentTypeEnum.STORAGE;
   capacity: number;     // Storage capacity in GB
 }
 
 export interface CaseSpec extends BaseComponentSpec {
-  componentType: ItemType.CASE_PC;
+  componentType: ComponentTypeEnum.CASE_PC;
   format: string;
 }
 
@@ -82,25 +82,25 @@ export const isCoolerSpec = (component: OfferSpec): component is CoolerSpec =>
 export const isGraphicsCardSpec = (component: OfferSpec): component is GraphicsCardSpec =>
   component.componentType.toLowerCase() === 'graphicsCard';
 
-
-export const isMemorySpec = (component: OfferSpec): component is MemorySpec =>
-  component.componentType === 'memory';
-
-
-export const isMotherboardSpec = (component: OfferSpec): component is MotherboardSpec =>
-  component.componentType === 'motherboard';
-
-
-export const isPowerSupplySpec = (component: OfferSpec): component is PowerSupplySpec =>
-  component.componentType === 'powerSupply';
-
-
-export const isStorageSpec = (component: OfferSpec): component is StorageSpec =>
-  component.componentType === 'storage';
-
-
-export const isCaseSpec = (component: OfferSpec): component is CaseSpec =>
-  component.componentType === 'casePc';
+//
+// export const isMemorySpec = (component: OfferSpec): component is MemorySpec =>
+//   component.componentType === 'memory';
+//
+//
+// export const isMotherboardSpec = (component: OfferSpec): component is MotherboardSpec =>
+//   component.componentType === 'motherboard';
+//
+//
+// export const isPowerSupplySpec = (component: OfferSpec): component is PowerSupplySpec =>
+//   component.componentType === 'powerSupply';
+//
+//
+// export const isStorageSpec = (component: OfferSpec): component is StorageSpec =>
+//   component.componentType === 'storage';
+//
+//
+// export const isCaseSpec = (component: OfferSpec): component is CaseSpec =>
+//   component.componentType === 'casePc';
 
 
 export const componentSpecsAtom = atom<OfferSpec[]>([]);

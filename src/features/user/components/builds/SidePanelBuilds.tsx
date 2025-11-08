@@ -1,326 +1,143 @@
-import { useState } from "react";
-import { useAtom } from 'jotai';
-import { 
-  listOfComputers, 
-  selectedComputerIdAtom, 
-  createNewEmptyComputerAtom, 
-  selectComputerAtom,
-  deleteComputerAtom,
-  renameComputerAtom,
-  removeComponentFromBuildAtom,
-  compatibilityIssuesAtom
-} from '../../../../atomContext/computerAtom.tsx';
+import {useEffect, useState} from "react";
+import type {ComponentOffer} from "../../../../types/OfferBase.ts";
 
-export default function EdgeExpandButton() {
-  const [hovered, setHovered] = useState(false);
-  const [computers] = useAtom(listOfComputers);
-  const [selectedComputerIndex] = useAtom(selectedComputerIdAtom);
-  const [compatibilityIssues] = useAtom(compatibilityIssuesAtom);
-  const selectedComputer = selectedComputerIndex !== null ? computers[selectedComputerIndex] : null;
-  const [, selectComputer] = useAtom(selectComputerAtom);
-  const [, deleteComputer] = useAtom(deleteComputerAtom);
-  const [, renameComputer] = useAtom(renameComputerAtom);
-  const [, removeComponentFromBuild] = useAtom(removeComponentFromBuildAtom);
-  const [, createNewEmptyComputer] = useAtom(createNewEmptyComputerAtom);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editingName, setEditingName] = useState('');
+import {useAtom} from "jotai";
+import {useFetchComputersByEmail} from "../../../../hooks/useFetchComputersByEmail.ts";
+import {userAtom} from "../../../../atomContext/userAtom.tsx";
+import {selectedComputerAtom, selectedComputerIndexAtom} from "../../../../atomContext/computerAtom.tsx";
+
+export default function SidePanelBuilds() {
+    const [hovered, setHovered] = useState(false);
+    const [user] = useAtom(userAtom);
+    const { data: fetchedComputers = [], isLoading } = useFetchComputersByEmail(user?.email);
+    const [selectedComputer, setSelectedComputer] = useAtom(selectedComputerAtom);
 
 
-  const handleCreateNewComputer = () => {
-    createNewEmptyComputer();
-  };
+    const handleSelectBuild = (id: number) => {
+        const computer = fetchedComputers.find(c => c.id === id) || null;
+        setSelectedComputer(computer);
+    };
 
-  const handleSelectComputer = (computerIndex: number) => {
-    selectComputer(computerIndex);
-  };
 
-  const handleDeleteComputer = (computerIndex: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    deleteComputer(computerIndex);
-  };
+    useEffect(() => {
+        if (!selectedComputer || fetchedComputers.length === 0) return;
+        const fresh = fetchedComputers.find(c => c.id === selectedComputer.id);
+        if (fresh) setSelectedComputer(fresh);
+    }, [fetchedComputers]);
 
-  const handleStartRename = (computer: any, index: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setEditingIndex(index);
-    setEditingName(computer.name);
-  };
 
-  const handleSaveRename = () => {
-    if (editingIndex !== null && editingName.trim()) {
-      renameComputer(editingIndex, editingName.trim());
-    }
-    setEditingIndex(null);
-    setEditingName('');
-  };
 
-  const handleCancelRename = () => {
-    setEditingIndex(null);
-    setEditingName('');
-  };
-
-return (
-    <div
-      className="fixed right-0 top-1/2 -translate-y-1/2 z-50"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{ 
-        paddingLeft: hovered ? '20px' : '0px',
-        transition: 'padding-left 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-      }}
-    >
-      <div 
-        className="bg-white shadow-lg border border-gray-200 overflow-hidden"
-        style={{
-          width: hovered ? '380px' : '56px',
-          borderRadius: hovered ? '12px 0 0 12px' : '28px 0 0 28px',
-          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-        }}
-      >
-        {/* Header button */}
-        <button
-          onClick={handleCreateNewComputer}
-          className="h-14 w-full flex items-center text-white bg-gradient-ocean hover:bg-gradient-ocean-hover cursor-pointer"
-          style={{
-            borderRadius: hovered ? '12px 0 0 0' : '28px 0 0 28px',
-            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-        >
-          {/* Icon */}
-          <span className="w-14 flex justify-center items-center text-2xl flex-shrink-0">
-            <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                d="M12 4a1 1 0 011 1v6h6a1 1 0 110 2h-6v6a1 1 0 11-2 0v-6H5a1 1 0 110-2h6V5a1 1 0 011-1z"
-              />
-            </svg>
-          </span>
-          
-          {/* Text */}
-          <div 
-            className="overflow-hidden whitespace-nowrap"
-            style={{
-              width: hovered ? '300px' : '0px',
-              transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-            }}
-          >
-            <span
-              className="ml-2 text-sm font-medium"
-              style={{
-                opacity: hovered ? 1 : 0,
-                transform: `translateX(${hovered ? '0px' : '-20px'})`,
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                transitionDelay: hovered ? '0.1s' : '0s'
-              }}
+    return (
+        <>
+            <div
+                className={`fixed top-1/2 right-0 -translate-y-1/2 z-[60] bg-gradient-ocean text-white 
+                   w-14 h-14 rounded-l-full shadow-lg flex items-center justify-center cursor-pointer
+                   transition-all duration-500 ease-in-out ${
+                    hovered ? "opacity-0 pointer-events-none" : "opacity-100"
+                }`}
+                onMouseEnter={() => setHovered(true)}
             >
-              Utwórz nowy komputer
-            </span>
-          </div>
-        </button>
-
-        {/* Computer list and selected computerAtom details */}
-        <div 
-          style={{
-            height: hovered ? 'auto' : '0px',
-            maxHeight: hovered ? '600px' : '0px',
-            opacity: hovered ? 1 : 0,
-            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-            transitionDelay: hovered ? '0.1s' : '0s'
-          }}
-          className="bg-white overflow-hidden"
-        >
-          <div className="p-4">
-            {/* Computer selection */}
-            <div className="mb-4">
-              <h3 className="text-sm font-medium text-midnight-dark mb-2">
-                Wybierz komputer ({computers.length})
-              </h3>
-              
-              {computers.length === 0 ? (
-                <p className="text-xs text-gray-500">Brak komputerów. Utwórz nowy powyżej.</p>
-              ) : (
-                <div className="space-y-1 max-h-32 overflow-y-auto">
-                        {(computers || []).map((computer, index) => (
-                            <div
-
-                      key={index}
-                      onClick={() => handleSelectComputer(index)}
-                      className={`flex items-center justify-between p-2 rounded cursor-pointer transition-colors ${
-                        selectedComputerIndex === index
-                          ? 'bg-blue-50 border border-blue-200'
-                          : 'bg-gray-50 hover:bg-gray-100'
-                      }`}
-                    >
-                      <div className="flex-1 min-w-0">
-                        {editingIndex === index ? (
-                          <input
-                            type="text"
-                            value={editingName}
-                            onChange={(e) => setEditingName(e.target.value)}
-                            onBlur={handleSaveRename}
-                            onKeyPress={(e) => {
-                              if (e.key === 'Enter') handleSaveRename();
-                              if (e.key === 'Escape') handleCancelRename();
-                            }}
-                            className="text-xs font-medium bg-white border border-gray-300 rounded px-1 py-0.5 w-full focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                            autoFocus
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                        ) : (
-                          <p className="text-xs font-medium text-midnight-dark truncate">
-                            {computer.name}
-                          </p>
-                        )}
-                        <p className="text-xs text-gray-500">
-                            {(computer.offers?.length || 0)} komponentów • {(computer.price ?? 0).toLocaleString('pl-PL')}zł
-                        </p>
-                      </div>
-                      
-                      <div className="flex items-center space-x-1 ml-2">
-                        <button
-                          onClick={(e) => handleStartRename(computer, index, e)}
-                          className="text-gray-400 hover:text-gray-600 p-1 transition-colors duration-200"
-                          title="Zmień nazwę"
-                        >
-                          <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
-                            <path
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"
-                            />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={(e) => handleDeleteComputer(index, e)}
-                          className="text-red-400 hover:text-red-600 p-1 transition-colors duration-200"
-                          title="Usuń komputer"
-                        >
-                          <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
-                            <path
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M6 18L18 6M6 6l12 12"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="26"
+                    height="26"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
             </div>
 
-            {/* Compatibility Issues Section */}
-            {selectedComputer && compatibilityIssues.length > 0 && (
-              <div className="mb-4 border-t border-gray-200 pt-4">
-                <h3 className="text-sm font-medium text-midnight-dark mb-2 flex items-center">
-                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24" className="mr-1 text-red-500">
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                    />
-                  </svg>
-                  Problemy z kompatybilnością
-                </h3>
-                
-                <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {compatibilityIssues.map((issue, index) => (
-                    <div
-                      key={index}
-                      className={`p-2 rounded text-xs border ${
-                        issue.type === 'error'
-                          ? 'bg-red-50 text-red-700 border-red-200'
-                          : 'bg-yellow-50 text-yellow-800 border-yellow-200'
-                      }`}
-                    >
-                      <div className="flex items-start gap-1">
-                        {issue.type === 'error' ? (
-                          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5 text-red-500">
-                            <path
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M6 18L18 6M6 6l12 12"
-                            />
-                          </svg>
-                        ) : (
-                          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5 text-yellow-600">
-                            <path
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                            />
-                          </svg>
-                        )}
-                        <span className="leading-tight">{issue.message}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            <div
+                className="fixed top-1/2 right-0 -translate-y-1/2 z-50 bg-white border border-gray-200 shadow-xl
+                   overflow-hidden flex flex-col justify-between transition-transform duration-500 ease-in-out"
+                style={{
+                    width: "340px",
+                    height: "480px",
+                    borderRadius: "12px 0 0 12px",
+                    transform: hovered ? "translateX(0)" : "translateX(340px)",
+                }}
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+            >
+                <div className="p-4 overflow-y-auto flex-1">
+                    <h3 className="text-sm font-medium text-midnight-dark mb-2">
+                        Twoje zestawy ({fetchedComputers?.length || 0})
+                    </h3>
 
-            {/* Selected computerAtom details */}
-            {selectedComputer && selectedComputer.offers.length > 0 && (
-              <div className="border-t border-gray-200 pt-4">
-                <h3 className="text-sm font-medium text-midnight-dark mb-2">
-                  {selectedComputer.name} - Komponenty
-                </h3>
-                
-                <div className="space-y-1 max-h-40 overflow-y-auto">
-                  {selectedComputer.offers.map((component, index) => (
-                    <div 
-                      key={index} 
-                      className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 transition-colors duration-200"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-midnight-dark truncate">
-                          {component.brand} {component.model}
-                        </p>
+                    {(!fetchedComputers || fetchedComputers.length === 0) ? (
                         <p className="text-xs text-gray-500">
-                          {component.componentType} • {component.price.toLocaleString('pl-PL')}zł
+                            Brak zestawów — utwórz nowy w konfiguratorze.
                         </p>
-                      </div>
-                      <button
-                        onClick={() => removeComponentFromBuild(component.componentType)}
-                        className="ml-2 text-red-400 hover:text-red-600 p-1 rounded hover:bg-red-50 transition-colors duration-200"
-                      >
-                        <svg width="12" height="12" fill="none" viewBox="0 0 24 24">
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  ))}
+                    ) : (
+                        <div className="space-y-1 max-h-32 overflow-y-auto">
+                            {fetchedComputers.map((computer, index) => (
+                                <div
+                                    key={index}
+                                    onClick={() => handleSelectBuild(computer.id)}
+                                    className={`flex items-center justify-between p-2 rounded cursor-pointer transition-colors ${
+                                        selectedComputer?.id === computer.id
+                                            ? "bg-ocean-light-blue bg-opacity-30 border border-ocean-blue"
+                                            : "bg-gray-50 hover:bg-gray-100"
+                                    }`}
+                                >
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-xs font-medium text-midnight-dark truncate">
+                                            {computer.name}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                            {(computer.offers?.length || 0)} komponentów •{" "}
+                                            {(computer.price ?? 0).toLocaleString("pl-PL")} zł
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {selectedComputer && (
+                        <div className="mt-4 border-t border-gray-200 pt-3">
+                            <h3 className="text-sm font-medium text-midnight-dark mb-2">
+                                {selectedComputer.name}
+                            </h3>
+
+                            {selectedComputer.offers?.length ? (
+                                <div className="space-y-1 max-h-40 overflow-y-auto">
+                                    {selectedComputer.offers.map((offer: ComponentOffer, idx: number) => (
+                                        <div
+                                            key={idx}
+                                            className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 transition-colors"
+                                        >
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-xs font-medium text-midnight-dark truncate">
+                                                    {offer.brand} {offer.model}
+                                                </p>
+                                                <p className="text-xs text-gray-500">
+                                                    {offer.componentType} •{" "}
+                                                    {offer.price.toLocaleString("pl-PL")} zł
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-xs text-gray-500 italic">
+                                    Brak dodanych komponentów.
+                                </p>
+                            )}
+
+                            <div className="mt-2 pt-2 border-t border-gray-200 flex justify-between items-center">
+                                <span className="text-xs font-medium text-midnight-dark">Łącznie:</span>
+                                <span className="text-xs font-bold text-ocean-dark-blue">
+                  {selectedComputer.price?.toLocaleString("pl-PL")} zł
+                </span>
+                            </div>
+                        </div>
+                    )}
                 </div>
-                
-                <div className="mt-2 pt-2 border-t border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium text-midnight-dark">Łącznie:</span>
-                    <span className="text-xs font-bold text-midnight-dark">
-                      {selectedComputer.price.toLocaleString('pl-PL')}zł
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+            </div>
+        </>
+    );
 }

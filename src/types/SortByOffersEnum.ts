@@ -1,0 +1,1 @@
+export enum SortByOffersEnum { CHEAPEST = "CHEAPEST", EXPENSIVE = "EXPENSIVE", NEWEST = "NEWEST" }

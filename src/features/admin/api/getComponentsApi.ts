@@ -1,6 +1,6 @@
 import {type ComponentItem } from "../../../types/BaseItemDto.ts";
 import customAxios from "../../../lib/customAxios.tsx";
-import type { ItemType } from "../../../types/BaseItemDto.ts";
+import type { ComponentTypeEnum } from "../../../types/BaseItemDto.ts";
 export interface ComponentsResponse {
     items: ComponentItem[];
     hasMore: boolean;
@@ -8,7 +8,7 @@ export interface ComponentsResponse {
     totalElements: number;
 }
 
-export async function getComponentsApi(page: number = 0, filters?: {itemType?:ItemType; brand?: string }): Promise<ComponentsResponse> {
+export async function getComponentsApi(page: number = 0, filters?: {itemType?:ComponentTypeEnum; brand?: string }): Promise<ComponentsResponse> {
     const params = new URLSearchParams();
     params.append('page', page.toString());
     params.append('size', '30');

@@ -18,7 +18,7 @@ const OfferComponent:React.FC<OfferRowProps> = ({ offer, onClick }) => {
             <td className="px-3 py-2">{offer.model}</td>
             <td className="px-3 py-2">{offer.title}</td>
             <td className="px-3 py-2">{offer.condition}</td>
-            <td className="px-3 py-2">{offer.shop}</td>
+            <td className="px-3 py-2">{offer.shopName}</td>
             <td className="px-3 py-2">{offer.price}</td>
             <td className="px-3 py-2">
                 <a

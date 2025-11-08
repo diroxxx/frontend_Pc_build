@@ -1,4 +1,4 @@
-export enum ItemType {
+export enum ComponentTypeEnum {
     PROCESSOR = "PROCESSOR",
     GRAPHICS_CARD = "GRAPHICS_CARD",
     MEMORY = "MEMORY",

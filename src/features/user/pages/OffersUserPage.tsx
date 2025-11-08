@@ -1,11 +1,8 @@
-import {useEffect, useState} from "react";
-import { useAtom } from 'jotai';
+import React, {useEffect, useState} from "react";
 import SidePanelBuilds from '../components/builds/SidePanelBuilds.tsx';
-import {
-  searchTextAtom,
-} from '../../../atomContext/offerAtom.tsx';
+
 import {useFetchOffers} from "../../../hooks/useFetchOffers.ts";
-import {ItemType} from "../../../types/BaseItemDto.ts";
+import {ComponentTypeEnum} from "../../../types/BaseItemDto.ts";
 import  {ItemConditionEnum} from "../../../types/ItemConditionEnum.ts";
 import LoadingSpinner from "../../../components/ui/LoadingSpinner.tsx";
 import OfferUserList from "../components/componentsPage/OfferUserList.tsx";
@@ -14,17 +11,47 @@ import {RightArrow} from "../../../assets/icons/rightArrow.tsx";
 import {LeftArrow} from "../../../assets/icons/leftArrow.tsx";
 import {useFetchBrands} from "../../admin/hooks/useFetchBrands.ts";
 import {useShopsNames} from "../../../hooks/useShopsNames.ts";
+import {SortByOffersEnum} from "../../../types/SortByOffersEnum.ts";
+// import {SearchIcon} from "lucide-react";
+import {SearchIcon} from "../../../assets/icons/searchIcon.tsx";
+import { useSearchParams } from "react-router-dom";
+import type {OfferFilters} from "../../../types/OfferFilters.ts";
+
 
 
 function OffersUserPage() {
 
-    const [searchText, setSearchText] = useAtom(searchTextAtom);
-    const [sortBy, setSortBy] = useState('');
     const [showScrollTop, setShowScrollTop] = useState(false);
+    const [searchParams] = useSearchParams();
+    const componentCategoryParam = searchParams.get("category");
+
+    const [sortBy, setSortBy] = useState('');
 
     const [page, setPage] = useState<number>(0);
-    const [filters, setFilters] = useState<{ itemType: ItemType | undefined; brand: string; minPrize: number; maxPrize:number; itemCondition: ItemConditionEnum | undefined; shopName: string }>({ itemType: undefined, brand: "", minPrize: 0, maxPrize: 99999, itemCondition: undefined, shopName: "" });
+    const [filters, setFilters] = useState<OfferFilters>({
+        componentType: componentCategoryParam ? (componentCategoryParam as ComponentTypeEnum) : undefined,
+        brand: "",
+        minPrize: 0,
+        maxPrize: 99999,
+        itemCondition: undefined,
+        shopName: "",
+        query: "",
+        sortBy: sortBy ? (sortBy as SortByOffersEnum) : undefined
+    });
     const [tempFilters, setTempFilters] = useState(filters);
+
+    useEffect(() => {
+        if (componentCategoryParam) {
+            setFilters((prev) => ({
+                ...prev,
+                componentType: componentCategoryParam as ComponentTypeEnum,
+            }));
+            setTempFilters((prev) => ({
+                ...prev,
+                componentType: componentCategoryParam as ComponentTypeEnum,
+            }));
+        }
+    }, [componentCategoryParam]);
 
     const {data: offersData, isLoading: isLoadingOffers, error, isFetching} = useFetchOffers(page, filters);
     const offers = offersData?.offers ?? [];
@@ -33,18 +60,31 @@ function OffersUserPage() {
     const brands = brandsData ?? []
 
     const componentConditions = Object.values(ItemConditionEnum);
-    const componentTypes = Object.values(ItemType);
+    const componentTypes = Object.values(ComponentTypeEnum);
     const {data: shopsData} = useShopsNames();
     const shopsNames = shopsData ?? [];
+
 
     const applyFilters = () => {
         setFilters(tempFilters);
     };
 
     const clearFilters = () => {
-        setFilters({ itemType: undefined, brand: "", minPrize: 0, maxPrize:99999, itemCondition: undefined, shopName: "" });
-        setTempFilters({ itemType: undefined, brand: "", minPrize: 0, maxPrize:99999, itemCondition: undefined, shopName: "" });
+        setFilters({ componentType: undefined, brand: "", minPrize: 0, maxPrize:99999, itemCondition: undefined, shopName: "", query: "", sortBy: undefined });
+        setTempFilters({ componentType: undefined, brand: "", minPrize: 0, maxPrize:99999, itemCondition: undefined, shopName: "", query: "", sortBy: undefined });
     }
+
+    const handleSearch = () => {
+        setFilters(prev => ({ ...prev, query: tempFilters.query}));
+        setPage(0);
+    };
+
+    const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSortBy(e.target.value);
+        setTempFilters(prev => ({ ...prev, sortBy: e.target.value as SortByOffersEnum }));
+        setFilters(prev => ({ ...prev, sortBy: e.target.value as SortByOffersEnum }));
+        setPage(0);
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -67,7 +107,6 @@ function OffersUserPage() {
     //     return <LoadingSpinner />;
     // }
     if (error) return <p className="p-4 text-ocean-red">Błąd podczas pobierania danych.</p>;
-
     return (
         <div className="min-h-screen bg-gray-50">
             <SidePanelBuilds />
@@ -78,36 +117,34 @@ function OffersUserPage() {
                     
                     {/* Search bar */}
                     <div className="flex gap-4 items-center">
-                    {/*    <div className="flex-1 max-w-2xl">*/}
-                    {/*        <div className="relative">*/}
-                    {/*            <input*/}
-                    {/*                type="text"*/}
-                    {/*                placeholder="Wyszukaj ofertę (np. Nvidia, RTX 4080)..."*/}
-                    {/*                value={searchText}*/}
-                    {/*                onChange={(e) => setSearchText(e.target.value)}*/}
-                    {/*                onKeyPress={handleSearchKeyPress}*/}
-                    {/*                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"*/}
-                    {/*            />*/}
-                    {/*            <button */}
-                    {/*                onClick={handleSearch}*/}
-                    {/*                className="absolute right-3 top-1/2 transform -translate-y-1/2 hover:text-gray-600"*/}
-                    {/*            >*/}
-                    {/*                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">*/}
-                    {/*                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />*/}
-                    {/*                </svg>*/}
-                    {/*            </button>*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                        
-                        {/*<select */}
-                        {/*    value={sortBy}*/}
-                        {/*    onChange={(e) => setSortBy(e.target.value)}*/}
-                        {/*    className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"*/}
-                        {/*>*/}
-                        {/*    <option value="">Domyślne sortowanie</option>*/}
-                        {/*    <option value="cheapest">Najtańsze</option>*/}
-                        {/*    <option value="expensive">Najdroższe</option>*/}
-                        {/*</select>*/}
+                        <div className="relative w-full max-w-2xl">
+                            <input
+                                type="text"
+                                placeholder="Wyszukaj ofertę (np. Nvidia, RTX 4080)..."
+                                value={tempFilters.query}
+                                onChange={(e) => setTempFilters(({ ...tempFilters, query: e.target.value }))}
+                                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                            />
+                            <button
+                                onClick={handleSearch}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 hover:text-gray-600"
+                            >
+                                <SearchIcon/>
+                            </button>
+                        </div>
+
+                        <select
+                            value={tempFilters.sortBy}
+                            onChange={handleSortChange}
+                            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                        >
+                            <option value="">Domyślne sortowanie</option>
+                            <option value={SortByOffersEnum.CHEAPEST}>Najtańsze</option>
+                            <option value={SortByOffersEnum.EXPENSIVE}>Najdroższe</option>
+                            <option value={SortByOffersEnum.NEWEST}>Najnowsze</option>
+                        </select>
+
                     </div>
                 </div>
             </div>
@@ -125,8 +162,8 @@ function OffersUserPage() {
                                 Kategoria
                             </label>
                             <select
-                                value={tempFilters.itemType}
-                                onChange={(e) => setTempFilters((prev) => ({...prev, itemType: e.target.value as ItemType}))}
+                                value={tempFilters.componentType}
+                                onChange={(e) => setTempFilters((prev) => ({...prev, componentType: e.target.value as ComponentTypeEnum}))}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                             >
                                 <option value="">Wszystkie kategorie</option>
@@ -174,11 +211,10 @@ function OffersUserPage() {
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                             >
                                 <option value="">Wszyscy producenci</option>
-                                {brands.map(brand => (
-                                    <option key={brand} value={brand}>
-                                        {brand}
-                                    </option>
+                                {Array.isArray(brands) && brands.map(brand => (
+                                    <option key={brand} value={brand}>{brand}</option>
                                 ))}
+
                             </select>
                         </div>
 
@@ -267,20 +303,21 @@ function OffersUserPage() {
                     {/* Pagination */}
                     <ReactPaginate
                         breakLabel="..."
-                        nextLabel={<RightArrow/>}
-                        previousLabel={<LeftArrow/>}
-                        onPageChange={(e) => setPage(e.selected + 1)}
-                        forcePage={page - 1}
+                        nextLabel={<RightArrow />}
+                        previousLabel={<LeftArrow />}
+                        onPageChange={(e) => setPage(e.selected)}
+                        forcePage={page}
                         pageRangeDisplayed={3}
                         marginPagesDisplayed={1}
                         pageCount={offersData?.totalPages ?? 1}
                         containerClassName="flex justify-center gap-1 py-4"
-                        pageClassName=""
                         pageLinkClassName="px-3 py-1 block rounded bg-gray-100 cursor-pointer"
                         activeLinkClassName="bg-ocean-dark-blue text-white font-semibold"
                         previousLinkClassName="px-3 py-1 block rounded hover:bg-gray-200 cursor-pointer"
                         nextLinkClassName="px-3 py-1 block rounded hover:bg-gray-200 cursor-pointer"
+                        onClick={scrollToTop}
                     />
+
                 </div>
             </div>
         </div>

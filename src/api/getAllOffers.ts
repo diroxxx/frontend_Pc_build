@@ -16,12 +16,14 @@ export async function getAllOffers(page: number = 0,
     const params = new URLSearchParams();
     params.append('page', page.toString());
     params.append('size', '30');
-    if (filters?.itemType) params.append('itemType', filters.itemType);
+    if (filters?.componentType) params.append('componentType', filters.componentType);
     if (filters?.brand) params.append('brand', filters.brand);
     if (filters?.minPrize) params.append('minPrize', filters.minPrize.toString());
     if (filters?.maxPrize) params.append('maxPrize', filters.maxPrize.toString());
     if (filters?.itemCondition) params.append('itemCondition', filters.itemCondition);
     if (filters?.shopName) params.append('shopName', filters.shopName);
+    if (filters?.query) params.append('query', filters.query);
+    if (filters?.sortBy) params.append('sortBy', filters.sortBy);
 
     const res = await customAxios.get(`/offers/v2?${params.toString()}`);
     return res.data;

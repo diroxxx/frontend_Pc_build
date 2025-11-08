@@ -1,15 +1,26 @@
-import axios from "axios";
+import axios, {type AxiosError, type InternalAxiosRequestConfig} from "axios";
 import { getAuthToken, setAuthToken } from "./Auth.tsx";
 
 import { showToast } from './ToastContainer.tsx';
+import {userAtom} from "../atomContext/userAtom.tsx";
+import {store} from "../atomContext/store.ts";
 
 const customAxios = axios.create({
     baseURL: "http://localhost:8080",
     headers: { "Content-Type": "application/json" },
-    withCredentials: true,
+    withCredentials: true, 
 });
+type AxiosRequestWithRetry = InternalAxiosRequestConfig & { _retry?: boolean };
 
-customAxios.interceptors.request.use((config) => {
+interface ApiErrorResponse {
+    message?: string;
+    error?: string;
+    status?: number;
+}
+
+
+// === REQUEST INTERCEPTOR ===
+customAxios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     const token = getAuthToken();
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -17,64 +28,92 @@ customAxios.interceptors.request.use((config) => {
     return config;
 });
 
+// === REFRESH TOKEN HANDLING ===
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+
+const subscribeTokenRefresh = (cb: (token: string) => void) => {
+    refreshSubscribers.push(cb);
+};
+
+const onRefreshed = (token: string) => {
+    refreshSubscribers.forEach(cb => cb(token));
+    refreshSubscribers = [];
+};
+
+// === RESPONSE INTERCEPTOR ===
 customAxios.interceptors.response.use(
     (response) => response,
-    async (error) => {
-        const originalRequest = error.config;
-        
-        // 401 - Token wygasł, spróbuj odświeżyć
+    async (error: AxiosError) => {
+        const originalRequest = error.config as AxiosRequestWithRetry;
+
+        // === 401 UNAUTHORIZED ===
         if (error.response?.status === 401 && !originalRequest._retry) {
-                // if ((error.response?.status === 401 || error.response?.status === 500) && !originalRequest._retry) {
+            if (isRefreshing) {
+                return new Promise(resolve => {
+                    subscribeTokenRefresh((token: string) => {
+                        originalRequest.headers.Authorization = `Bearer ${token}`;
+                        resolve(customAxios(originalRequest));
+                    });
+                });
+            }
 
             originalRequest._retry = true;
+            isRefreshing = true;
+
             try {
-                // const refreshToken = getRefreshToken();
-                const response = await axios.post("http://localhost:8080/auth/refresh", {
-                    // refreshToken: refreshToken,
-                }
-            , {withCredentials: true}
-        );
-                const newAccessToken = response.data.accessToken;
+                const response = await axios.post(
+                    "http://localhost:8080/auth/refresh",
+                    {},
+                    { withCredentials: true }
+                );
+
+                const newAccessToken = (response.data as any).accessToken;
                 setAuthToken(newAccessToken);
+                onRefreshed(newAccessToken);
+                isRefreshing = false;
+
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
                 return customAxios(originalRequest);
+
             } catch (refreshError) {
                 console.error("Refresh token failed:", refreshError);
+                isRefreshing = false;
                 setAuthToken(null);
-                // showToast.error("Sesja wygasła. Zaloguj się ponownie.");
-                // window.location.href = "/login";
+                store.set(userAtom, null);
+                showToast.error("Sesja wygasła. Zaloguj się ponownie.");
+                window.location.href = "/login";
                 return Promise.reject(refreshError);
             }
         }
-        
-        // 403 - Brak uprawnień (nie próbuj odświeżać tokenu)
+
+        // === 403 FORBIDDEN ===
         if (error.response?.status === 403) {
-            console.error("Access forbidden - insufficient permissions");
+            console.warn("Brak uprawnień do wykonania operacji (403)");
             showToast.error("Brak uprawnień do wykonania tej operacji.");
-            
-            const token = getAuthToken();
-            if (!token) {
-                setAuthToken(null);
-                window.location.href = "/login";
-            }
-            
-            return Promise.reject(error);
-        }
-        
-        if (error.response?.status === 500) {
-            showToast.error(error.response.data.message || "Error occurred on the server. Please try again later.");
             return Promise.reject(error);
         }
 
+        // === 400 BAD REQUEST ===
         if (error.response?.status === 400) {
-            const message = error.response.data.message || "Nieprawidłowe dane";
-            showToast.error(message);
-            console.error("Bad Request:", message);
+            const axiosError = error as AxiosError<ApiErrorResponse>;
+            const msg = axiosError.response?.data?.message || "Nieprawidłowe dane";
+            showToast.error(msg);
+            console.error("400 Bad Request:", msg);
             return Promise.reject(error);
         }
-        
-        // Inne błędy
+
+        // === 500 SERVER ERROR ===
+        if (error.response?.status === 500) {
+            const axiosError = error as AxiosError<ApiErrorResponse>;
+            const msg = axiosError.response?.data?.message || "Wystąpił błąd po stronie serwera.";
+            showToast.error(msg);
+            console.error("500 Server Error:", msg);
+            return Promise.reject(error);
+        }
         return Promise.reject(error);
     }
 );
+
 export default customAxios;

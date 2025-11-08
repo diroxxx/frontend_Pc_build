@@ -3,8 +3,6 @@ import { atomWithStorage } from 'jotai/utils';
 import { jwtDecode } from 'jwt-decode';
 import {setAuthToken} from '../lib/Auth.tsx';
 
-import {retriveComputersFromDbAtom, migrateGuestDataAtom } from './computerAtom.tsx';
-
 export interface User {
     // id: number;
   email: string;
@@ -21,14 +19,9 @@ export interface CustomJwtPayload {
 
 export const userAtom = atomWithStorage<User | null>('user', null);
 
-export const isAuthenticatedAtom = atom<boolean>((get) => {
-  const user = get(userAtom);
-  return user !== null;
-});
-
 export const loginUserAtom = atom(
   null,
-  async (get, set, token: string) => {
+  async (_get, set, token: string) => {
     try {
       const decoded = jwtDecode<CustomJwtPayload>(token);
       const user: User = {
@@ -39,14 +32,7 @@ export const loginUserAtom = atom(
       
       setAuthToken(token);
       set(userAtom, user);
-      set(migrateGuestDataAtom);
 
-      try {
-        await set(retriveComputersFromDbAtom);
-        console.log('Zestawy pobrane i zsynchronizowane');
-      } catch (error) {
-        console.warn('Nie udało się pobrać zestawów z bazy:', error);
-      }
     } catch (error) {
       console.error('Błąd dekodowania tokenu:', error);
       throw new Error('Nieprawidłowy token');
@@ -54,10 +40,6 @@ export const loginUserAtom = atom(
   }
 );
 
-export const canSaveComputersAtom = atom<boolean>((get) => {
-  const user = get(userAtom);
-  return user !== null; 
-});
 
 export const loginAdminAtom = atom(
   null,

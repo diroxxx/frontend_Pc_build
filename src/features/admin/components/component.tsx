@@ -1,5 +1,5 @@
 import {type ComponentItem} from "../../../types/BaseItemDto.ts";
-import {ItemType} from "../../../types/BaseItemDto.ts";
+import {ComponentTypeEnum} from "../../../types/BaseItemDto.ts";
 
 interface Props {
     component: ComponentItem;
