@@ -9,8 +9,9 @@ import toast from "react-hot-toast";
 import {useOfferUpdates} from "../hooks/useOffersUpdates.ts";
 import OffersUpdatesView from "../components/OffersUpdatesView.tsx";
 import {LoadingSpinner} from "../../../assets/components/ui/LoadingSpinner.tsx";
+import ComponentsStatsPanel from "../components/ComponentsStatsPanel.tsx";
 
-// Shop Selector OfferCard
+// Shop Selector OfferCardFlex
 interface Shop {
     name: string;
     [key: string]: any;
@@ -270,6 +271,9 @@ const OffersComponent = () => {
                     </div>
                 </div>
             )}
+            <div className="space-y-4">
+                <ComponentsStatsPanel />
+            </div>
             <OffersUpdatesView/>
         </div>
     );

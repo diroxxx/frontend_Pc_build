@@ -1,3 +1,5 @@
+import type {ItemConditionEnum} from "./ItemConditionEnum.ts";
+
 export enum ComponentTypeEnum {
     PROCESSOR = "PROCESSOR",
     GRAPHICS_CARD = "GRAPHICS_CARD",
@@ -7,6 +9,34 @@ export enum ComponentTypeEnum {
     STORAGE = "STORAGE",
     CASE_PC = "CASE_PC",
     CPU_COOLER = "CPU_COOLER",
+}
+export interface NewComponentRow {
+    componentType: ComponentTypeEnum;
+    brand: string;
+    model: string;
+    price: number;
+    condition: ItemConditionEnum;
+    shopName?: string;
+
+    cores?: number;
+    threads?: number;
+    baseClock?: string;
+    socketType?: string;
+
+    memorySize?: number;
+    gddr?: string;
+    powerDraw?: number;
+
+    capacity?: number;
+    speed?: number;
+    type?: string;
+
+    chipset?: string;
+    format?: string;
+
+    maxPowerWatt?: number;
+
+    coolerSocketsType?: string;
 }
 
 export interface BaseItem {

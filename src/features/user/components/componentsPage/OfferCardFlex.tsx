@@ -12,7 +12,7 @@ interface Props {
     offer: ComponentOffer;
 }
 
-const OfferCard: FC<Props> = ({ offer }) => {
+const OfferCardFlex: FC<Props> = ({ offer }) => {
     const selectedComputer = useAtomValue(selectedComputerAtom);
     const updateMutation = useUpdateOffersToComputer();
     const [imgError, setImgError] = useState(false);
@@ -90,35 +90,30 @@ const OfferCard: FC<Props> = ({ offer }) => {
         return tags.filter(Boolean);
     };
 
-    const renderConditionBadge = (condition: string) => {
-        switch (condition?.toLowerCase()) {
-            case "new":
-                return (
-                    <span className="flex items-center gap-1 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">
-          <CheckCircle size={14} /> Nowy
-        </span>
-                );
-            case "used":
-                return (
-                    <span className="flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-1 rounded-full">
-          <Wrench size={14} /> Używany
-        </span>
-                );
-            case "defective":
-                return (
-                    <span className="flex items-center gap-1 bg-red-100 text-red-700 text-xs font-medium px-2.5 py-1 rounded-full">
-          <AlertTriangle size={14} /> Uszkodzony
-        </span>
-                );
-            default:
-                return null;
-        }
-    };
-
-    //
-
-
-
+    // const renderConditionBadge = (condition: string) => {
+    //     switch (condition?.toLowerCase()) {
+    //         case "new":
+    //             return (
+    //                 <span className="flex items-center gap-1 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">
+    //       <CheckCircle size={14} /> Nowy
+    //     </span>
+    //             );
+    //         case "used":
+    //             return (
+    //                 <span className="flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-1 rounded-full">
+    //       <Wrench size={14} /> Używany
+    //     </span>
+    //             );
+    //         case "defective":
+    //             return (
+    //                 <span className="flex items-center gap-1 bg-red-100 text-red-700 text-xs font-medium px-2.5 py-1 rounded-full">
+    //       <AlertTriangle size={14} /> Uszkodzony
+    //     </span>
+    //             );
+    //         default:
+    //             return null;
+    //     }
+    // };
 
     const specTags = renderSpecTags();
 
@@ -152,16 +147,12 @@ const OfferCard: FC<Props> = ({ offer }) => {
             ? "UŻYWANY"
             : "USZKODZONY"}
   </span>
-
-
-
                 </div>
 
                 <div className="flex-1 flex flex-col justify-between">
                     {/*<div className="flex items-center justify-between mb-2">*/}
                     {/*    {renderConditionBadge(offer.condition)}*/}
                     {/*</div>*/}
-
 
                     <div className="flex justify-between items-start gap-2">
                         <div>
@@ -234,4 +225,4 @@ const OfferCard: FC<Props> = ({ offer }) => {
         </div>
     );
 };
-export default OfferCard;
+export default OfferCardFlex;

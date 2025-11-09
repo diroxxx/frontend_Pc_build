@@ -1,10 +1,10 @@
 import type {ComponentOffer} from "../../../../types/OfferBase.ts";
 import type {FC} from "react";
-import OfferCard from "./OfferCard.tsx";
+import OfferCardFlex from "./OfferCardFlex.tsx";
 import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.tsx";
 import {useAtom} from "jotai";
 import {viewModeAtom} from "../../atoms/OfferListViewMode.ts";
-import {OfferCardGrid} from "./OfferCardGrid.tsx";
+import OfferCardGrid from "./OfferCardGrid.tsx";
 
 interface OffersTableProps {
     offers: ComponentOffer[];
@@ -38,7 +38,7 @@ const OfferUserList: FC<OffersTableProps> = ({offers, isFetching, isLoading}) =>
             {/*        </div>*/}
             {/*    ) : (*/}
             {/*        offers.map((offer, index) => (*/}
-            {/*            <OfferCard*/}
+            {/*            <OfferCardFlex*/}
             {/*                key={index}*/}
             {/*                offer={offer}*/}
             {/*            />*/}
@@ -55,7 +55,7 @@ const OfferUserList: FC<OffersTableProps> = ({offers, isFetching, isLoading}) =>
             >
                 {offers.map((offer) =>
                     viewMode === "list" ? (
-                        <OfferCard key={offer.websiteUrl} offer={offer} />
+                        <OfferCardFlex key={offer.websiteUrl} offer={offer} />
                     ) : (
                         <OfferCardGrid key={offer?.websiteUrl} offer={offer} />
                     )

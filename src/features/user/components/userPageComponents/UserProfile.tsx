@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import {useLogout} from "../../../../hooks/useLogout.ts";
 
 function UserProfile(){
-    const [user, setUser] = useAtom(userAtom);
+    const [user,] = useAtom(userAtom);
     const navigate = useNavigate();
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');

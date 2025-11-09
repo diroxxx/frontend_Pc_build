@@ -11,6 +11,12 @@ import  { ComponentTypeEnum } from "../../../types/BaseItemDto.ts";
 import { useFetchBrands } from "../hooks/useFetchBrands.ts";
 import {LeftArrow} from "../../../assets/icons/leftArrow.tsx";
 import {RightArrow} from "../../../assets/icons/rightArrow.tsx";
+import {PlusIcon, UploadIcon} from "lucide-react";
+import AddComponentForm from "../components/AddComponentForm.tsx";
+
+import ImportCsvButton from "../components/ImportCsvButton";
+import {useBulkImportComponents} from "../hooks/useBulkImportComponents.ts";
+
 const ComponentsPage = () => {
     const componentList = useAtomValue(componentSpecsAtom);
     const [searchTerm, setSearchTerm] = useState('');
@@ -22,6 +28,14 @@ const ComponentsPage = () => {
     const [filters, setFilters] = useState<{ itemType: ComponentTypeEnum | undefined; brand: string }>({ itemType: undefined, brand: "" });
 
     const { data, isLoading, error, isFetching, isPlaceholderData } = useFetchComponents(page, filters);
+    const [showForm, setShowForm] = useState(false);
+
+    const bulkImport = useBulkImportComponents();
+
+    const handleAddComponent = (data: any) => {
+        console.log("Zapisano nowy komponent:", data);
+        setShowForm(false);
+    };
 
     const filteredComponents = componentList.filter(component => {
         const matchesSearch =
@@ -46,19 +60,32 @@ const ComponentsPage = () => {
 
     return (
         <div className="space-y-4">
-            {/* Header */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold text-midnight-dark">Komponenty PC</h2>
-                    <div className="flex gap-2">
-                        <button className="px-3 py-1.5 bg-ocean-dark-blue text-white rounded hover:bg-ocean-blue text-sm font-medium transition-colors flex items-center gap-1">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                            </svg>
-                            Dodaj
-                        </button>
-                    </div>
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold text-midnight-dark">Komponenty PC</h2>
+
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => setShowForm(true)}
+                        className="px-3 py-1.5 bg-ocean-dark-blue text-white rounded hover:bg-ocean-blue text-sm font-medium flex items-center gap-1"
+                    >
+                        <PlusIcon className="w-5 h-5" />
+                        Dodaj ręcznie
+                    </button>
+
+                    <ImportCsvButton
+                        onParsed={(rows) => bulkImport.mutate(rows)}
+                    />
                 </div>
+            </div>
+            {showForm && (
+                <AddComponentForm
+                    isOpen={showForm}
+                    onClose={() => setShowForm(false)}
+                    onSubmit={handleAddComponent}
+                />
+            )}
+
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
 
                 <div className="flex gap-3 mb-3">
                     <div className="flex-1 relative">
@@ -79,7 +106,7 @@ const ComponentsPage = () => {
                          onChange={(e) => setFilters((prev) => ({ ...prev, itemType: e.target.value as ComponentTypeEnum | undefined }))}
                          className="border border-gray-300 rounded p-2 text-sm"
                      >
-                         <option value="">-- wybierz typ --</option>
+                         <option value="">wybierz typ</option>
                          {Object.values(ComponentTypeEnum).map((type) => (
                              <option key={type} value={type}>
                                  {type.replaceAll("_", " ")}
