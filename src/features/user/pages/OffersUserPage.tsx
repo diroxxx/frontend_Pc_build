@@ -4,7 +4,6 @@ import SidePanelBuilds from '../components/builds/SidePanelBuilds.tsx';
 import {useFetchOffers} from "../../../hooks/useFetchOffers.ts";
 import {ComponentTypeEnum} from "../../../types/BaseItemDto.ts";
 import  {ItemConditionEnum} from "../../../types/ItemConditionEnum.ts";
-import LoadingSpinner from "../../../components/ui/LoadingSpinner.tsx";
 import OfferUserList from "../components/componentsPage/OfferUserList.tsx";
 import ReactPaginate from "react-paginate";
 import {RightArrow} from "../../../assets/icons/rightArrow.tsx";
@@ -16,6 +15,9 @@ import {SortByOffersEnum} from "../../../types/SortByOffersEnum.ts";
 import {SearchIcon} from "../../../assets/icons/searchIcon.tsx";
 import { useSearchParams } from "react-router-dom";
 import type {OfferFilters} from "../../../types/OfferFilters.ts";
+import {LayoutGrid, List} from "lucide-react";
+import {useAtom} from "jotai";
+import {viewModeAtom} from "../atoms/OfferListViewMode.ts";
 
 
 
@@ -64,6 +66,9 @@ function OffersUserPage() {
     const {data: shopsData} = useShopsNames();
     const shopsNames = shopsData ?? [];
 
+    const [viewMode, setViewMode] = useAtom(viewModeAtom);
+
+
 
     const applyFilters = () => {
         setFilters(tempFilters);
@@ -103,9 +108,6 @@ function OffersUserPage() {
         });
     };
 
-    // if (isLoadingOffers) {
-    //     return <LoadingSpinner />;
-    // }
     if (error) return <p className="p-4 text-ocean-red">Błąd podczas pobierania danych.</p>;
     return (
         <div className="min-h-screen bg-gray-50">
@@ -113,8 +115,9 @@ function OffersUserPage() {
             {/* Header */}
             <div className="bg-white border-b border-gray-200 px-4 py-6">
                 <div className="max-w-7xl mx-auto">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-4">Oferty komponentów</h1>
-                    
+                    {/*<h1 className="text-3xl font-bold text-gray-900 mb-4">Oferty komponentów</h1>*/}
+
+
                     {/* Search bar */}
                     <div className="flex gap-4 items-center">
                         <div className="relative w-full max-w-2xl">
@@ -124,7 +127,7 @@ function OffersUserPage() {
                                 value={tempFilters.query}
                                 onChange={(e) => setTempFilters(({ ...tempFilters, query: e.target.value }))}
                                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                             />
                             <button
                                 onClick={handleSearch}
@@ -137,7 +140,7 @@ function OffersUserPage() {
                         <select
                             value={tempFilters.sortBy}
                             onChange={handleSortChange}
-                            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                            className="px-4 py-3 border border-gray-300 rounded-lg"
                         >
                             <option value="">Domyślne sortowanie</option>
                             <option value={SortByOffersEnum.CHEAPEST}>Najtańsze</option>
@@ -145,6 +148,31 @@ function OffersUserPage() {
                             <option value={SortByOffersEnum.NEWEST}>Najnowsze</option>
                         </select>
 
+                    </div>
+                    <div className="flex justify-end mb-4 gap-2">
+                        <button
+                            onClick={() => setViewMode("list")}
+                            className={`p-2 rounded-md border transition ${
+                                viewMode === "list"
+                                    ? "bg-ocean-blue text-white border-ocean-blue"
+                                    : "border-gray-300 text-gray-600 hover:bg-gray-100"
+                            }`}
+                            title="Widok listy"
+                        >
+                            <List size={18} />
+                        </button>
+
+                        <button
+                            onClick={() => setViewMode("grid")}
+                            className={`p-2 rounded-md border transition ${
+                                viewMode === "grid"
+                                    ? "bg-ocean-blue text-white border-ocean-blue"
+                                    : "border-gray-300 text-gray-600 hover:bg-gray-100"
+                            }`}
+                            title="Widok siatki"
+                        >
+                            <LayoutGrid size={18} />
+                        </button>
                     </div>
                 </div>
             </div>
@@ -164,7 +192,7 @@ function OffersUserPage() {
                             <select
                                 value={tempFilters.componentType}
                                 onChange={(e) => setTempFilters((prev) => ({...prev, componentType: e.target.value as ComponentTypeEnum}))}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                             >
                                 <option value="">Wszystkie kategorie</option>
                                 {componentTypes.map(type => (
@@ -257,18 +285,21 @@ function OffersUserPage() {
                         </div>
 
                         {/* Clear filters button */}
-                        <button
-                            onClick={applyFilters}
-                            className="w-full bg-ocean-dark-blue text-white py-2 rounded-lg hover:bg-ocean-light-blue transition"
-                        >
-                            Zastosuj filtry
-                        </button>
-                        <button
-                            onClick={clearFilters}
-                            className="w-full px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
-                        >
-                            Wyczyść filtry
-                        </button>
+                        <div className="mb-6">
+                            <button
+                                onClick={applyFilters}
+                                className="w-full bg-ocean-dark-blue text-white py-2 rounded-lg hover:bg-ocean-blue transition mb-2"
+                            >
+                                Zastosuj filtry
+                            </button>
+                            <button
+                                onClick={clearFilters}
+                                className="w-full px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                            >
+                                Wyczyść filtry
+                            </button>
+                        </div>
+
                     </div>
                 </div>
 

@@ -99,7 +99,10 @@ const BuildList: React.FC<BuildListProps> = ({
                                             value={newName}
                                             autoFocus
                                             onChange={(e) => setNewName(e.target.value)}
-                                            onBlur={() => saveName(computer.id)}
+                                            onBlur={() => {
+                                                saveName(computer.id);
+                                                setEditingId(null);
+                                            }}
                                             onKeyDown={(e) => {
                                                 if (e.key === "Enter") saveName(computer.id);
                                                 if (e.key === "Escape") setEditingId(null);
@@ -134,7 +137,7 @@ const BuildList: React.FC<BuildListProps> = ({
                                     )}
 
                                     <p className="text-sm text-ocean-blue">
-                                        {(computer.offers || []).length} komponentów •{" "}
+                                        {(computer.offers || []).length} komponentów - {" "}
                                         {computer.price.toLocaleString("pl-PL")} zł
                                     </p>
                                 </div>

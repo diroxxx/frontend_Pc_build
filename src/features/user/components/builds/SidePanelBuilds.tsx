@@ -88,7 +88,7 @@ export default function SidePanelBuilds() {
                                             {computer.name}
                                         </p>
                                         <p className="text-xs text-gray-500">
-                                            {(computer.offers?.length || 0)} komponentów •{" "}
+                                            {(computer.offers?.length || 0)} komponentów - {" "}
                                             {(computer.price ?? 0).toLocaleString("pl-PL")} zł
                                         </p>
                                     </div>
