@@ -1,7 +1,6 @@
 import {useFetchComponents} from "../hooks/useFetchComponents.ts";
 import {Component} from "./component.tsx";
 // import type {ComponentItem} from "../../../types/BaseItemDto.ts";
-import {useState} from "react";
 import { ComponentTypeEnum } from "../../../types/BaseItemDto.ts";
 import LoadingSpinner from "../../../components/ui/LoadingSpinner.tsx";
 

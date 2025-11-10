@@ -8,15 +8,15 @@ export interface ComponentsResponse {
     totalElements: number;
 }
 
-export async function getComponentsApi(page: number = 0, filters?: {itemType?:ComponentTypeEnum; brand?: string }): Promise<ComponentsResponse> {
+export async function getComponentsApi(page: number = 0, filters?: {itemType?:ComponentTypeEnum; brand?: string; searchTerm: string }): Promise<ComponentsResponse> {
     const params = new URLSearchParams();
     params.append('page', page.toString());
     params.append('size', '30');
     console.log('Filters in API call:', filters);
 
-
-    if (filters?.itemType) params.append('itemType', filters.itemType);
+    if (filters?.itemType) params.append('componentType', filters.itemType);
     if (filters?.brand) params.append('brand', filters.brand);
+    if (filters?.searchTerm) params.append('searchTerm', filters.searchTerm);
 
     const res = await customAxios.get(`/api/components?${params.toString()}`);
     return res.data;

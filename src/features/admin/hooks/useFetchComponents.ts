@@ -3,15 +3,13 @@ import {getComponentsApi} from "../api/getComponentsApi.ts";
 import {useEffect} from "react";
 import type { ComponentTypeEnum } from "../../../types/BaseItemDto.ts";
 
-export const useFetchComponents = (page: number, filters?: {itemType?: ComponentTypeEnum; brand?: string}) => {
+export const useFetchComponents = (page: number, filters?: {itemType?: ComponentTypeEnum; brand?: string; searchTerm: string}) => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
         queryKey: ["components", page, filters],
         queryFn: () => getComponentsApi(page, filters),
         placeholderData: keepPreviousData,
-        // keepPreviousData: true,
-        staleTime: 5000,
     });
 
     useEffect(() => {

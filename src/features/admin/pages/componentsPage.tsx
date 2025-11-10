@@ -1,9 +1,5 @@
 
 import {useState} from "react";
-import {
-    componentSpecsAtom
-} from "../../../atomContext/componentAtom.tsx";
-import {useAtomValue} from "jotai";
 import Components from "../components/ComponentsList.tsx";
 import {useFetchComponents} from "../hooks/useFetchComponents.ts";
 import ReactPaginate from "react-paginate";
@@ -11,22 +7,20 @@ import  { ComponentTypeEnum } from "../../../types/BaseItemDto.ts";
 import { useFetchBrands } from "../hooks/useFetchBrands.ts";
 import {LeftArrow} from "../../../assets/icons/leftArrow.tsx";
 import {RightArrow} from "../../../assets/icons/rightArrow.tsx";
-import {PlusIcon, UploadIcon} from "lucide-react";
+import {PlusIcon, Search} from "lucide-react";
 import AddComponentForm from "../components/AddComponentForm.tsx";
 
 import ImportCsvButton from "../components/ImportCsvButton";
 import {useBulkImportComponents} from "../hooks/useBulkImportComponents.ts";
 
 const ComponentsPage = () => {
-    const componentList = useAtomValue(componentSpecsAtom);
     const [searchTerm, setSearchTerm] = useState('');
-    const [filterType, setFilterType] = useState<string>('all');
 
     const { data: brandsData, isLoading: isLoadingBrands } = useFetchBrands();
     console.log('getBrandsApi:', brandsData?.length);
     const [page, setPage] = useState<number>(0);
-    const [filters, setFilters] = useState<{ itemType: ComponentTypeEnum | undefined; brand: string }>({ itemType: undefined, brand: "" });
-
+    const [filters, setFilters] = useState<{ itemType: ComponentTypeEnum | undefined; brand: string; searchTerm: string }>({ itemType: undefined, brand: "", searchTerm: "" });
+    const componentsTypeList = Object.values(ComponentTypeEnum);
     const { data, isLoading, error, isFetching, isPlaceholderData } = useFetchComponents(page, filters);
     const [showForm, setShowForm] = useState(false);
 
@@ -37,16 +31,6 @@ const ComponentsPage = () => {
         setShowForm(false);
     };
 
-    const filteredComponents = componentList.filter(component => {
-        const matchesSearch =
-            component.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            component.model.toLowerCase().includes(searchTerm.toLowerCase());
-
-        const matchesType = filterType === 'all' || component.componentType === filterType;
-
-        return matchesSearch && matchesType;
-    });
-
     const componentTypeNames: Record<string, string> = {
         processor: 'Procesor',
         cooler: 'Chłodzenie',
@@ -56,6 +40,23 @@ const ComponentsPage = () => {
         powerSupply: 'Zasilacz',
         storage: 'Dysk',
         casePc: 'Obudowa'
+    };
+
+    const removeFilter = () => {
+        setFilters({ itemType: undefined, brand: "", searchTerm: "" });
+        setSearchTerm('');
+    }
+
+    const handleSearchFiltrAdd = () => {
+        setFilters((prev) => ({ ...prev, searchTerm: searchTerm }));
+    }
+
+    const [isClicked, setIsClicked] = useState(false);
+
+    const handleSearchClick = () => {
+        handleSearchFiltrAdd();
+        setIsClicked(true);
+        setTimeout(() => setIsClicked(false), 200);
     };
 
     return (
@@ -86,51 +87,68 @@ const ComponentsPage = () => {
             )}
 
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-
-                <div className="flex gap-3 mb-3">
-                    <div className="flex-1 relative">
-                        <svg className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
+                <div className="flex flex-wrap items-center gap-3 mb-4">
+                    <div className="relative flex-1 min-w-[200px]">
                         <input
                             type="text"
                             placeholder="Szukaj..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-ocean-blue"
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") handleSearchFiltrAdd();
+                            }}
+                            className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-ocean-blue"
                         />
+
+                        <Search
+                            onClick={handleSearchClick}
+                            className={`absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 cursor-pointer transition-all duration-200 ${
+                                isClicked ? "text-ocean-blue scale-90" : "text-gray-400 hover:text-ocean-dark-blue hover:scale-110"
+                            }`}
+                        />
+
                     </div>
+                    <select
+                        value={filters.itemType}
+                        onChange={(e) =>
+                            setFilters((prev) => ({
+                                ...prev,
+                                itemType: e.target.value as ComponentTypeEnum | undefined,
+                            }))
+                        }
+                        className="border border-gray-300 rounded p-2 text-sm min-w-[150px]"
+                    >
+                        <option value="">Wybierz typ</option>
+                        { componentsTypeList.map((type) => (
+                            <option key={type} value={type}>
+                                {type.replaceAll("_", " ")}
+                            </option>
+                        ))}
+                    </select>
 
                     <select
-                         value={filters.itemType}
-                         onChange={(e) => setFilters((prev) => ({ ...prev, itemType: e.target.value as ComponentTypeEnum | undefined }))}
-                         className="border border-gray-300 rounded p-2 text-sm"
-                     >
-                         <option value="">wybierz typ</option>
-                         {Object.values(ComponentTypeEnum).map((type) => (
-                             <option key={type} value={type}>
-                                 {type.replaceAll("_", " ")}
-                             </option>
-                         ))}
-                     </select>
-
-                      <select
-    value={filters.brand}
-    onChange={(e) => setFilters(prev => ({ ...prev, brand: e.target.value }))}
-    className="border border-gray-300 rounded p-2 text-sm"
-    disabled={isLoadingBrands}
->
-    <option value="">
-        {isLoadingBrands ? "Ładowanie marek..." : "Wszystkie marki"}
-    </option>
-    {brandsData?.map((brand) => ( 
-        <option key={brand} value={brand}>{brand}</option>
-    ))}
-</select>
+                        value={filters.brand}
+                        onChange={(e) => setFilters((prev) => ({ ...prev, brand: e.target.value }))}
+                        className="border border-gray-300 rounded p-2 text-sm min-w-[150px]"
+                        disabled={isLoadingBrands}
+                    >
+                        <option value="">
+                            {isLoadingBrands ? "Ładowanie marek..." : "Wszystkie marki"}
+                        </option>
+                        {brandsData?.map((brand) => (
+                            <option key={brand} value={brand}>
+                                {brand}
+                            </option>
+                        ))}
+                    </select>
                 </div>
-
-                <div className="flex items-center gap-3 text-xs text-gray-600">
-                    
+                <div className="flex justify-end">
+                    <button
+                        onClick={removeFilter}
+                        className="px-4 py-1.5 bg-ocean-dark-blue text-white rounded hover:bg-ocean-blue text-sm font-medium flex items-center gap-1"
+                    >
+                        Wyczyść filtry
+                    </button>
                 </div>
             </div>
 

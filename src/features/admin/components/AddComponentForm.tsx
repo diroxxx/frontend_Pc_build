@@ -1,7 +1,6 @@
-import {PlusIcon, SaveIcon, X} from "lucide-react";
+import {PlusIcon, X} from "lucide-react";
 import {ComponentTypeEnum} from "../../../types/BaseItemDto.ts";
 import {useState} from "react";
-import Papa from "papaparse";
 
 interface AddComponentModalProps {
     isOpen: boolean;
@@ -48,6 +47,55 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
                         <Field label="Pamięć VRAM (GB)" value={details.vram} onChange={(v) => handleDetailChange("vram", v)} />
                         <Field label="Rodzaj pamięci" value={details.gddr} onChange={(v) => handleDetailChange("gddr", v)} />
                         <Field label="TDP (W)" value={details.powerDraw} onChange={(v) => handleDetailChange("powerDraw", v)} />
+                    </>
+                );
+
+            case ComponentTypeEnum.MEMORY:
+                return (
+                    <>
+                        <Field label="Typ pamięci" value={details.type} onChange={(v) => handleDetailChange("type", v)} />
+                        <Field label="Pojemność (GB)" value={details.capacity} onChange={(v) => handleDetailChange("capacity", v)} />
+                        <Field label="Taktowanie (MHz)" value={details.speed} onChange={(v) => handleDetailChange("speed", v)} />
+                        <Field label="Opóźnienie (CL)" value={details.latency} onChange={(v) => handleDetailChange("latency", v)} />
+                    </>
+                );
+
+            case ComponentTypeEnum.MOTHERBOARD:
+                return (
+                    <>
+                        <Field label="Chipset" value={details.chipset} onChange={(v) => handleDetailChange("chipset", v)} />
+                        <Field label="Typ socketu" value={details.socketType} onChange={(v) => handleDetailChange("socketType", v)} />
+                        <Field label="Rodzaj pamięci" value={details.memoryType} onChange={(v) => handleDetailChange("memoryType", v)} />
+                        <Field label="Format płyty" value={details.format} onChange={(v) => handleDetailChange("format", v)} />
+                    </>
+                );
+
+            case ComponentTypeEnum.POWER_SUPPLY:
+                return (
+                    <>
+                        <Field label="Moc maksymalna (W)" value={details.maxPowerWatt} onChange={(v) => handleDetailChange("maxPowerWatt", v)} />
+                    </>
+                );
+
+            case ComponentTypeEnum.STORAGE:
+                return (
+                    <>
+                        <Field label="Pojemność (GB)" value={details.capacity} onChange={(v) => handleDetailChange("capacity", v)} />
+                        <Field label="Typ dysku" value={details.type} onChange={(v) => handleDetailChange("type", v)} />
+                    </>
+                );
+
+            case ComponentTypeEnum.CPU_COOLER:
+                return (
+                    <>
+                        <Field label="Socket" value={details.socketType} onChange={(v) => handleDetailChange("socketType", v)} />
+                    </>
+                );
+
+            case ComponentTypeEnum.CASE_PC:
+                return (
+                    <>
+                        <Field label="Format" value={details.format} onChange={(v) => handleDetailChange("format", v)} />
                     </>
                 );
 
@@ -98,7 +146,8 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
                     <Field label="Marka" value={brand} onChange={setBrand} />
                     <Field label="Model" value={model} onChange={setModel} />
                     {renderDynamicFields()}
-                    
+
+                    {/*<SaveIcon className="w-6 h-6 text-ocean-blue absolute top-4 right-4 cursor-pointer" onClick={handleSubmit} />*/}
                 </form>
             </div>
         </div>

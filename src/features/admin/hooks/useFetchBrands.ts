@@ -4,6 +4,6 @@ export const useFetchBrands = () => {
     return useQuery({
         queryKey: ["brands"],
         queryFn: getBrandsApi,
-        staleTime: 10 * 60 * 1000, 
+        // staleTime: 10 * 60 * 1000,
     });
 }

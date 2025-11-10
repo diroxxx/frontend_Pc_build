@@ -5,7 +5,7 @@ import {showToast} from "../../../../lib/ToastContainer.tsx";
 import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
 import {useUpdateOffersToComputer} from "../../../admin/hooks/useUpdateOffersToComputer.ts";
 import {validateCompatibility} from "../../hooks/validateCompatibility.ts";
-import { ImageOff } from "lucide-react";
+import {ImageOff, Info} from "lucide-react";
 import { CheckCircle, Wrench, AlertTriangle } from "lucide-react";
 
 interface Props {
@@ -166,8 +166,22 @@ const OfferCardFlex: FC<Props> = ({ offer }) => {
                                     {offer.brand} {offer.model}
                                 </a>
                             </h3>
+                            {offer.title && (
+                                <p className="text-xs text-gray-500 mt-0.5 line-clamp-1 group-hover:line-clamp-2 transition-all">
+                                    {offer.title}
+                                </p>
+                            )}
 
+                            {/*{offer.title && (*/}
+                            {/*    <div className="relative group">*/}
+                            {/*        <Info className="w-4 h-4 text-gray-400 cursor-pointer" />*/}
+                            {/*        <div className="absolute hidden group-hover:block bg-gray-800 text-white text-xs rounded p-2 top-5 left-0 w-56 z-10">*/}
+                            {/*            {offer.title}*/}
+                            {/*        </div>*/}
+                            {/*    </div>*/}
+                            {/*)}*/}
                         </div>
+
                         {offer.shopName && (
                             <img
                                 src={

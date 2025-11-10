@@ -39,6 +39,10 @@ export interface NewComponentRow {
     coolerSocketsType?: string;
 }
 
+
+
+
+
 export interface BaseItem {
     id?: number;
     brand: string;
