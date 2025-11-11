@@ -63,7 +63,7 @@ export const Component = ({ component }: Props) => {
                     {baseCells}
                     <td className={cellClass}>
                         {component.chipset} • {component.format} • {component.memoryType} • {component.ramCapacity} GB /{" "}
-                        {component.ramslots} sloty • {component.socketType}
+                        {component.ramSlots} sloty • {component.socketType}
                     </td>
                 </tr>
             );

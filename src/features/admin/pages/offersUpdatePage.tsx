@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import customAxios from '../../../lib/customAxios.tsx';
-import { useWebSocketStomp } from '../../../hooks/webSocketHook.ts';
 import { useAtom } from 'jotai';
 import { fetchShopsAtom, shopsAtom } from '../atoms/shopAtom.tsx';
-import { fetchOfferUpdatesAtom, fetchOfferUpdateConfigAtom, offerUpdateConfigAtom, offerUpdatesAtom, type OfferUpdateType } from '../atoms/adminAtom.tsx';
+import {fetchOfferUpdateConfigAtom, offerUpdateConfigAtom, type OfferUpdateType } from '../atoms/adminAtom.tsx';
 import { showToast } from "../../../lib/ToastContainer.tsx";
 import toast from "react-hot-toast";
 import {useOfferUpdates} from "../hooks/useOffersUpdates.ts";
@@ -11,7 +10,7 @@ import OffersUpdatesView from "../components/OffersUpdatesView.tsx";
 import {LoadingSpinner} from "../../../assets/components/ui/LoadingSpinner.tsx";
 import ComponentsStatsPanel from "../components/ComponentsStatsPanel.tsx";
 
-// Shop Selector OfferCardFlex
+
 interface Shop {
     name: string;
     [key: string]: any;
@@ -54,9 +53,6 @@ const ShopSelector: React.FC<ShopSelectorProps> = ({ shops, selectedShopNames, o
 const intervalsInMinutes = [5, 15, 30, 60, 120, 240, 1440];
 
 const OffersComponent = () => {
-    const [isUpdating, setIsUpdating] = useState(false);
-    const [messages, setMessages] = useState<string[]>([]);
-    const webSocketUrl = useMemo(() => 'ws://localhost:8080/offers', []);
     const [updateType, setUpdateType] = useState<OfferUpdateType>('MANUAL');
     const [shops] = useAtom(shopsAtom);
     const [, fetchShops] = useAtom(fetchShopsAtom);
@@ -149,7 +145,6 @@ const OffersComponent = () => {
 
     return (
         <div className="space-y-6 p-6">
-            {/* Header with Toggle */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <div className="flex items-center justify-between">
                     <div>
@@ -159,9 +154,9 @@ const OffersComponent = () => {
                         </p>
                     </div>
                     <div className="flex items-center gap-4">
-                        <span className={`text-sm font-medium transition-colors ${updateType === 'MANUAL' ? 'text-ocean-blue' : 'text-gray-500'}`}>
-                            Ręczna
-                        </span>
+          <span className={`text-sm font-medium transition-colors ${updateType === 'MANUAL' ? 'text-ocean-blue' : 'text-gray-500'}`}>
+            Ręczna
+          </span>
                         <button
                             onClick={handleUpdateTypeToggle}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-ocean-blue focus:ring-offset-2 ${
@@ -170,111 +165,113 @@ const OffersComponent = () => {
                                     : 'bg-gray-200'
                             }`}
                         >
-                            <span
-                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                    updateType === 'AUTOMATIC' ? 'translate-x-6' : 'translate-x-1'
-                                }`}
-                            />
+            <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    updateType === 'AUTOMATIC' ? 'translate-x-6' : 'translate-x-1'
+                }`}
+            />
                         </button>
                         <span className={`text-sm font-medium transition-colors ${updateType === 'AUTOMATIC' ? 'text-ocean-blue' : 'text-gray-500'}`}>
-                            Automatyczna
-                        </span>
+            Automatyczna
+          </span>
                     </div>
                 </div>
             </div>
-            {/* Manual Mode */}
-            {updateType === 'MANUAL' && (
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h3 className="text-lg font-semibold text-midnight-dark mb-4">Aktualizacja manualna</h3>
-                    {/* Shop Selection */}
-                    <div className="mb-6">
-                        <p className="block text-sm font-medium text-gray-700 mb-2">
-                            Wybierz sklepy do aktualizacji
-                        </p>
-                        <ShopSelector
-                            shops={shops}
-                            selectedShopNames={selectedShopNames}
-                            onShopToggle={handleShopToggle}
-                        />
-                    </div>
-                    <div className="flex gap-4">
-                        <button
-                            onClick={() => handleManualFetchOffers(selectedShopNames)}
-                            disabled={hasOngoingUpdate || selectedShopNames.length === 0}
-                            className={`flex-1 py-4 px-6 rounded-lg font-semibold text-white transition-all duration-200 flex items-center justify-center gap-3 ${
-                                hasOngoingUpdate
-                                    ? "bg-gray-400 cursor-not-allowed"
-                                    : "bg-gradient-blue-horizontal hover:bg-gradient-blue-horizontal-hover shadow-lg hover:shadow-xl"
-                            }`}
-                        >
-                            {hasOngoingUpdate ? (
-                                <>
-                                    <LoadingSpinner size={32} />
-                                </>
-                            ) : (
-                                <>
-                                    Pobierz oferty
-                                </>
-                            )}
-                        </button>
 
-                    </div>
-                    {/*<OffersUpdatesView/>*/}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-6">
+                    {updateType === 'MANUAL' && (
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <h3 className="text-lg font-semibold text-midnight-dark mb-4">Aktualizacja manualna</h3>
+                            <div className="mb-6">
+                                <p className="block text-sm font-medium text-gray-700 mb-2">
+                                    Wybierz sklepy do aktualizacji
+                                </p>
+                                <ShopSelector
+                                    shops={shops}
+                                    selectedShopNames={selectedShopNames}
+                                    onShopToggle={handleShopToggle}
+                                />
+                            </div>
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={() => handleManualFetchOffers(selectedShopNames)}
+                                    disabled={hasOngoingUpdate || selectedShopNames.length === 0}
+                                    className={`flex-1 py-4 px-6 rounded-lg font-semibold text-white transition-all duration-200 flex items-center justify-center gap-3 ${
+                                        hasOngoingUpdate
+                                            ? "bg-gray-400 cursor-not-allowed"
+                                            : "bg-gradient-blue-horizontal hover:bg-gradient-blue-horizontal-hover shadow-lg hover:shadow-xl"
+                                    }`}
+                                >
+                                    {hasOngoingUpdate ? (
+                                        <>
+                                            <LoadingSpinner size={32} />
+                                        </>
+                                    ) : (
+                                        <>
+                                            Pobierz oferty
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {updateType === 'AUTOMATIC' && (
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <h3 className="text-lg font-semibold text-midnight-dark mb-6">Konfiguracja automatycznej aktualizacji</h3>
+                            <div className="space-y-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Interwał aktualizacji
+                                    </label>
+                                    <select
+                                        value={intervalInMinutes}
+                                        onChange={handleIntervalChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ocean-blue focus:border-ocean-blue transition-colors"
+                                    >
+                                        {intervalsInMinutes.map((interval) => (
+                                            <option key={interval} value={interval}>
+                                                {interval < 60 ? `${interval} minut` :
+                                                    interval === 60 ? '1 godzina' :
+                                                        interval === 120 ? '2 godziny' :
+                                                            interval === 240 ? '4 godziny' :
+                                                                interval === 1440 ? '24 godziny' : `${interval} minut`}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="mb-6">
+                                    <p className="block text-sm font-medium text-gray-700 mb-2">
+                                        Wybierz sklepy do aktualizacji
+                                    </p>
+                                    <ShopSelector
+                                        shops={shops}
+                                        selectedShopNames={selectedShopNames}
+                                        onShopToggle={handleShopToggle}
+                                    />
+                                </div>
+                                <div className="pt-4 border-t border-gray-200">
+                                    <button
+                                        onClick={saveOfferUpdateConfig}
+                                        className="w-full py-3 px-4 bg-gradient-blue-horizontal text-white rounded-lg hover:bg-gradient-blue-horizontal-hover font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                                    >
+                                        Zapisz konfigurację
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
-            )}
-            {/* Automatic Mode */}
-            {updateType === 'AUTOMATIC' && (
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h3 className="text-lg font-semibold text-midnight-dark mb-6">Konfiguracja automatycznej aktualizacji</h3>
-                    <div className="space-y-6">
-                        {/* Interval Selection */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Interwał aktualizacji
-                            </label>
-                            <select
-                                value={intervalInMinutes}
-                                onChange={handleIntervalChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ocean-blue focus:border-ocean-blue transition-colors"
-                            >
-                                {intervalsInMinutes.map((interval) => (
-                                    <option key={interval} value={interval}>
-                                        {interval < 60 ? `${interval} minut` :
-                                            interval === 60 ? '1 godzina' :
-                                                interval === 120 ? '2 godziny' :
-                                                    interval === 240 ? '4 godziny' :
-                                                        interval === 1440 ? '24 godziny' : `${interval} minut`}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        {/* Shop Selection */}
-                        <div className="mb-6">
-                            <p className="block text-sm font-medium text-gray-700 mb-2">
-                                Wybierz sklepy do aktualizacji
-                            </p>
-                            <ShopSelector
-                                shops={shops}
-                                selectedShopNames={selectedShopNames}
-                                onShopToggle={handleShopToggle}
-                            />
-                        </div>
-                        {/* Save Button */}
-                        <div className="pt-4 border-t border-gray-200">
-                            <button
-                                onClick={saveOfferUpdateConfig}
-                                className="w-full py-3 px-4 bg-gradient-blue-horizontal text-white rounded-lg hover:bg-gradient-blue-horizontal-hover font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-                            >
-                                Zapisz konfigurację
-                            </button>
-                        </div>
+
+                <div className="lg:col-span-1">
+                    <div className="h-full">
+                        <ComponentsStatsPanel />
                     </div>
                 </div>
-            )}
-            <div className="space-y-4">
-                <ComponentsStatsPanel />
             </div>
-            <OffersUpdatesView/>
+
+            <OffersUpdatesView />
         </div>
     );
 };

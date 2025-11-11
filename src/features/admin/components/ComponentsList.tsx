@@ -6,7 +6,7 @@ import LoadingSpinner from "../../../components/ui/LoadingSpinner.tsx";
 
 interface ComponentsProps {
     page: number;
-    filters: { itemType: ComponentTypeEnum | undefined; brand: string };
+    filters: { itemType: ComponentTypeEnum | undefined; brand: string; searchTerm: string };
 }
 
 const Components = ({ page, filters }: ComponentsProps) => {

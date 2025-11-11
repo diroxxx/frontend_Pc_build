@@ -1,5 +1,5 @@
-import {PlusIcon, X} from "lucide-react";
-import {ComponentTypeEnum} from "../../../types/BaseItemDto.ts";
+import {Check, PlusIcon, X} from "lucide-react";
+import {type ComponentItem, ComponentTypeEnum} from "../../../types/BaseItemDto.ts";
 import {useState} from "react";
 
 interface AddComponentModalProps {
@@ -9,7 +9,8 @@ interface AddComponentModalProps {
 }
 
 const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, onSubmit }) => {
-    const [componentType, setComponentType] = useState<ComponentTypeEnum | "">("");
+    const [componentType, setComponentType] = useState<ComponentTypeEnum | undefined>(undefined);
+
     const [brand, setBrand] = useState("");
     const [model, setModel] = useState("");
     const [details, setDetails] = useState<Record<string, string>>({});
@@ -22,13 +23,98 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
         if (!componentType || !brand || !model) {
             alert("Uzupełnij wszystkie wymagane pola");
             return;
         }
-        onSubmit({ componentType, brand, model, details });
+
+        let newComponent: ComponentItem;
+
+        switch (componentType) {
+            case ComponentTypeEnum.PROCESSOR:
+                newComponent = {
+                    componentType: ComponentTypeEnum.PROCESSOR,
+                    brand,
+                    model,
+                    cores: Number(details.cores),
+                    threads: Number(details.threads),
+                    baseClock: Number(details.baseClock),
+                    socketType: details.socketType,
+                };
+                break;
+
+            case ComponentTypeEnum.GRAPHICS_CARD:
+                newComponent = {
+                    componentType: ComponentTypeEnum.GRAPHICS_CARD,
+                    brand,
+                    model,
+                    vram: Number(details.vram),
+                    gddr: details.gddr,
+                    powerDraw: Number(details.powerDraw),
+                };
+                break;
+
+            case ComponentTypeEnum.MEMORY:
+                newComponent = {
+                    componentType: ComponentTypeEnum.MEMORY,
+                    brand,
+                    model,
+                    type: details.type,
+                    capacity: Number(details.capacity),
+                    speed: details.speed,
+                    latency: details.latency,
+                };
+                break;
+
+                case ComponentTypeEnum.MOTHERBOARD:
+                    newComponent = {
+                        componentType : ComponentTypeEnum.MOTHERBOARD,
+                        brand,
+                        model,
+                        chipset: details.chipset,
+                        socketType: details.socketType,
+                        memoryType: details.memoryType,
+                        format: details.format,
+                        ramSlots: Number(details.ramSlots),
+                        ramCapacity: Number(details.ramCapacity)
+                    }
+                    break;
+
+                    case ComponentTypeEnum.POWER_SUPPLY:
+                        newComponent = {
+                            componentType : ComponentTypeEnum.POWER_SUPPLY,
+                            brand,
+                            model,
+                            maxPowerWatt: Number(details.maxPowerWatt)
+                        }
+                        break;
+                        case ComponentTypeEnum.STORAGE:
+                            newComponent = {
+                                componentType : ComponentTypeEnum.STORAGE,
+                                brand,
+                                model,
+                                capacity: Number(details.capacity)
+                            }
+                            break;
+
+                            case ComponentTypeEnum.CPU_COOLER:
+                                newComponent = {
+                                    componentType : ComponentTypeEnum.CPU_COOLER,
+                                    brand,
+                                    model,
+                                    coolerSocketsType: Array.of(details.coolerSocketsType)
+                                }
+                                break;
+            default:
+                alert("Nieobsługiwany typ komponentu");
+                return;
+        }
+
+        onSubmit(newComponent);
         onClose();
     };
+
     const renderDynamicFields = () => {
         switch (componentType) {
             case ComponentTypeEnum.PROCESSOR:
@@ -67,6 +153,8 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
                         <Field label="Typ socketu" value={details.socketType} onChange={(v) => handleDetailChange("socketType", v)} />
                         <Field label="Rodzaj pamięci" value={details.memoryType} onChange={(v) => handleDetailChange("memoryType", v)} />
                         <Field label="Format płyty" value={details.format} onChange={(v) => handleDetailChange("format", v)} />
+                        <Field label="ilość slotów ram" value={details.ramSlots} onChange={(v) => handleDetailChange("ramSlots", v)} />
+                        <Field label="max pojemnosci ram" value={details.ramCapacity} onChange={(v) => handleDetailChange("ramCapacity", v)} />
                     </>
                 );
 
@@ -126,9 +214,11 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-3">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-midnight-dark mb-1">Typ komponentu</label>
+                        <label className="block text-sm font-medium text-midnight-dark mb-1">
+                            Typ komponentu
+                        </label>
                         <select
                             value={componentType}
                             onChange={(e) => setComponentType(e.target.value as ComponentTypeEnum)}
@@ -147,14 +237,21 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
                     <Field label="Model" value={model} onChange={setModel} />
                     {renderDynamicFields()}
 
-                    {/*<SaveIcon className="w-6 h-6 text-ocean-blue absolute top-4 right-4 cursor-pointer" onClick={handleSubmit} />*/}
+                    <div className="flex justify-end pt-4">
+                        <button
+                            type="submit"
+                            className="flex items-center gap-2 px-4 py-2 bg-ocean-blue text-white text-sm font-semibold rounded-md shadow-sm hover:bg-ocean-dark-blue hover:shadow-md transition-all duration-200"
+                        >
+                            <Check className="w-5 h-5" />
+                            Zapisz
+                        </button>
+                    </div>
                 </form>
+
             </div>
         </div>
     );
 };
-
-
 
 const Field = ({
                    label,

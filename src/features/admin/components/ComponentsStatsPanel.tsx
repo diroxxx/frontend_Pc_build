@@ -10,10 +10,18 @@ export default function ComponentsStatsPanel() {
     if (isLoading) return <p className="text-gray-500 text-sm">Ładowanie statystyk...</p>;
     if (isError) return <p className="text-red-600 text-sm">Błąd podczas pobierania danych.</p>;
 
+    const sumAllOffers = ():number => {
+        let sum = 0;
+        data?.forEach((stat: ComponentsStats) => {
+            sum += stat.total;
+        });
+        return sum;
+    }
+
     return (
         <div className="bg-white border border-ocean-light-blue rounded-xl shadow-sm p-4 mb-6">
             <h2 className="text-lg font-semibold text-midnight-dark mb-3">
-                Aktualny stan ofert w bazie
+                Aktualny stan ofert w bazie -  { sumAllOffers()}
             </h2>
 
             <div className="divide-y divide-gray-200">

@@ -60,7 +60,7 @@ export type ComponentItem =
     | CoolerItem;
 
 export interface ProcessorItem extends BaseItem {
-    componentType: "PROCESSOR";
+    componentType: ComponentTypeEnum.PROCESSOR;
     cores: number;
     threads: number;
     baseClock: number;
@@ -68,19 +68,19 @@ export interface ProcessorItem extends BaseItem {
 }
 
 export interface GraphicsCardItem extends BaseItem {
-    componentType: "GRAPHICS_CARD";
+    componentType: ComponentTypeEnum.GRAPHICS_CARD;
     vram: number;
     gddr: string;
     powerDraw: number;
 }
 
 export interface CoolerItem extends BaseItem {
-    componentType: "CPU_COOLER";
+    componentType: ComponentTypeEnum.CPU_COOLER;
     coolerSocketsType: string[];
 }
 
 export interface MemoryItem extends BaseItem {
-    componentType: "MEMORY";
+    componentType: ComponentTypeEnum.MEMORY;
     type: string;
     capacity: number;
     speed: string;
@@ -88,27 +88,27 @@ export interface MemoryItem extends BaseItem {
 }
 
 export interface MotherboardItem extends BaseItem {
-    componentType: "MOTHERBOARD";
+    componentType: ComponentTypeEnum.MOTHERBOARD;
     chipset: string;
     socketType: string;
     memoryType: string;
     format: string;
-    ramslots: number;
+    ramSlots: number;
     ramCapacity: number;
 }
 
 export interface PowerSupplyItem extends BaseItem {
-    componentType: "POWER_SUPPLY";
+    componentType: ComponentTypeEnum.POWER_SUPPLY;
     maxPowerWatt: number;
 }
 
 export interface StorageItem extends BaseItem {
-    componentType: "STORAGE";
+    componentType: ComponentTypeEnum.STORAGE;
     capacity: number;
 }
 
 export interface CaseItem extends BaseItem {
-    componentType: "CASE_PC";
+    componentType: ComponentTypeEnum.CASE_PC;
     format: string;
 }
 

@@ -3,7 +3,7 @@ import {useState} from "react";
 import Components from "../components/ComponentsList.tsx";
 import {useFetchComponents} from "../hooks/useFetchComponents.ts";
 import ReactPaginate from "react-paginate";
-import  { ComponentTypeEnum } from "../../../types/BaseItemDto.ts";
+import {type ComponentItem, ComponentTypeEnum} from "../../../types/BaseItemDto.ts";
 import { useFetchBrands } from "../hooks/useFetchBrands.ts";
 import {LeftArrow} from "../../../assets/icons/leftArrow.tsx";
 import {RightArrow} from "../../../assets/icons/rightArrow.tsx";
@@ -12,6 +12,8 @@ import AddComponentForm from "../components/AddComponentForm.tsx";
 
 import ImportCsvButton from "../components/ImportCsvButton";
 import {useBulkImportComponents} from "../hooks/useBulkImportComponents.ts";
+import {saveComponentApi} from "../api/saveComponentApi.ts";
+import {showToast} from "../../../lib/ToastContainer.tsx";
 
 const ComponentsPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -26,8 +28,12 @@ const ComponentsPage = () => {
 
     const bulkImport = useBulkImportComponents();
 
-    const handleAddComponent = (data: any) => {
-        console.log("Zapisano nowy komponent:", data);
+    const  handleAddComponent = async (data: ComponentItem)  => {
+        await saveComponentApi(data)
+            .then(res => {
+                showToast.success("Dodano komponent");
+            });
+
         setShowForm(false);
     };
 

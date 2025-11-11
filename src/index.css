@@ -47,7 +47,10 @@
 
 }
  /* css */
- 
+
+html {
+    scrollbar-gutter: stable;
+}
 body {
   /* font-family: 'Inter', 'Segoe UI', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif !important; */
     /* font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important; */
