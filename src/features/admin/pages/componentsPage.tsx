@@ -19,6 +19,7 @@ const ComponentsPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const { data: brandsData, isLoading: isLoadingBrands } = useFetchBrands();
+    const brands = brandsData || [];
     console.log('getBrandsApi:', brandsData?.length);
     const [page, setPage] = useState<number>(0);
     const [filters, setFilters] = useState<{ itemType: ComponentTypeEnum | undefined; brand: string; searchTerm: string }>({ itemType: undefined, brand: "", searchTerm: "" });
@@ -141,7 +142,7 @@ const ComponentsPage = () => {
                         <option value="">
                             {isLoadingBrands ? "Ładowanie marek..." : "Wszystkie marki"}
                         </option>
-                        {brandsData?.map((brand) => (
+                        {brands.map((brand) => (
                             <option key={brand} value={brand}>
                                 {brand}
                             </option>
