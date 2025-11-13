@@ -1,18 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {setAuthToken} from "../../../lib/Auth.tsx";
-import { useAtom } from 'jotai';
-import { loginAdminAtom, loginUserAtom } from '../../../atomContext/userAtom.tsx';
+import { useAtom, useAtomValue } from 'jotai';
+import { loginAdminAtom, loginUserAtom, userAtom } from '../../../atomContext/userAtom.tsx';
+import LoadingSpinner from '../../../components/ui/LoadingSpinner.tsx';
+import { AuthRedirect } from '../../../components/auth/AuthRedirect.tsx';
 
 const AdminLoginPage = () => {
     const [, loginAdmin] = useAtom(loginAdminAtom);
+    const navigate = useNavigate();
+
 
     const [credentials, setCredentials] = useState({
         email: '',
         password: ''
     });
-    const navigate = useNavigate();
-
+  
    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
            event.preventDefault();
            fetch("http://localhost:8080/auth/login/admin", {
@@ -43,9 +46,14 @@ const AdminLoginPage = () => {
        }
 
     return (
-        <div className="min-h-screen bg-gray-100 font-sans">
-            {/* Header w stylu forum */}
-            <div className="bg-ocean-dark-blue text-white py-12 mb-8">
+
+        <AuthRedirect 
+            requiredRole="USER" 
+            redirectTo="/admin/controlPanel"
+            forbiddenRedirectTo="/"
+        >
+            <div className="min-h-screen bg-ocean-white font-sans">
+             <div className="bg-ocean-dark-blue text-white py-12 mb-8">
                 <div className="container mx-auto px-4">
                     <h1 className="text-text-ocean-white text-4xl md:text-5xl font-bold text-center">
                         PANEL ADMINISTRATORA
@@ -108,7 +116,8 @@ const AdminLoginPage = () => {
                     </div>
                 </div>
             </div>
-        </div>
+            </div>
+        </AuthRedirect>
     );
 };
 

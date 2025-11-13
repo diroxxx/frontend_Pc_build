@@ -1,15 +1,16 @@
-import  {type FormEvent, useState} from "react";
+import  {type FormEvent, use, useEffect, useState} from "react";
 import {setAuthToken} from "../../../../lib/Auth.tsx";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
-import { useAtom } from 'jotai';
-import { loginUserAtom } from '../../../../atomContext/userAtom.tsx';
-
+import { useAtom, useAtomValue } from 'jotai';
+import { loginUserAtom, userAtom } from '../../../../atomContext/userAtom.tsx';
+import LoadingSpinner from "../../../../components/ui/LoadingSpinner.tsx";
+import { AuthRedirect } from "../../../../components/auth/AuthRedirect.tsx";
 function Login() {
     const navigate: NavigateFunction = useNavigate();
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
     const [, loginUser] = useAtom(loginUserAtom);
-
+   
     const onSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         fetch("http://localhost:8080/auth/login/user",  {
@@ -39,9 +40,16 @@ function Login() {
             setAuthToken(null);
         })
     }
+
 return (
-    <div className="min-h-screen bg-ocean-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+       <AuthRedirect 
+            requiredRole="ADMIN" 
+            redirectTo="/" 
+            forbiddenRedirectTo="/admin/controlPanel"
+        >
+            <div className="min-h-screen bg-ocean-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            
+             <div className="sm:mx-auto sm:w-full sm:max-w-md">
             <h1 className="text-center text-4xl font-bold text-midnight-dark mb-2">Pc-Build</h1>
             <h2 className="text-center text-2xl font-semibold text-midnight-dark mb-8">
                 Zaloguj się do swojego konta
@@ -90,14 +98,14 @@ return (
                         </button>
                     </div>
 
-                    <div className="text-center">
+                    {/* <div className="text-center">
                         <a
                             href="#"
                             className="text-sm text-ocean-blue hover:text-ocean-dark-blue transition-colors duration-200"
                         >
                             Zapomniałeś swojego hasła?
                         </a>
-                    </div>
+                    </div> */}
                 </form>
 
                 <div className="mt-6">
@@ -123,8 +131,12 @@ return (
                 </div>
             </div>
         </div>
-    </div>
-);
+            </div>
+        </AuthRedirect>
+
+
+                    );
+       
 }
 
 export default Login;
