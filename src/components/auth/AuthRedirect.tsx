@@ -30,7 +30,6 @@ export const AuthRedirect = ({
             return;
         }
 
-        // Jeśli user jest zalogowany i nie ma required role -> redirect
         if (user && !requiredRole) {
             setIsRedirecting(true);
             const timer = setTimeout(() => {

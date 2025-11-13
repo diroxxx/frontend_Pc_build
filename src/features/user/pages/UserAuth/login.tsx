@@ -5,14 +5,17 @@ import { useAtom, useAtomValue } from 'jotai';
 import { loginUserAtom, userAtom } from '../../../../atomContext/userAtom.tsx';
 import LoadingSpinner from "../../../../components/ui/LoadingSpinner.tsx";
 import { AuthRedirect } from "../../../../components/auth/AuthRedirect.tsx";
+import { set } from "date-fns";
 function Login() {
     const navigate: NavigateFunction = useNavigate();
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
     const [, loginUser] = useAtom(loginUserAtom);
+    const [errorMessage, setErrorMessage] = useState<string[] | null>(null);
    
     const onSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setErrorMessage(null);
         fetch("http://localhost:8080/auth/login/user",  {
             method: "POST",
             headers: {"content-type": "application/json"},
@@ -21,20 +24,23 @@ function Login() {
                 password: password
                 }),
             credentials: 'include'
-        }).then(response => {
-            if (response.status == 200) {
-                return response.json();
-
-            } else {
-                return null;
-            }
-        }).then(data => {
+        })
+        .then(response =>response.json())
+        .then(data => {
             console.log(data);
-            if (data !== null) {
-                loginUser(data["accessToken"]);
+            if (data?.accessToken) {
+                loginUser(data.accessToken);
+                // loginUser(data["accessToken"]);
                 navigate("/")
 
             }
+           if (data?.errors && typeof data.errors === 'object') {
+            const errorArray = Object.values(data.errors) as string[];
+            setErrorMessage(errorArray);
+        } 
+        else if (data?.message) {
+            setErrorMessage([data.message]);
+        }
         }).catch((error) => {
             console.error("Error during login:", error);
             setAuthToken(null);
@@ -107,6 +113,18 @@ return (
                         </a>
                     </div> */}
                 </form>
+                
+                <div className="mt-3 min-h-[60px]">
+                    {errorMessage && errorMessage.length > 0 && (
+                        <div className="rounded-lg bg-ocean-red/5 p-3 border border-ocean-red/20">
+                            {errorMessage.map((error, index) => (
+                                <p key={index} className="text-sm text-ocean-red font-medium">
+                                    {error}
+                                </p>
+                            ))}
+                        </div>
+                    )}
+                </div>
 
                 <div className="mt-6">
                     <div className="text-center">
@@ -133,8 +151,6 @@ return (
         </div>
             </div>
         </AuthRedirect>
-
-
                     );
        
 }

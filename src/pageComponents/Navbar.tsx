@@ -132,9 +132,9 @@ return (
                                 Konfigurator
                             </button>
                             <button 
-                                onClick={() => navigate("/components")} 
+                                onClick={() => navigate("/offers")} 
                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                                    location.pathname === "/components" 
+                                    location.pathname === "/offers" 
                                         ? "bg-white text-ocean-blue shadow-sm" 
                                         : "text-white hover:bg-ocean-light-blue hover:bg-opacity-25 hover:shadow-md hover:backdrop-blur-sm"
                                 }`}

@@ -34,14 +34,14 @@ function MainPage() {
             <div className="flex justify-center gap-8 px-6 py-8">
                 <div
                     className="flex flex-col items-center  hover:text-ocean-blue transition-colors duration-200 cursor-pointer"
-                    onClick={() => navigate("/components")}>
+                    onClick={() => navigate("/offers")}>
                     <div className="w-20 h-20">
                         <img
                             src="/components_mainPage.png"
                             alt="OffersUserPage"
                             className="w-full h-full object-cover rounded shadow-md hover:shadow-lg transition-shadow duration-200"
                         />
-                        <p className="mt-2 text-sm font-medium">Komponenty</p>
+                        <p className="mt-2 text-sm font-medium">Oferty</p>
                     </div>
                 </div>
 

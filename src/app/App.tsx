@@ -27,7 +27,7 @@ function App() {
                 <Route path="/unauthorized" element={<Unauthorized />} />
                 <Route element={<Layout/>}>
                     <Route path="/" element={<MainPage />} />
-                    <Route path="/components" element={<OffersUserPage />} />
+                    <Route path="/offers" element={<OffersUserPage />} />
                     <Route path="/builds" element={<Builds />} />
                     <Route path="/community" element={<Community/>} />
 
