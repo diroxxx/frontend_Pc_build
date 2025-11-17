@@ -9,13 +9,11 @@ import { showToast } from "../../../lib/ToastContainer";
 
 export function useOfferUpdates() {
     const queryClient = useQueryClient();
-    // const webSocketUrl = "ws://localhost:8080/offers";
     const webSocketUrl = "http://localhost:8080/offers";
 
     const query = useQuery<OfferUpdateInfo[]>({
         queryKey: ["offersUpdates"],
         queryFn: fetchOfferUpdates,
-        // staleTime: 10_000,
     });
 
     const client = useWebSocketStomp({
@@ -31,6 +29,10 @@ export function useOfferUpdates() {
                     }
                     return [...old, parsed];
                 });
+
+                queryClient.invalidateQueries({ queryKey: ["componentsStats"] });
+                
+
                 showToast.info(`Nowa aktualizacja #${parsed.id}`);
             } catch (err) {
                 console.error("WebSocket parse error:", err);

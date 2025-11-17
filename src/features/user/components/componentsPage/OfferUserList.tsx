@@ -2,7 +2,7 @@ import type {ComponentOffer} from "../../../../types/OfferBase.ts";
 import type {FC} from "react";
 import OfferCardFlex from "./OfferCardFlex.tsx";
 import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.tsx";
-import {useAtom} from "jotai";
+import {useAtom, useAtomValue} from "jotai";
 import {viewModeAtom} from "../../atoms/OfferListViewMode.ts";
 import OfferCardGrid from "./OfferCardGrid.tsx";
 
@@ -13,39 +13,26 @@ interface OffersTableProps {
 }
 
 const OfferUserList: FC<OffersTableProps> = ({offers, isFetching, isLoading}) => {
-    const [viewMode, setViewMode] = useAtom(viewModeAtom);
+    const viewMode = useAtomValue(viewModeAtom);
 
-    if (isLoading) {
+     if (isLoading) {
         return (
-            <div className="flex justify-center py-10">
-                <LoadingSpinner />
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-center">
+                    <LoadingSpinner />
+                    <p className="mt-4 text-midnight-dark text-sm">Ładowanie ofert...</p>
+                </div>
             </div>
         );
     }
 
     return (
         <div className="relative">
-            {(isFetching || isLoading) && (
+            {isFetching && !isLoading && (
                 <div className="absolute top-3 right-3 z-10">
                     <LoadingSpinner />
                 </div>
             )}
-
-            {/*<div className="flex flex-col gap-4">*/}
-            {/*    {offers.length === 0 ? (*/}
-            {/*        <div className="text-center text-gray-600 py-8 bg-white border border-gray-200 rounded-xl shadow-sm">*/}
-            {/*            Brak ofert spełniających kryteria wyszukiwania.*/}
-            {/*        </div>*/}
-            {/*    ) : (*/}
-            {/*        offers.map((offer, index) => (*/}
-            {/*            <OfferCardFlex*/}
-            {/*                key={index}*/}
-            {/*                offer={offer}*/}
-            {/*            />*/}
-            {/*        ))*/}
-            {/*    )}*/}
-            {/*</div>*/}
-
             <div
                 className={`${
                     viewMode === "grid"

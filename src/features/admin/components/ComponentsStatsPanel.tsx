@@ -1,10 +1,10 @@
-import {ChevronDown, ChevronUp} from "lucide-react";
+import {ChevronDown, ChevronUp, Loader2} from "lucide-react";
 import {useState} from "react";
 import {useGetComponentsStats} from "../hooks/useGetComponentsStats.ts";
 import type {ComponentsStats} from "../../../types/ComponentsStats.ts";
 
 export default function ComponentsStatsPanel() {
-    const { data, isLoading, isError } = useGetComponentsStats();
+    const { data, isLoading, isError, isFetching } = useGetComponentsStats();
     const [expanded, setExpanded] = useState<string | null>(null);
 
     if (isLoading) return <p className="text-gray-500 text-sm">Ładowanie statystyk...</p>;
@@ -19,12 +19,20 @@ export default function ComponentsStatsPanel() {
     }
 
     return (
-        <div className="bg-white border border-ocean-light-blue rounded-xl shadow-sm p-4 mb-6">
+        <div className="bg-white border border-ocean-light-blue rounded-xl shadow-sm p-4 mb-6 relative">
+            {/* Spinner przy odświeżaniu */}
+            {isFetching && (
+                <div className="absolute top-4 right-4 flex items-center gap-2 text-ocean-blue text-sm">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Odświeżanie...</span>
+                </div>
+            )}
+
             <h2 className="text-lg font-semibold text-midnight-dark mb-3">
                 Aktualny stan ofert w bazie -  { sumAllOffers()}
             </h2>
 
-            <div className="divide-y divide-gray-200">
+            <div className={`divide-y divide-gray-200 transition-opacity ${isFetching ? 'opacity-50' : 'opacity-100'}`}>
                 {data?.map((stat: ComponentsStats) => (
                     <div key={stat.componentType} className="py-2">
                         <div

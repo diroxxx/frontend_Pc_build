@@ -4,7 +4,6 @@ import { useAtom } from 'jotai';
 import { fetchShopsAtom, shopsAtom } from '../atoms/shopAtom.tsx';
 import {fetchOfferUpdateConfigAtom, offerUpdateConfigAtom, type OfferUpdateType } from '../atoms/adminAtom.tsx';
 import { showToast } from "../../../lib/ToastContainer.tsx";
-import toast from "react-hot-toast";
 import {useOfferUpdates} from "../hooks/useOffersUpdates.ts";
 import OffersUpdatesView from "../components/OffersUpdatesView.tsx";
 import {LoadingSpinner} from "../../../assets/components/ui/LoadingSpinner.tsx";
@@ -87,16 +86,19 @@ const OffersComponent = () => {
         localStorage.setItem("selectedShops", JSON.stringify(selectedShopNames));
     }, [selectedShopNames]);
 
-    const hasOngoingUpdate = useMemo(() => {
-        if (!updates) return false;
-        return updates.some(
-            (update) =>
-                !update.finishedAt &&
-                update.shops?.some((s) =>
-                    selectedShopNames.includes(s.shopName)
-                )
+const hasOngoingUpdate = useMemo(() => {
+    if (!updates) return false;
+    
+    return updates.some((update) => {
+        const relevantShops = update.shops?.filter(s => 
+            selectedShopNames.includes(s.shopName)
         );
-    }, [updates, selectedShopNames]);
+        
+        if (!relevantShops?.length) return false;
+        
+        return relevantShops.some(shop => shop.status === 'RUNNING');
+    });
+}, [updates, selectedShopNames]);
 
 
 
@@ -142,6 +144,8 @@ const OffersComponent = () => {
             return false;
         }
     }, [getConfigToSave, setOfferUpdateConfig]);
+
+    
 
     return (
         <div className="space-y-6 p-6">
@@ -199,7 +203,7 @@ const OffersComponent = () => {
                                     disabled={hasOngoingUpdate || selectedShopNames.length === 0}
                                     className={`flex-1 py-4 px-6 rounded-lg font-semibold text-white transition-all duration-200 flex items-center justify-center gap-3 ${
                                         hasOngoingUpdate
-                                            ? "bg-gray-400 cursor-not-allowed"
+                                            ? "bg-gray-200 cursor-not-allowed"
                                             : "bg-gradient-blue-horizontal hover:bg-gradient-blue-horizontal-hover shadow-lg hover:shadow-xl"
                                     }`}
                                 >

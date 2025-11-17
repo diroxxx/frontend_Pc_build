@@ -64,20 +64,22 @@ const OfferCardGrid: React.FC<OfferCardGridProps> = ({ offer }) => {
                 return null;
         }
     };
+        const hasValidPhoto = offer.photoUrl && offer.photoUrl.trim() !== "";
+
 
     return (
         <div className="relative border border-gray-200 rounded-md hover:border-ocean-blue transition cursor-pointer bg-white shadow-sm hover:shadow-md flex flex-col">
             <div className="relative w-full h-36 bg-white flex items-center justify-center overflow-hidden rounded-t-md">
-                {!imgError ? (
-                    <img
-                        src={offer.photoUrl}
-                        alt={`${offer.brand} ${offer.model}`}
-                        className="w-full h-full object-contain"
-                        onError={() => setImgError(true)}
-                    />
-                ) : (
-                    <ImageOff className="text-gray-400 w-10 h-10" strokeWidth={1.5} />
-                )}
+                 {hasValidPhoto && !imgError ? (
+                        <img
+                            src={offer.photoUrl}
+                            alt={`${offer.brand} ${offer.model}`}
+                            className="w-full h-full object-contain"
+                            onError={() => setImgError(true)}
+                        />
+                    ) : (
+                        <ImageOff className="text-gray-400 w-10 h-10" strokeWidth={1.5} />
+                    )}
                 {renderConditionBadge(offer.condition)}
             </div>
 

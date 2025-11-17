@@ -39,10 +39,6 @@ export interface NewComponentRow {
     coolerSocketsType?: string;
 }
 
-
-
-
-
 export interface BaseItem {
     id?: number;
     brand: string;
@@ -65,6 +61,10 @@ export interface ProcessorItem extends BaseItem {
     threads: number;
     baseClock: number;
     socketType: string;
+    boostClock: number;
+    integratedGraphics: string;
+    tdp: number;
+
 }
 
 export interface GraphicsCardItem extends BaseItem {
@@ -72,19 +72,25 @@ export interface GraphicsCardItem extends BaseItem {
     vram: number;
     gddr: string;
     powerDraw: number;
+    boostClock: number;
+    lengthInMM: number;
 }
 
 export interface CoolerItem extends BaseItem {
     componentType: ComponentTypeEnum.CPU_COOLER;
     coolerSocketsType: string[];
+    fanRpm: string;
+    noiseLevel: string;
+    radiatorSize: string;
 }
 
 export interface MemoryItem extends BaseItem {
     componentType: ComponentTypeEnum.MEMORY;
     type: string;
     capacity: number;
-    speed: string;
-    latency: string;
+    speed: number;
+    latency: number;
+    amount: number;
 }
 
 export interface MotherboardItem extends BaseItem {
@@ -100,6 +106,9 @@ export interface MotherboardItem extends BaseItem {
 export interface PowerSupplyItem extends BaseItem {
     componentType: ComponentTypeEnum.POWER_SUPPLY;
     maxPowerWatt: number;
+    efficiencyRating: string;
+    modular: string;
+    type: string;
 }
 
 export interface StorageItem extends BaseItem {

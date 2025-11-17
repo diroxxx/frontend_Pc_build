@@ -116,6 +116,8 @@ const OfferCardFlex: FC<Props> = ({ offer }) => {
     // };
 
     const specTags = renderSpecTags();
+    const hasValidPhoto = offer.photoUrl && offer.photoUrl.trim() !== "";
+
 
     return (
         <div className="relative group bg-white border rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200 border-gray-200 hover:border-ocean-blue">
@@ -125,7 +127,7 @@ const OfferCardFlex: FC<Props> = ({ offer }) => {
 
 
                 <div className="w-24 h-24 flex items-center justify-center bg-gray-50 border border-gray-200 rounded">
-                    {!imgError ? (
+                     {hasValidPhoto && !imgError ? (
                         <img
                             src={offer.photoUrl}
                             alt={`${offer.brand} ${offer.model}`}
