@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import {useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {setAuthToken} from "../../../lib/Auth.tsx";
-import { useAtom, useAtomValue } from 'jotai';
-import { loginAdminAtom, loginUserAtom, userAtom } from '../../../atomContext/userAtom.tsx';
-import LoadingSpinner from '../../../components/ui/LoadingSpinner.tsx';
+import { useAtom} from 'jotai';
+import { loginAdminAtom} from '../../../atomContext/userAtom.tsx';
+import { LoadingSpinner } from '../../../assets/components/ui/LoadingSpinner.tsx';
 import { AuthRedirect } from '../../../components/auth/AuthRedirect.tsx';
 
 const AdminLoginPage = () => {

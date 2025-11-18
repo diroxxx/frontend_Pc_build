@@ -1,12 +1,4 @@
-import type {
-    CaseSpec,
-    CoolerSpec,
-    GraphicsCardSpec,
-    MemorySpec,
-    MotherboardSpec, PowerSupplySpec,
-    ProcessorSpec, StorageSpec
-} from "../atomContext/componentAtom.tsx";
-
+import type { CaseItem, CoolerItem, GraphicsCardItem, MemoryItem, MotherboardItem, PowerSupplyItem, ProcessorItem, StorageItem } from "./BaseItemDto.ts";
 export interface OfferBase {
     title: string;
     condition: string;
@@ -20,12 +12,12 @@ export interface OfferBase {
 export type ComponentOffer = ProcessorOffer | CoolerOffer | GraphicsCardOffer |
     MemoryOffer | MotherboardOffer | PowerSupplyOffer | StorageOffer | CaseOffer;
 
-export interface ProcessorOffer extends ProcessorSpec, OfferBase {}
-export interface CoolerOffer extends CoolerSpec, OfferBase {}
-export interface GraphicsCardOffer extends GraphicsCardSpec, OfferBase {}
-export interface MemoryOffer extends MemorySpec, OfferBase {}
-export interface MotherboardOffer extends MotherboardSpec, OfferBase {}
-export interface PowerSupplyOffer extends PowerSupplySpec, OfferBase {}
-export interface StorageOffer extends StorageSpec, OfferBase {}
-export interface CaseOffer extends CaseSpec, OfferBase {}
+export interface ProcessorOffer extends ProcessorItem, OfferBase {}
+export interface CoolerOffer extends CoolerItem, OfferBase {}
+export interface GraphicsCardOffer extends GraphicsCardItem, OfferBase {}
+export interface MemoryOffer extends MemoryItem, OfferBase {}
+export interface MotherboardOffer extends MotherboardItem, OfferBase {}
+export interface PowerSupplyOffer extends PowerSupplyItem, OfferBase {}
+export interface StorageOffer extends StorageItem, OfferBase {}
+export interface CaseOffer extends CaseItem, OfferBase {}
 

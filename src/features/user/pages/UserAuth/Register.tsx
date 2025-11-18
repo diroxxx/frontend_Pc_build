@@ -1,10 +1,4 @@
 import React, { useEffect } from 'react';
-import AuthLayout from '../../../../components/auth/AuthLayout.tsx';
-import FormField from '../../../../components/auth/FormField.tsx';
-import PasswordField from '../../../../components/auth/PasswordField.tsx';
-import Button from '../../../../components/ui/Button.tsx';
-import ErrorMessage from '../../../../components/ui/ErrorMessage.tsx';
-import AuthNavigation from '../../../../components/auth/AuthNavigation.tsx';
 import useFormValidation, { validationRules } from '../../../../hooks/useFormValidation.tsx';
 import useAuth from '../../../../hooks/useAuth.tsx';
 
@@ -20,7 +14,6 @@ function Register() {
 
     const { isLoading, error, register, clearError } = useAuth();
 
-    // Clear auth error when user starts typing
     useEffect(() => {
         if (error) {
             clearError();

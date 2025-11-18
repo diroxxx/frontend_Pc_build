@@ -2,7 +2,7 @@ import {useFetchComponents} from "../hooks/useFetchComponents.ts";
 import {Component} from "./component.tsx";
 // import type {ComponentItem} from "../../../types/BaseItemDto.ts";
 import { ComponentTypeEnum } from "../../../types/BaseItemDto.ts";
-import LoadingSpinner from "../../../components/ui/LoadingSpinner.tsx";
+import {LoadingSpinner} from "../../../assets/components/ui/LoadingSpinner.tsx";
 
 interface ComponentsProps {
     page: number;

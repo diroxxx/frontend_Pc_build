@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '../../atomContext/userAtom';
-import LoadingSpinner from '../ui/LoadingSpinner';
+import {LoadingSpinner} from '../../assets/components/ui/LoadingSpinner';
 
 interface AuthRedirectProps {
     requiredRole?: 'ADMIN' | 'USER';

@@ -2,13 +2,11 @@ import {useFetchOffers} from "../../../hooks/useFetchOffers.ts";
 import {useState} from "react";
 import {ComponentTypeEnum} from "../../../types/BaseItemDto.ts";
 import type {ItemConditionEnum} from "../../../types/ItemConditionEnum.ts";
-
 import OffersTable from "../components/OffersTable.tsx";
-import Components from "../components/ComponentsList.tsx";
 import ReactPaginate from "react-paginate";
 import {RightArrow} from "../../../assets/icons/rightArrow.tsx";
 import {LeftArrow} from "../../../assets/icons/leftArrow.tsx";
-import LoadingSpinner from "../../../components/ui/LoadingSpinner.tsx";
+import {LoadingSpinner} from "../../../assets/components/ui/LoadingSpinner.tsx";
 
 const OffersAdminPage = () => {
 

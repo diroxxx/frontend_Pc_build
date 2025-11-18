@@ -42,22 +42,30 @@ const OfferCardFlex: FC<Props> = ({ offer }) => {
 
         switch (offer.componentType) {
             case "GRAPHICS_CARD":
-                if (offer.memorySize) tags.push(`${offer.memorySize}GB`);
+                if (offer.vram) tags.push(`${offer.vram}GB`);
                 if (offer.gddr) tags.push(offer.gddr);
+                if (offer.boostClock) tags.push(`${offer.boostClock}MHz`);
                 if (offer.powerDraw) tags.push(`${offer.powerDraw}W`);
+                if (offer.lengthInMM) tags.push(`${offer.lengthInMM}mm`);
                 break;
 
             case "PROCESSOR":
                 if (offer.cores) tags.push(`${offer.cores} rdzeni`);
                 if (offer.threads) tags.push(`${offer.threads} wątków`);
-                if (offer.baseClock) tags.push(offer.baseClock);
+                if (offer.baseClock) tags.push(`${offer.baseClock}GHz`);
                 if (offer.socketType) tags.push(offer.socketType);
+                if (offer.tdp) tags.push(`${offer.tdp}W`);
+                if (offer.boostClock) tags.push(`${offer.boostClock}GHz`);
+                if (offer.integratedGraphics) tags.push(offer.integratedGraphics);
+
                 break;
 
             case "MEMORY":
                 if (offer.capacity) tags.push(`${offer.capacity}GB`);
                 if (offer.speed) tags.push(`${offer.speed}MHz`);
                 if (offer.type) tags.push(offer.type);
+                if (offer.latency) tags.push(offer.latency);
+                if (offer.amount) tags.push(`${offer.amount}x`);
                 break;
 
             case "STORAGE":
@@ -66,17 +74,26 @@ const OfferCardFlex: FC<Props> = ({ offer }) => {
 
             case "POWER_SUPPLY":
                 if (offer.maxPowerWatt) tags.push(`${offer.maxPowerWatt}W`);
+                if (offer.efficiencyRating) tags.push(offer.efficiencyRating);
+                if (offer.modular) tags.push(` modular: ${offer.modular}`);
+                if (offer.type) tags.push(offer.type);
                 break;
 
             case "MOTHERBOARD":
                 if (offer.socketType) tags.push(offer.socketType);
                 if (offer.chipset) tags.push(offer.chipset);
                 if (offer.format) tags.push(offer.format);
+                if (offer.memoryType) tags.push(offer.memoryType);
+                if (offer.ramSlots) tags.push(`${offer.ramSlots} sloty RAM`);
+                if (offer.ramCapacity) tags.push(`${offer.ramCapacity}GB RAM`);
                 break;
 
             case "CPU_COOLER":
                 if (offer.coolerSocketsType?.length)
                     tags.push(...offer.coolerSocketsType);
+                if (offer.fanRpm) tags.push(`RPM: ${offer.fanRpm}`);
+                if (offer.noiseLevel) tags.push(`Poziom hałasu: ${offer.noiseLevel}`);
+                if (offer.radiatorSize) tags.push(`Rozmiar radiatora: ${offer.radiatorSize}`);
                 break;
 
             case "CASE_PC":

@@ -6,7 +6,7 @@ import {useShopOfferUpdates} from "../hooks/useShopUpdates.ts";
 import { ArrowUp, ArrowDown, CheckCircle2, Loader2 } from "lucide-react";
 import { formatDistanceStrict } from "date-fns";
 import { pl } from "date-fns/locale";
-import LoadingSpinner from "../../../components/ui/LoadingSpinner.tsx";
+import { LoadingSpinner } from "../../../assets/components/ui/LoadingSpinner.tsx";
 
 
 function ShopUpdateSubscriber({ updateId, isActive }: { updateId: number; isActive: boolean }) {

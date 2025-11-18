@@ -1,11 +1,9 @@
-import  {type FormEvent, use, useEffect, useState} from "react";
+import  {type FormEvent, useState} from "react";
 import {setAuthToken} from "../../../../lib/Auth.tsx";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
-import { useAtom, useAtomValue } from 'jotai';
-import { loginUserAtom, userAtom } from '../../../../atomContext/userAtom.tsx';
-import LoadingSpinner from "../../../../components/ui/LoadingSpinner.tsx";
+import { useAtom } from 'jotai';
+import { loginUserAtom } from '../../../../atomContext/userAtom.tsx';
 import { AuthRedirect } from "../../../../components/auth/AuthRedirect.tsx";
-import { set } from "date-fns";
 function Login() {
     const navigate: NavigateFunction = useNavigate();
     const [login, setLogin] = useState("");
