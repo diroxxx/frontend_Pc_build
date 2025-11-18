@@ -15,6 +15,7 @@ import AdminControlPanel from "../features/admin/pages/adminControlPanel.tsx";
 import {ToastProvider} from "../lib/ToastContainer.tsx";
 import {queryClient} from "./store/queryClient.ts";
 import {QueryClientProvider} from "@tanstack/react-query";
+import GamesPage from "../features/user/game/pages/GamesPage.tsx";
 
 function App() {
     return(
@@ -30,6 +31,7 @@ function App() {
                     <Route path="/offers" element={<OffersUserPage />} />
                     <Route path="/builds" element={<Builds />} />
                     <Route path="/community" element={<Community/>} />
+                    <Route path="/check-games" element={<GamesPage/>} />
 
                     <Route
                         path="/userInfo"

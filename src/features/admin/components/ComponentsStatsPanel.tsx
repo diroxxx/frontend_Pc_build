@@ -18,18 +18,17 @@ export default function ComponentsStatsPanel() {
         return sum;
     }
 
-    return (
-        <div className="bg-white border border-ocean-light-blue rounded-xl shadow-sm p-4 mb-6 relative">
-            {/* Spinner przy odświeżaniu */}
+ return (
+        <div className="bg-white border border-ocean-light-blue rounded-xl shadow-sm p-3 sm:p-4 mb-6 relative">
             {isFetching && (
-                <div className="absolute top-4 right-4 flex items-center gap-2 text-ocean-blue text-sm">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Odświeżanie...</span>
+                <div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex items-center gap-1.5 sm:gap-2 text-ocean-blue text-xs sm:text-sm">
+                    <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
+                    <span className="hidden sm:inline">Odświeżanie...</span>
                 </div>
             )}
 
-            <h2 className="text-lg font-semibold text-midnight-dark mb-3">
-                Aktualny stan ofert w bazie -  { sumAllOffers()}
+            <h2 className="text-base sm:text-lg font-semibold text-midnight-dark mb-3 pr-20 sm:pr-0">
+                Aktualny stan ofert w bazie - { sumAllOffers()}
             </h2>
 
             <div className={`divide-y divide-gray-200 transition-opacity ${isFetching ? 'opacity-50' : 'opacity-100'}`}>
@@ -41,35 +40,35 @@ export default function ComponentsStatsPanel() {
                                 setExpanded(expanded === stat.componentType ? null : stat.componentType)
                             }
                         >
-                            <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-midnight-dark">
-                  {stat.componentType.replaceAll("_", " ")}
-                </span>
-                                <span className="text-xs bg-ocean-light-blue text-ocean-dark-blue font-semibold px-2 py-0.5 rounded-full">
-                  {stat.total}
-                </span>
+                            <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                                <span className="text-xs sm:text-sm font-medium text-midnight-dark truncate">
+                                  {stat.componentType.replaceAll("_", " ")}
+                                </span>
+                                <span className="text-xs bg-ocean-light-blue text-ocean-dark-blue font-semibold px-2 py-0.5 rounded-full flex-shrink-0">
+                                  {stat.total}
+                                </span>
                             </div>
 
                             {expanded === stat.componentType ? (
-                                <ChevronUp className="w-4 h-4 text-ocean-dark-blue" />
+                                <ChevronUp className="w-4 h-4 text-ocean-dark-blue flex-shrink-0" />
                             ) : (
-                                <ChevronDown className="w-4 h-4 text-ocean-dark-blue" />
+                                <ChevronDown className="w-4 h-4 text-ocean-dark-blue flex-shrink-0" />
                             )}
                         </div>
 
                         {expanded === stat.componentType && (
-                            <div className="mt-2 pl-4 grid grid-cols-2 sm:grid-cols-3 gap-2">
-                                {Object.entries(stat.shopBreakdown).map(([shop, count]) => (
-                                    <div
-                                        key={shop}
-                                        className="flex items-center justify-between bg-gray-50 border border-ocean-light-blue rounded-md px-2 py-1 text-sm text-midnight-dark"
-                                    >
-                                        <span className="font-medium capitalize">{shop}</span>
-                                        <span className="font-semibold text-ocean-blue">{count}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+    <div className="mt-2 pl-2 sm:pl-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+        {Object.entries(stat.shopBreakdown).map(([shop, count]) => (
+            <div
+                key={shop}
+                className="flex items-center justify-between bg-gray-50 border border-ocean-light-blue rounded-md px-2 py-1.5 sm:py-1 text-xs sm:text-sm text-midnight-dark"
+            >
+                <span className="font-medium capitalize truncate mr-2">{shop}</span>
+                <span className="font-semibold text-ocean-blue flex-shrink-0">{count}</span>
+            </div>
+        ))}
+    </div>
+)}
                     </div>
                 ))}
             </div>
