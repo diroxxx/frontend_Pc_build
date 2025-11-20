@@ -1,112 +1,82 @@
 import { Toaster } from 'react-hot-toast';
 import toast from 'react-hot-toast';
 import React from "react";
+import { CheckCircle2, XCircle, AlertCircle, Info, Loader2 } from 'lucide-react';
 
-// Style definitions
-const glassmorphismStyle = {
-  background: 'rgba(255, 255, 255, 0.95)',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(255, 255, 255, 0.18)',
+// Wspólny styl bazowy
+const baseStyle = {
   borderRadius: '12px',
-  color: '#1f2937',
-  boxShadow: '0 4px 16px 0 rgba(31, 38, 135, 0.25)',
-  maxWidth: '300px',
-  padding: '12px 16px',
-  fontSize: '13px',
-  fontWeight: '600',
+  maxWidth: '400px',
+  padding: '14px 18px',
+  fontSize: '14px',
+  fontWeight: '500',
+  backdropFilter: 'blur(12px)',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px',
 };
 
-const neonStyle = {
-  background: '#0f0f23',
-  border: '2px solid #00ff88',
-  borderRadius: '8px',
-  color: '#ffffff',
-  boxShadow: '0 0 15px rgba(0, 255, 136, 0.4), inset 0 0 15px rgba(0, 255, 136, 0.08)',
-  textShadow: '0 0 8px rgba(0, 255, 136, 0.6)',
-  maxWidth: '300px',
-  padding: '10px 14px',
-  fontSize: '13px', 
-  fontWeight: '600',
-};
+
 
 export const showToast = {
+
+  
   success: (message: string) => toast.success(message, {
-    duration: 2000,
-    icon: null,
+    duration: 3000,
+    icon: <CheckCircle2 className="w-5 h-5 text-white" />,
     style: {
-      background: 'rgba(16, 185, 129, 0.95)',
-      border: '1px solid rgba(16, 185, 129, 0.5)',
-      borderRadius: '12px',
+      ...baseStyle,
+      background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.95) 0%, rgba(5, 150, 105, 0.95) 100%)',
+      border: '1px solid rgba(255, 255, 255, 0.2)',
       color: '#ffffff',
-      boxShadow: '0 4px 16px 0 rgba(16, 185, 129, 0.3)',
-      maxWidth: '300px',
-      padding: '12px 16px',
-      fontSize: '13px',
-      fontWeight: '600',
-      backdropFilter: 'blur(10px)',
+      boxShadow: '0 8px 32px 0 rgba(16, 185, 129, 0.35), 0 2px 8px 0 rgba(0, 0, 0, 0.1)',
     },
   }),
   
   error: (message: string) => toast.error(message, {
-    duration: 3000,
+    duration: 4000,
+    icon: <XCircle className="w-5 h-5 text-white" />,
     style: {
-      background: 'rgba(239, 68, 68, 0.95)',
-      border: '1px solid rgba(239, 68, 68, 0.5)',
-      borderRadius: '12px',
+      ...baseStyle,
+      background: 'linear-gradient(135deg, rgba(230, 57, 70, 0.95) 0%, rgba(200, 40, 50, 0.95) 100%)',
+      border: '1px solid rgba(255, 255, 255, 0.2)',
       color: '#ffffff',
-      boxShadow: '0 4px 16px 0 rgba(239, 68, 68, 0.3)',
-      maxWidth: '300px',
-      padding: '12px 16px',
-      fontSize: '13px',
-      fontWeight: '600',
-      backdropFilter: 'blur(10px)',
+      boxShadow: '0 8px 32px 0 rgba(230, 57, 70, 0.35), 0 2px 8px 0 rgba(0, 0, 0, 0.1)',
     },
   }),
   
   warning: (message: string) => toast(message, {
-    duration: 2500,
+    duration: 3500,
+    icon: <AlertCircle className="w-5 h-5 text-white" />,
     style: {
-      background: 'rgba(245, 158, 11, 0.95)',
-      border: '1px solid rgba(245, 158, 11, 0.5)',
-      borderRadius: '12px',
-      color: '#ffffff', 
-      boxShadow: '0 4px 16px 0 rgba(245, 158, 11, 0.3)',
-      maxWidth: '300px',
-      padding: '12px 16px',
-      fontSize: '13px',
-      fontWeight: '600',
-      backdropFilter: 'blur(10px)',
+      ...baseStyle,
+      background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.95) 0%, rgba(217, 119, 6, 0.95) 100%)',
+      border: '1px solid rgba(255, 255, 255, 0.2)',
+      color: '#ffffff',
+      boxShadow: '0 8px 32px 0 rgba(245, 158, 11, 0.35), 0 2px 8px 0 rgba(0, 0, 0, 0.1)',
     },
   }),
   
   info: (message: string) => toast(message, {
-    duration: 2000,
+    duration: 3000,
+    icon: <Info className="w-5 h-5 text-white" />,
     style: {
-      background: 'rgba(59, 130, 246, 0.95)',
-      border: '1px solid rgba(59, 130, 246, 0.5)',
-      borderRadius: '12px',
-      color: '#ffffff',
-      boxShadow: '0 4px 16px 0 rgba(59, 130, 246, 0.3)',
-      maxWidth: '300px',
-      padding: '12px 16px',
-      fontSize: '13px',
-      fontWeight: '600',
-      backdropFilter: 'blur(10px)',
+      ...baseStyle,
+      background: 'linear-gradient(135deg, rgba(69, 123, 157, 0.95) 0%, rgba(29, 53, 87, 0.95) 100%)',
+      border: '1px solid rgba(168, 218, 220, 0.3)',
+      color: '#F1FAEE',
+      boxShadow: '0 8px 32px 0 rgba(69, 123, 157, 0.35), 0 2px 8px 0 rgba(0, 0, 0, 0.1)',
     },
   }),
   
   loading: (message: string) => toast.loading(message, {
+    icon: <Loader2 className="w-5 h-5 text-white animate-spin" />,
     style: {
-      background: 'rgba(99, 102, 241, 0.95)',
-      border: '1px solid rgba(99, 102, 241, 0.5)',
-      borderRadius: '12px',
-      color: '#ffffff',
-      boxShadow: '0 4px 16px 0 rgba(99, 102, 241, 0.3)',
-      maxWidth: '300px',
-      padding: '12px 16px',
-      fontSize: '13px',
-      fontWeight: '600',
-      backdropFilter: 'blur(10px)',
+      ...baseStyle,
+      background: 'linear-gradient(135deg, rgba(168, 218, 220, 0.95) 0%, rgba(69, 123, 157, 0.95) 100%)',
+      border: '1px solid rgba(241, 250, 238, 0.3)',
+      color: '#1D3557',
+      boxShadow: '0 8px 32px 0 rgba(69, 123, 157, 0.35), 0 2px 8px 0 rgba(0, 0, 0, 0.1)',
     },
   }),
 
@@ -117,22 +87,29 @@ export const showToast = {
 type ToastProviderProps = {
     children: React.ReactNode;
 };
+
 export function ToastProvider({ children }: ToastProviderProps) {
   return (
       <>
           <Toaster
               position="top-right"
-              gutter={8}
+              gutter={12}
               containerStyle={{
-                  top: 20,
-                  right: 20,
+                  top: 24,
+                  right: 24,
+                  zIndex: 99999,
               }}
               toastOptions={{
-                  style: glassmorphismStyle,
+                  className: '',
+                  style: {
+                    animation: 'slideIn 0.3s ease-out',
+                  },
               }}
           />
           {children}
       </>
-
   );
+  
+  
 }
+

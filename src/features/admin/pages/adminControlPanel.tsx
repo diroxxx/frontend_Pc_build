@@ -5,7 +5,7 @@ import { setAuthToken } from "../../../lib/Auth.tsx";
 import { userAtom } from "../../../atomContext/userAtom.tsx";
 import { useAtom } from "jotai";
 import { showToast } from "../../../lib/ToastContainer.tsx";
-import OffersComponent from "./offersUpdatePage.tsx";
+import OffersComponent from "../offersUpdates/offersUpdatePage.tsx";
 import GeneralPage from "./generalPage.tsx";
 import ComponentsPage from "./componentsPage.tsx";
 import OffersAdminPage from "./OffersAdminPage.tsx";

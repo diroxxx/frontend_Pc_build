@@ -7,7 +7,6 @@ export type User =  {
     email: string;
     role: string;
 }
-// import {type User} from "./userAtom.tsx";
 
 export const usersListAtom = atom<User[]>([]);
 
@@ -35,14 +34,6 @@ export type OfferUpdateConfigAtom = {
 }
 export const offerUpdateConfigAtom = atom<OfferUpdateConfigAtom>();
 
-export const fetchOfferUpdateConfigAtom = atom(
-  null, // Initial value (read-only)
-  async (get, set) => {
-    // const response = await instance.get('/admin/offer-update-config');
-    // set(offerUpdateConfigAtom, response.data);
-  }
-);
-
 export type OfferUpdate = {
     shopName: string;
     startedAt: string;
@@ -52,10 +43,3 @@ export type OfferUpdate = {
     offersAdded: number;
 }
 export const offerUpdatesAtom = atom<OfferUpdate[]>([]);
-export const fetchOfferUpdatesAtom = atom(
-  null, // Initial value (read-only)
-  async (get, set) => {
-    // const response = await instance.get('/admin/offer-updates');
-    // set(offerUpdatesAtom, response.data);
-  }
-);

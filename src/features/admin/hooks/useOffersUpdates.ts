@@ -3,7 +3,7 @@ import {useEffect, useCallback, useMemo} from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchOfferUpdates } from "../api/offerUpdateApi.ts";
 import {type OfferUpdateInfo } from '../../../types/OfferUpdateInfo.ts'
-import { useWebSocketStomp } from '../../../hooks/webSocketHook';
+import { useWebSocketStomp } from '../../../hooks/webSocketHook.ts';
 import { showToast } from "../../../lib/ToastContainer";
 // import SockJS from "sockjs-client";
 
@@ -32,8 +32,6 @@ export function useOfferUpdates() {
 
                 queryClient.invalidateQueries({ queryKey: ["componentsStats"] });
                 
-
-                showToast.info(`Nowa aktualizacja #${parsed.id}`);
             } catch (err) {
                 console.error("WebSocket parse error:", err);
             }

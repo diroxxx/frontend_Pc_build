@@ -5,7 +5,7 @@ import {Routes, Route } from "react-router-dom";
 import Unauthorized from "../pages/Unauthorized.tsx";
 import Register from "../features/user/pages/UserAuth/Register.tsx";
 import Layout from "../pageComponents/Layout.tsx";
-import OffersUserPage from "../features/user/pages/OffersUserPage.tsx";
+import OffersUserPage from "../features/user/offers/pages/OffersUserPage.tsx";
 import UserPage from "../features/user/pages/UserPage.tsx";
 import Community from "../pages/UserPage/Community/community.tsx";
 import Builds from "../features/user/components/builds/Builds.tsx";

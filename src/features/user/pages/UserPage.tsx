@@ -1,6 +1,6 @@
 import { useState } from "react";
-import UserProfile from "../components/userPageComponents/UserProfile.tsx";
-import UserComputers from "../components/userPageComponents/UserComputers.tsx";
+import UserProfile from "../components/userPages/UserProfile.tsx";
+import UserComputers from "../components/userPages/UserComputers.tsx";
 
 function UserPage() {
     const [activeTab, setActiveTab] = useState("profile");

@@ -3,7 +3,7 @@ import type {FC} from "react";
 import OfferCardFlex from "./OfferCardFlex.tsx";
 import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.tsx";
 import {useAtom, useAtomValue} from "jotai";
-import {viewModeAtom} from "../../atoms/OfferListViewMode.ts";
+import {viewModeAtom} from "../atoms/OfferListViewMode.ts";
 import OfferCardGrid from "./OfferCardGrid.tsx";
 
 interface OffersTableProps {

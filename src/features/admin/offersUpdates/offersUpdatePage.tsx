@@ -2,12 +2,13 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import customAxios from '../../../lib/customAxios.tsx';
 import { useAtom } from 'jotai';
 import { fetchShopsAtom, shopsAtom } from '../atoms/shopAtom.tsx';
-import {fetchOfferUpdateConfigAtom, offerUpdateConfigAtom, type OfferUpdateType } from '../atoms/adminAtom.tsx';
+import {offerUpdateConfigAtom, type OfferUpdateType } from '../atoms/adminAtom.tsx';
 import { showToast } from "../../../lib/ToastContainer.tsx";
 import {useOfferUpdates} from "../hooks/useOffersUpdates.ts";
 import OffersUpdatesView from "../components/OffersUpdatesView.tsx";
 import {LoadingSpinner} from "../../../assets/components/ui/LoadingSpinner.tsx";
 import ComponentsStatsPanel from "../components/ComponentsStatsPanel.tsx";
+import { putOfferUpdateConfig } from './api/putOfferUpdateConfig.ts';
 
 
 interface Shop {
@@ -18,8 +19,9 @@ interface ShopSelectorProps {
     shops: Shop[];
     selectedShopNames: string[];
     onShopToggle: (shopName: string) => void;
+    isDisabled: boolean;
 }
-const ShopSelector: React.FC<ShopSelectorProps> = ({ shops, selectedShopNames, onShopToggle }) => {
+const ShopSelector: React.FC<ShopSelectorProps> = ({ shops, selectedShopNames, onShopToggle, isDisabled }) => {
     if (shops.length === 0) {
         return (
             <p className="text-sm text-gray-500">
@@ -33,9 +35,13 @@ const ShopSelector: React.FC<ShopSelectorProps> = ({ shops, selectedShopNames, o
                 const isSelected = selectedShopNames.includes(shop.name);
                 return (
                     <span
-                        key={shop.name}
-                        onClick={() => onShopToggle(shop.name)}
-                        className={`cursor-pointer px-3 py-1.5 rounded-md border transition-all duration-200 text-sm font-medium ${
+                         key={shop.name}
+                        onClick={() => !isDisabled && onShopToggle(shop.name)}
+                        className={`px-3 py-1.5 rounded-md border transition-all duration-200 text-sm font-medium ${
+                            isDisabled 
+                                ? 'cursor-not-allowed opacity-50' 
+                                : 'cursor-pointer'
+                        } ${
                             isSelected
                                 ? 'bg-ocean-blue text-white border-ocean-blue shadow-sm'
                                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
@@ -52,28 +58,32 @@ const ShopSelector: React.FC<ShopSelectorProps> = ({ shops, selectedShopNames, o
 const intervalsInMinutes = [5, 15, 30, 60, 120, 240, 1440];
 
 const OffersComponent = () => {
-    const [updateType, setUpdateType] = useState<OfferUpdateType>('MANUAL');
+      const [updateType, setUpdateType] = useState<OfferUpdateType>('MANUAL');
     const [shops] = useAtom(shopsAtom);
     const [, fetchShops] = useAtom(fetchShopsAtom);
     const [offerUpdateConfig, setOfferUpdateConfig] = useAtom(offerUpdateConfigAtom);
-    const [, fetchOfferUpdateConfig] = useAtom(fetchOfferUpdateConfigAtom);
     const [selectedShopNames, setSelectedShopNames] = useState<string[]>([]);
     const [intervalInMinutes, setIntervalInMinutes] = useState<number>(60);
-
+    
     const { data: updates, isLoading, error, handleManualFetchOffers } = useOfferUpdates();
-
 
     useEffect(() => {
         fetchShops();
-        fetchOfferUpdateConfig();
-    }, [fetchShops, fetchOfferUpdateConfig]);
+    }, [fetchShops]);
+
+
 
     useEffect(() => {
         if (offerUpdateConfig?.shops) {
             setSelectedShopNames(offerUpdateConfig.shops.map(s => s.name));
         }
+        if (offerUpdateConfig?.intervalInMinutes) {
+            setIntervalInMinutes(offerUpdateConfig.intervalInMinutes);
+        }
+        if (offerUpdateConfig?.type) {
+            setUpdateType(offerUpdateConfig.type);
+        }
     }, [offerUpdateConfig]);
-
 
     useEffect(() => {
         const saved = localStorage.getItem("selectedShops");
@@ -86,30 +96,34 @@ const OffersComponent = () => {
         localStorage.setItem("selectedShops", JSON.stringify(selectedShopNames));
     }, [selectedShopNames]);
 
-const hasOngoingUpdate = useMemo(() => {
-    if (!updates) return false;
-    
-    return updates.some((update) => {
-        const relevantShops = update.shops?.filter(s => 
-            selectedShopNames.includes(s.shopName)
-        );
+    const hasOngoingUpdate = useMemo(() => {
+        if (!updates) return false;
         
-        if (!relevantShops?.length) return false;
-        
-        return relevantShops.some(shop => shop.status === 'RUNNING');
-    });
-}, [updates, selectedShopNames]);
-
-
+        return updates.some((update) => {
+            const relevantShops = update.shops?.filter(s => 
+                selectedShopNames.includes(s.shopName)
+            );
+            
+            if (!relevantShops?.length) return false;
+            
+            return relevantShops.some(shop => shop.status === 'RUNNING');
+        });
+    }, [updates, selectedShopNames]);
 
     const handleUpdateTypeToggle = useCallback(() => {
-        setUpdateType(prev => prev === 'AUTOMATIC' ? 'MANUAL' : 'AUTOMATIC');
+        const newType = updateType === 'AUTOMATIC' ? 'MANUAL' : 'AUTOMATIC';
+        setUpdateType(newType);
+        
+        if (newType === 'AUTOMATIC') {
+            setSelectedShopNames([]);
+        }
+        
         setOfferUpdateConfig(prev =>
             prev
-                ? { ...prev, type: prev.type === 'AUTOMATIC' ? 'MANUAL' : 'AUTOMATIC' }
-                : { type: 'MANUAL', intervalInMinutes: null, shops: [] }
+                ? { ...prev, type: newType, shops: newType === 'AUTOMATIC' ? [] : prev.shops }
+                : { type: newType, intervalInMinutes: null, shops: [] }
         );
-    }, [setOfferUpdateConfig]);
+    }, [updateType, setOfferUpdateConfig]);
 
     const handleShopToggle = useCallback((shopName: string) => {
         setSelectedShopNames(prev =>
@@ -123,28 +137,28 @@ const hasOngoingUpdate = useMemo(() => {
         setIntervalInMinutes(Number(e.target.value));
     };
 
-    const getConfigToSave = useCallback(() => {
-        return {
-            type: updateType,
-            intervalInMinutes: updateType === 'MANUAL' ? null : intervalInMinutes,
-            shops: shops.filter(shop => selectedShopNames.includes(shop.name)),
-        };
-    }, [updateType, intervalInMinutes, shops, selectedShopNames]);
-
-    const saveOfferUpdateConfig = useCallback(async () => {
-        try {
-            const configToSave = getConfigToSave();
-            const response = await customAxios.post('/admin/OfferUpdateConfig', configToSave);
-            console.log("Odpowiedź backendu:", response.data);
-
-            showToast.success(response.data.message || "Configuration saved!");
-            setOfferUpdateConfig(configToSave);
-        } catch (error) {
-            showToast.error('Error saving configuration');
-            return false;
+const saveOfferUpdateConfig = useCallback(async () => {
+    try {
+        if (updateType !== 'AUTOMATIC') {
+            showToast.error("Ta funkcja działa tylko dla automatycznej aktualizacji");
+            return;
         }
-    }, [getConfigToSave, setOfferUpdateConfig]);
-
+        
+        if (!intervalInMinutes || intervalInMinutes <= 0) {
+            showToast.error("Proszę wybrać prawidłowy interwał aktualizacji");
+            return;
+        }
+        
+        await putOfferUpdateConfig(intervalInMinutes); 
+        
+        showToast.success("Konfiguracja automatycznej aktualizacji zapisana!");
+        
+        
+    } catch (error: any) {
+        console.error('Błąd podczas zapisywania konfiguracji:', error);
+        showToast.error(error.response?.data?.message || 'Błąd podczas zapisywania konfiguracji');
+    }
+}, [updateType, intervalInMinutes]);
     
 
     return (
@@ -195,6 +209,7 @@ const hasOngoingUpdate = useMemo(() => {
                                     shops={shops}
                                     selectedShopNames={selectedShopNames}
                                     onShopToggle={handleShopToggle}
+                                    isDisabled={hasOngoingUpdate}
                                 />
                             </div>
                             <div className="flex gap-4">
@@ -253,6 +268,7 @@ const hasOngoingUpdate = useMemo(() => {
                                         shops={shops}
                                         selectedShopNames={selectedShopNames}
                                         onShopToggle={handleShopToggle}
+                                        isDisabled={hasOngoingUpdate}
                                     />
                                 </div>
                                 <div className="pt-4 border-t border-gray-200">
