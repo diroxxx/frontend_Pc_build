@@ -7,7 +7,6 @@ import { useFpsComponents } from "../hooks/useFpsComponents.ts";
 import type { GameFpsConfigDto } from "../types/GameFpsConfigDto.ts";
 import { resolutionList, graphicsPresetList, technologyList } from "../types/GameFpsConfigDto.ts";
 import { useReccommendedVideo } from "../hooks/useReccommendedVideo.ts";
-import { da } from "date-fns/locale";
 
 
 const GamesPage = () => {
@@ -55,10 +54,6 @@ const canSearch = isConfigComplete(gameFpsConfig);
 return (
         <div className="min-h-screen bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 py-6">
-                <div className="mb-6">
-                    <p className="text-gray-600 mt-1">Sprawdź jak wybrane komponenty poradzą sobie z Twoją ulubioną grą</p>
-                </div>
-
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                     <div className="lg:col-span-1">
                         <div className="bg-white rounded-lg shadow-sm border border-gray-200 sticky top-6">
@@ -222,7 +217,6 @@ return (
                                         </svg>
                                         Rekomendowane wideo
                                     </h2>
-                                    <p className="text-white/80 text-sm mt-1">Sprawdź wydajność w praktyce</p>
                                 </div>
                                 
                                 <div className="p-4 space-y-4">
