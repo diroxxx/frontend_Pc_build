@@ -138,41 +138,37 @@ const OfferCardFlex: FC<Props> = ({ offer }) => {
 
     return (
         <div className="relative group bg-white border rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200 border-gray-200 hover:border-ocean-blue">
-            {/* Layout */}
-            {/*{renderConditionBadge(offer.condition)}*/}
             <div className="flex gap-4">
 
-
-                <div className="w-24 h-24 flex items-center justify-center bg-gray-50 border border-gray-200 rounded">
-                     {hasValidPhoto && !imgError ? (
-                        <img
-                            src={offer.photoUrl}
-                            alt={`${offer.brand} ${offer.model}`}
-                            className="w-full h-full object-contain"
-                            onError={() => setImgError(true)}
-                        />
-                    ) : (
-                        <ImageOff className="text-gray-400 w-10 h-10" strokeWidth={1.5} />
-                    )}
+                <div className="flex flex-col gap-1">
+                    <div className="w-24 h-24 flex items-center justify-center bg-gray-50 border border-gray-200 rounded">
+                        {hasValidPhoto && !imgError ? (
+                            <img
+                                src={offer.photoUrl}
+                                alt={`${offer.brand} ${offer.model}`}
+                                className="w-full h-full object-contain"
+                                onError={() => setImgError(true)}
+                            />
+                        ) : (
+                            <ImageOff className="text-gray-400 w-10 h-10" strokeWidth={1.5} />
+                        )}
+                    </div>
+                    
                     <span
-                        className={`absolute bottom-1 left-1 text-[10px] font-semibold px-1.5 py-0.5 rounded text-white
-      ${offer.condition === "NEW" ? "bg-green-500"
-                            : offer.condition === "USED" ? "bg-yellow-500"
-                                : "bg-red-500"}`}
+                        className={`text-[10px] font-semibold px-1.5 py-0.5 rounded shadow-sm text-center
+                            ${offer.condition === "NEW" ? "bg-text-green-v1 text-ocean-dark-blue"
+                                : offer.condition === "USED" ? "bg-yellow-100 text-yellow-700"
+                                    : "bg-ocean-red/20 text-ocean-red"}`}
                     >
-    {offer.condition === "NEW"
-        ? "NOWY"
-        : offer.condition === "USED"
-            ? "UŻYWANY"
-            : "USZKODZONY"}
-  </span>
+                        {offer.condition === "NEW"
+                            ? "NOWY"
+                            : offer.condition === "USED"
+                                ? "UŻYWANY"
+                                : "USZKODZONY"}
+                    </span>
                 </div>
 
                 <div className="flex-1 flex flex-col justify-between">
-                    {/*<div className="flex items-center justify-between mb-2">*/}
-                    {/*    {renderConditionBadge(offer.condition)}*/}
-                    {/*</div>*/}
-
                     <div className="flex justify-between items-start gap-2">
                         <div>
                             <h3 className="text-sm sm:text-base font-semibold text-midnight-dark leading-tight">
@@ -190,15 +186,6 @@ const OfferCardFlex: FC<Props> = ({ offer }) => {
                                     {offer.title}
                                 </p>
                             )}
-
-                            {/*{offer.title && (*/}
-                            {/*    <div className="relative group">*/}
-                            {/*        <Info className="w-4 h-4 text-gray-400 cursor-pointer" />*/}
-                            {/*        <div className="absolute hidden group-hover:block bg-gray-800 text-white text-xs rounded p-2 top-5 left-0 w-56 z-10">*/}
-                            {/*            {offer.title}*/}
-                            {/*        </div>*/}
-                            {/*    </div>*/}
-                            {/*)}*/}
                         </div>
 
                         {offer.shopName && (

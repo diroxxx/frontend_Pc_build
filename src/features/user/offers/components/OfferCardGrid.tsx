@@ -40,24 +40,18 @@ const OfferCardGrid: React.FC<OfferCardGridProps> = ({ offer }) => {
     }
 
 
-    const renderConditionBadge = (condition: string) => {
+ const renderConditionBadge = (condition: string) => {
         switch (condition?.toLowerCase()) {
             case "new":
                 return (
-                    <span className="absolute top-2 right-2 bg-green-100 text-green-800 text-[10px] font-semibold px-1.5 py-0.5 rounded-full border border-green-300 shadow-sm">
+                    <span className="absolute top-2 right-2 bg-text-green-v1 text-ocean-dark-blue text-[10px] font-semibold px-1.5 py-0.5 rounded shadow-sm">
             Nowy
           </span>
                 );
             case "used":
                 return (
-                    <span className="absolute top-2 right-2 bg-yellow-100 text-yellow-800 text-[10px] font-semibold px-1.5 py-0.5 rounded-full border border-yellow-300 shadow-sm">
+                    <span className="absolute top-2 right-2 bg-yellow-100 text-yellow-700 text-[10px] font-semibold px-1.5 py-0.5 rounded shadow-sm">
             Używany
-          </span>
-                );
-            case "defective":
-                return (
-                    <span className="absolute top-2 right-2 bg-red-100 text-red-700 text-[10px] font-semibold px-1.5 py-0.5 rounded-full border border-red-300 shadow-sm">
-            Uszkodzony
           </span>
                 );
             default:
@@ -83,7 +77,6 @@ const OfferCardGrid: React.FC<OfferCardGridProps> = ({ offer }) => {
                 {renderConditionBadge(offer.condition)}
             </div>
 
-            {/* DÓŁ – dane */}
             <div className="p-2 flex flex-col flex-grow justify-between text-center">
                 <a
                     href={offer.websiteUrl}
