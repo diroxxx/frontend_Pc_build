@@ -1,5 +1,5 @@
 import type {ComputerDto} from "../types/ComputerDto.ts";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {saveComputerByUserEmail} from "../api/saveComputerByUserEmail.ts";
 
 export const useSaveComputerByUserEmail = () => {
@@ -18,6 +18,4 @@ export const useSaveComputerByUserEmail = () => {
 
         },
     });
-
-
 };

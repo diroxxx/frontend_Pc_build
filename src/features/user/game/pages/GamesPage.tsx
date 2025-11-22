@@ -1,4 +1,4 @@
-import { use, useState } from "react";
+import {useState } from "react";
 import GameCard from "../components/GameCard.tsx";
 import { useGetAllGamesApi } from "../hooks/useAllGames.ts";
 import type { GameDto } from "../types/GameDto.ts";
@@ -12,7 +12,6 @@ import { useReccommendedVideo } from "../hooks/useReccommendedVideo.ts";
 const GamesPage = () => {
     const { data: games, isLoading, isError } = useGetAllGamesApi();
     const [selectedGame, setSelectedGame] = useState<GameDto | null>(null);
-    const [budget, setBudget] = useState<string>("");
     const { data: fpsComponentsData } = useFpsComponents();
     const [gameFpsConfig, setGameFpsConfig] = useState<GameFpsConfigDto>({
         cpu: "",
@@ -21,7 +20,9 @@ const GamesPage = () => {
         technology: "" as typeof technologyList[number],
         graphicsPreset: "" as typeof graphicsPresetList[number],
         gameTitle: ""
-    });    const processorTypes = fpsComponentsData?.cpusModels || [];
+    });    
+    
+    const processorTypes = fpsComponentsData?.cpusModels || [];
     const gpuTypes = fpsComponentsData?.gpusModels || [];
 
 const isConfigComplete = (config: GameFpsConfigDto | null): config is GameFpsConfigDto => {

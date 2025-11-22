@@ -3,14 +3,13 @@ import {useNavigate} from 'react-router-dom';
 import {selectedCategoryAtom} from '../../../../atomContext/offerAtom.tsx';
 import {userAtom} from "../../../../atomContext/userAtom.tsx";
 import {useFetchComputersByEmail} from "../../../../hooks/useFetchComputersByEmail.ts";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import BuildList from "./BuildList.tsx";
 import BuildConfiguration from "./BuildConfiguration.tsx";
 import {useSaveComputerByUserEmail} from "../../../../hooks/useSaveComputersByUserEmail.ts";
 import type {ComputerDto} from "../../../../types/ComputerDto.ts";
 import  {ComponentTypeEnum} from "../../../../types/BaseItemDto.ts";
-import {computersAtom, selectedComputerAtom, selectedComputerIndexAtom} from "../../../../atomContext/computerAtom.tsx";
-import {queryClient} from "../../../../app/store/queryClient.ts";
+import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
 
 
 export default function Builds() {
@@ -44,7 +43,7 @@ export default function Builds() {
 
     const handleAddComponent = (category: ComponentTypeEnum) => {
         setSelectedCategory(category);
-        navigate(`/components?category=${category}`);
+        navigate(`/offers?category=${category}`);
     };
 
 

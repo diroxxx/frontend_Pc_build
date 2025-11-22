@@ -8,59 +8,43 @@ type DownloadCsvTemplateButtonProps = {
 
 const csvTemplates: Record<ComponentTypeEnum, { header: string; sample: string[] }> = {
     [ComponentTypeEnum.PROCESSOR]: {
-        header: "componentType,brand,model,price,condition,shopName,cores,threads,baseClock,socketType",
+        header: "brand,model,cores,threads,baseClock,socketType,boostClock,integratedGraphics,tdp",
         sample: [
-            "PROCESSOR,AMD,Ryzen 5 5600,450,USED,Allegro,6,12,3.5GHz,AM4",
-            "PROCESSOR,Intel,Core i5-12400F,599,NEW,x-kom,6,12,2.5GHz,LGA1700",
         ]
     },
     [ComponentTypeEnum.GRAPHICS_CARD]: {
-        header: "componentType,brand,model,price,condition,shopName,memorySize,gddr,powerDraw",
+        header: "brand,model,vram,gddr,boostClock,coreClock, lenghtInMM,powerDraw",
         sample: [
-            "GRAPHICS_CARD,NVIDIA,RTX 4060,1499,NEW,Allegro,8,GDDR6,115",
-            "GRAPHICS_CARD,AMD,RX 7600,1299,NEW,Morele,8,GDDR6,165",
         ]
     },
     [ComponentTypeEnum.MEMORY]: {
-        header: "componentType,brand,model,price,condition,shopName,capacity,speed,type",
+        header: "brand,model,capacity,speed,type,amount,latency",
         sample: [
-            "MEMORY,Kingston,Fury Beast,199,NEW,OLX,16,3200,DDR4",
-            "MEMORY,Corsair,Vengeance RGB,399,NEW,x-kom,32,6000,DDR5",
         ]
     },
     [ComponentTypeEnum.STORAGE]: {
-        header: "componentType,brand,model,price,condition,shopName,capacity,type,format",
+        header: "brand,model,capacity,type",
         sample: [
-            "STORAGE,Crucial,P3,229,NEW,Allegro,1000,NVMe,M.2",
-            "STORAGE,Samsung,970 EVO Plus,459,NEW,Morele,2000,NVMe,M.2",
         ]
     },
     [ComponentTypeEnum.MOTHERBOARD]: {
-        header: "componentType,brand,model,price,condition,shopName,chipset,socketType,format",
+        header: "brand,model,chipset,socketType,format,ramSlots,ramCapacity,memoryType",
         sample: [
-            "MOTHERBOARD,ASUS,TUF B550-PLUS,599,NEW,x-kom,B550,AM4,ATX",
-            "MOTHERBOARD,MSI,MAG B660M,499,NEW,Morele,B660,LGA1700,microATX",
         ]
     },
     [ComponentTypeEnum.POWER_SUPPLY]: {
-        header: "componentType,brand,model,price,condition,shopName,maxPowerWatt",
+        header: "brand,model,efficiencyRating,modular,type,maxPowerWatt",
         sample: [
-            "POWER_SUPPLY,Seasonic,Focus GX,399,USED,OLX,750",
-            "POWER_SUPPLY,Corsair,RM850x,649,NEW,x-kom,850",
         ]
     },
     [ComponentTypeEnum.CASE_PC]: {
-        header: "componentType,brand,model,price,condition,shopName,format",
+        header: "brand,model,componentType,format",
         sample: [
-            "CASE_PC,NZXT,H510,299,NEW,Allegro,ATX",
-            "CASE_PC,Fractal Design,Meshify C,399,NEW,Morele,ATX",
         ]
     },
     [ComponentTypeEnum.CPU_COOLER]: {
-        header: "componentType,brand,model,price,condition,shopName,coolerSocketsType",
+        header: "brand,model,coolerSocketsType,fanRpm,noiseLevel,radiatorSize",
         sample: [
-            "CPU_COOLER,Noctua,NH-D15,399,NEW,x-kom,AM4/LGA1700",
-            "CPU_COOLER,be quiet!,Dark Rock 4,299,NEW,Morele,AM4/LGA1700",
         ]
     },
 };

@@ -11,7 +11,6 @@ import {PlusIcon, Search} from "lucide-react";
 import AddComponentForm from "../components/AddComponentForm.tsx";
 
 import ImportCsvButton from "../components/ImportCsvButton";
-import {useBulkImportComponents} from "../hooks/useBulkImportComponents.ts";
 import {saveComponentApi} from "../api/saveComponentApi.ts";
 import {showToast} from "../../../lib/ToastContainer.tsx";
 import DownloadCsvTemplateButton from "../components/DownloadCsvTemplateButton.tsx";
@@ -30,7 +29,7 @@ const ComponentsPage = () => {
 
     const handleAddComponent = async (data: ComponentItem) => {
         await saveComponentApi(data)
-            .then(res => {
+            .then(() => {
                 showToast.success("Dodano komponent");
             });
         setShowForm(false);
@@ -77,9 +76,7 @@ const ComponentsPage = () => {
                 />
             )}
 
-            {/* Filters Section + Import CSV */}
             <div className="flex gap-4">
-                {/* Filters - większa część */}
                 <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                     <div className="flex flex-wrap items-center gap-3 mb-4">
                         <div className="relative flex-1 min-w-[200px]">
@@ -146,7 +143,6 @@ const ComponentsPage = () => {
                     </div>
                 </div>
 
-                {/* Import CSV - mniejsza część */}
                 <div className="w-80 bg-white rounded-lg shadow-sm border border-ocean-light-blue p-4">
                     <h3 className="text-sm font-semibold text-midnight-dark mb-3">Import CSV</h3>
                     

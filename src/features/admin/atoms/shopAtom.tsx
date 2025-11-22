@@ -10,7 +10,6 @@ export const fetchShopsAtom = atom(
   null,
   async (_get, set) => {
     try {
-
       const response = await customAxios.get('api/shops');
       const shops: Shop[] = response.data;
 

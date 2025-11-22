@@ -5,7 +5,6 @@ import {userAtom} from "../atomContext/userAtom.tsx";
 
 export const useLogout = () => {
     const queryClient = useQueryClient();
-    const user = useAtomValue(userAtom);
     const setUser = useSetAtom(userAtom);
 
     return async () => {

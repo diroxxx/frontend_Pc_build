@@ -1,5 +1,4 @@
 import {atom, useSetAtom} from "jotai";
-import {type Shop } from "./shopAtom.tsx";
 import customAxios from "../../../lib/customAxios.tsx";
 import {useCallback} from "react";
 export type User =  {
@@ -24,16 +23,6 @@ export const useFetchAllUsers = () => {
             });
     }, [setUsers]);
 };
-
-
-export type OfferUpdateType = 'MANUAL' | 'AUTOMATIC';
-export type OfferUpdateConfigAtom = {
-    intervalInMinutes: number | null;
-    type: OfferUpdateType;
-    shops: Shop[];
-}
-export const offerUpdateConfigAtom = atom<OfferUpdateConfigAtom>();
-
 export type OfferUpdate = {
     shopName: string;
     startedAt: string;
@@ -42,4 +31,3 @@ export type OfferUpdate = {
     offersDeleted: number;
     offersAdded: number;
 }
-export const offerUpdatesAtom = atom<OfferUpdate[]>([]);

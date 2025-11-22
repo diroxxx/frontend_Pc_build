@@ -1,6 +1,7 @@
 import customAxios from "../lib/customAxios.tsx";
 import type {ComponentOffer} from "../types/OfferBase.ts";
-import type {OfferFilters} from "../types/OfferFilters.ts";
+
+import type {OfferFiltersType} from "../shared/components/OffersFilters.tsx";
 
 export interface OfferResponse {
     offers: ComponentOffer[];
@@ -10,7 +11,7 @@ export interface OfferResponse {
 }
 
 export async function getAllOffers(page: number = 0,
-    filters?: OfferFilters): Promise<OfferResponse> {
+    filters?: OfferFiltersType): Promise<OfferResponse> {
 
 
     const params = new URLSearchParams();

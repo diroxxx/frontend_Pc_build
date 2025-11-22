@@ -1,15 +1,14 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import customAxios from '../../../lib/customAxios.tsx';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAtom } from 'jotai';
 import { fetchShopsAtom, shopsAtom } from '../atoms/shopAtom.tsx';
-import {offerUpdateConfigAtom, type OfferUpdateType } from '../atoms/adminAtom.tsx';
 import { showToast } from "../../../lib/ToastContainer.tsx";
 import {useOfferUpdates} from "../hooks/useOffersUpdates.ts";
 import OffersUpdatesView from "../components/OffersUpdatesView.tsx";
 import {LoadingSpinner} from "../../../assets/components/ui/LoadingSpinner.tsx";
 import ComponentsStatsPanel from "../components/ComponentsStatsPanel.tsx";
 import { putOfferUpdateConfig } from './api/putOfferUpdateConfig.ts';
-
+import type {OfferUpdateConfigDto, OfferUpdateType} from "../types/OfferUpdateConfigDto.ts";
+import {IntervalsMap} from "../types/intervalsMap.ts";
 
 interface Shop {
     name: string;
@@ -21,7 +20,7 @@ interface ShopSelectorProps {
     onShopToggle: (shopName: string) => void;
     isDisabled: boolean;
 }
-const ShopSelector: React.FC<ShopSelectorProps> = ({ shops, selectedShopNames, onShopToggle, isDisabled }) => {
+const ShopSelector  = ({ shops, selectedShopNames, onShopToggle, isDisabled }: ShopSelectorProps) => {
     if (shops.length === 0) {
         return (
             <p className="text-sm text-gray-500">
@@ -55,30 +54,26 @@ const ShopSelector: React.FC<ShopSelectorProps> = ({ shops, selectedShopNames, o
     );
 };
 
-const intervalsInMinutes = [5, 15, 30, 60, 120, 240, 1440];
-
 const OffersComponent = () => {
-      const [updateType, setUpdateType] = useState<OfferUpdateType>('MANUAL');
+    const [updateType, setUpdateType] = useState<OfferUpdateType>('MANUAL');
     const [shops] = useAtom(shopsAtom);
     const [, fetchShops] = useAtom(fetchShopsAtom);
-    const [offerUpdateConfig, setOfferUpdateConfig] = useAtom(offerUpdateConfigAtom);
+    const [offerUpdateConfig, setOfferUpdateConfig] = useState<OfferUpdateConfigDto>();
     const [selectedShopNames, setSelectedShopNames] = useState<string[]>([]);
-    const [intervalInMinutes, setIntervalInMinutes] = useState<number>(60);
-    
+    const [interval, setInterval] = useState<string>();
+
     const { data: updates, isLoading, error, handleManualFetchOffers } = useOfferUpdates();
 
     useEffect(() => {
         fetchShops();
     }, [fetchShops]);
 
-
-
     useEffect(() => {
         if (offerUpdateConfig?.shops) {
             setSelectedShopNames(offerUpdateConfig.shops.map(s => s.name));
         }
         if (offerUpdateConfig?.intervalInMinutes) {
-            setIntervalInMinutes(offerUpdateConfig.intervalInMinutes);
+            setInterval(offerUpdateConfig.intervalInMinutes);
         }
         if (offerUpdateConfig?.type) {
             setUpdateType(offerUpdateConfig.type);
@@ -134,7 +129,7 @@ const OffersComponent = () => {
     }, []);
 
     const handleIntervalChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setIntervalInMinutes(Number(e.target.value));
+        setInterval(e.target.value);
     };
 
 const saveOfferUpdateConfig = useCallback(async () => {
@@ -143,22 +138,17 @@ const saveOfferUpdateConfig = useCallback(async () => {
             showToast.error("Ta funkcja działa tylko dla automatycznej aktualizacji");
             return;
         }
-        
-        if (!intervalInMinutes || intervalInMinutes <= 0) {
+        if (!interval) {
             showToast.error("Proszę wybrać prawidłowy interwał aktualizacji");
             return;
         }
-        
-        await putOfferUpdateConfig(intervalInMinutes); 
-        
+        await putOfferUpdateConfig(interval);
         showToast.success("Konfiguracja automatycznej aktualizacji zapisana!");
-        
-        
     } catch (error: any) {
         console.error('Błąd podczas zapisywania konfiguracji:', error);
         showToast.error(error.response?.data?.message || 'Błąd podczas zapisywania konfiguracji');
     }
-}, [updateType, intervalInMinutes]);
+}, [updateType, interval]);
     
 
     return (
@@ -212,7 +202,7 @@ const saveOfferUpdateConfig = useCallback(async () => {
                                     isDisabled={hasOngoingUpdate}
                                 />
                             </div>
-                            <div className="flex gap-4">
+                            <div className="flex gap-3">
                                 <button
                                     onClick={() => handleManualFetchOffers(selectedShopNames)}
                                     disabled={hasOngoingUpdate || selectedShopNames.length === 0}
@@ -238,29 +228,26 @@ const saveOfferUpdateConfig = useCallback(async () => {
 
                     {updateType === 'AUTOMATIC' && (
                         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                            <h3 className="text-lg font-semibold text-midnight-dark mb-6">Konfiguracja automatycznej aktualizacji</h3>
-                            <div className="space-y-6">
+                            <h3 className="text-lg mb-3">Konfiguracja automatycznej aktualizacji</h3>
+                            <div className="space-y-2">
                                 <div>
+                                    <p className={"text-sm font-medium text-gray-600 mb-1"}>Aktualizacje bedą zawierały wszystkie dostępne sklepy</p>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Interwał aktualizacji
                                     </label>
                                     <select
-                                        value={intervalInMinutes}
+                                        value={interval}
                                         onChange={handleIntervalChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ocean-blue focus:border-ocean-blue transition-colors"
                                     >
-                                        {intervalsInMinutes.map((interval) => (
-                                            <option key={interval} value={interval}>
-                                                {interval < 60 ? `${interval} minut` :
-                                                    interval === 60 ? '1 godzina' :
-                                                        interval === 120 ? '2 godziny' :
-                                                            interval === 240 ? '4 godziny' :
-                                                                interval === 1440 ? '24 godziny' : `${interval} minut`}
+                                        {Object.entries(IntervalsMap).map(([key,interval]) => (
+                                            <option key={interval} value={ key}>
+                                                {key}
                                             </option>
                                         ))}
                                     </select>
                                 </div>
-                                <div className="mb-6">
+                                {updateType != 'AUTOMATIC' &&  <div className="mb-6">
                                     <p className="block text-sm font-medium text-gray-700 mb-2">
                                         Wybierz sklepy do aktualizacji
                                     </p>
@@ -270,7 +257,7 @@ const saveOfferUpdateConfig = useCallback(async () => {
                                         onShopToggle={handleShopToggle}
                                         isDisabled={hasOngoingUpdate}
                                     />
-                                </div>
+                                </div>}
                                 <div className="pt-4 border-t border-gray-200">
                                     <button
                                         onClick={saveOfferUpdateConfig}

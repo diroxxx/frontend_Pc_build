@@ -27,7 +27,6 @@ export default function BuildConfiguration({
     const selectedComputer = useAtomValue(selectedComputerAtom)
     return (
         <div className="bg-white rounded-xl shadow-md overflow-hidden border border-ocean-light-blue">
-            {/* Header */}
             <div className="bg-ocean-blue text-white p-4">
                 <h2 className="text-lg font-semibold">
                     {selectedComputer ? selectedComputer.name : "Wybierz lub utwórz zestaw"}
@@ -39,7 +38,6 @@ export default function BuildConfiguration({
                 )}
             </div>
 
-            {/* Główna sekcja */}
             {selectedComputer ? (
                 <div>
                     {categories.map((cat) => {
@@ -52,15 +50,12 @@ export default function BuildConfiguration({
                                 key={cat}
                                 className="grid grid-cols-4 border-b border-gray-200 p-3 items-center last:border-b-0 hover:bg-gray-50 transition-colors"
                             >
-                                {/* Kategoria */}
                                 <div className="font-medium text-midnight-dark">
                                     {categoryLabels[cat] || cat}
                                 </div>
 
-                                {/* Jeśli oferta istnieje */}
                                 {offer ? (
                                     <>
-                                        {/* Miniatura + opis */}
                                         <div className="flex items-center gap-3">
                                             {offer.photoUrl ? (
                                                 <img
@@ -82,17 +77,15 @@ export default function BuildConfiguration({
                                                     {offer.brand} {offer.model}
                                                 </div>
                                                 <div className="text-xs text-gray-500">
-                                                    {offer.shop ? offer.shop : "—"} • {offer.condition}
+                                                    {offer.shopName ? offer.shopName : "—"} • {offer.condition}
                                                 </div>
                                             </div>
                                         </div>
 
-                                        {/* Cena */}
                                         <div className="font-semibold text-ocean-dark-blue text-sm">
                                             {offer.price.toLocaleString("pl-PL")} zł
                                         </div>
 
-                                        {/* Przycisk Zmień */}
                                         <button
                                             className="px-3 py-1 text-sm rounded-md bg-gray-100 hover:bg-gray-200 text-midnight-dark transition-colors"
                                             onClick={() =>
@@ -109,7 +102,6 @@ export default function BuildConfiguration({
                                         </div>
                                         <div></div>
 
-                                        {/* Przycisk Dodaj */}
                                         <button
                                             className="px-3 py-1 text-sm rounded-md bg-ocean-blue text-white hover:bg-ocean-dark-blue transition-colors"
                                             onClick={() =>
