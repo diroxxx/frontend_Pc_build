@@ -10,12 +10,10 @@ import { useSearchParams } from "react-router-dom";
 import {LayoutGrid, List} from "lucide-react";
 import {useAtom} from "jotai";
 import {viewModeAtom} from "../atoms/OfferListViewMode.ts";
-import { OffersFilters} from "../../../../shared/components/OffersFilters.tsx";
+import { OffersSideFilters} from "../../../../shared/components/OffersSideFilters.tsx";
 import {offerLeftPanelFiltersAtom} from "../../../../shared/atoms/OfferLeftPanelFiltersAtom.ts";
 import {OfferSearchFilters} from "../../../../shared/components/OfferSearchFilters.tsx";
 import {offerPageAtom} from "../../../../shared/atoms/OfferPageAtom.ts";
-
-
 
 function OffersUserPage() {
 
@@ -32,7 +30,7 @@ function OffersUserPage() {
         } 
     }, []);
 
-    const {data: offersData, isLoading: isLoadingOffers, error, isFetching} = useFetchOffers(page, offerLeftPanelFilters);
+    const {data: offersData, isLoading: isLoadingOffers, error,isError, isFetching, isRefetching} = useFetchOffers(page, offerLeftPanelFilters);
     const offers = offersData?.offers ?? [];
 
     const [viewMode, setViewMode] = useAtom(viewModeAtom);
@@ -58,170 +56,48 @@ function OffersUserPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             <SidePanelBuilds />
-            {/* Header */}
-            <div className="bg-white border-b border-gray-200 px-4 py-6">
-                <div className="max-w-7xl mx-auto">
 
-                    <OfferSearchFilters/>
-                    <div className="flex justify-end mb-4 gap-2">
-                        <button
-                            onClick={() => setViewMode("list")}
-                            className={`p-2 rounded-md border transition ${
-                                viewMode === "list"
-                                    ? "bg-ocean-blue text-white border-ocean-blue"
-                                    : "border-gray-300 text-gray-600 hover:bg-gray-100"
-                            }`}
-                            title="Widok listy"
-                        >
-                            <List size={18} />
-                        </button>
+            <div className="border-b border-gray-200 bg-white">
+                <div className="max-w-7xl mx-auto px-4 py-5">
+                    <div className="flex items-start justify-between gap-6">
 
-                        <button
-                            onClick={() => setViewMode("grid")}
-                            className={`p-2 rounded-md border transition ${
-                                viewMode === "grid"
-                                    ? "bg-ocean-blue text-white border-ocean-blue"
-                                    : "border-gray-300 text-gray-600 hover:bg-gray-100"
-                            }`}
-                            title="Widok siatki"
-                        >
-                            <LayoutGrid size={18} />
-                        </button>
+                        <div className="flex-1 max-w-3xl mx-auto">
+                            <OfferSearchFilters />
+                        </div>
+
+                        <div className="flex gap-2 shrink-0">
+                            <button
+                                onClick={() => setViewMode("list")}
+                                className={`p-2.5 rounded-lg border transition-all duration-200 ${
+                                    viewMode === "list"
+                                        ? "bg-ocean-blue text-white border-ocean-blue shadow-sm"
+                                        : "border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400"
+                                }`}
+                                title="Widok listy"
+                            >
+                                <List size={20} />
+                            </button>
+
+                            <button
+                                onClick={() => setViewMode("grid")}
+                                className={`p-2.5 rounded-lg border transition-all duration-200 ${
+                                    viewMode === "grid"
+                                        ? "bg-ocean-blue text-white border-ocean-blue shadow-sm"
+                                        : "border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400"
+                                }`}
+                                title="Widok siatki"
+                            >
+                                <LayoutGrid size={20} />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Content with sidebar */}
             <div className="max-w-7xl mx-auto px-4 py-6 flex gap-6">
-                {/* Sidebar with filters */}
-                {/*<div className="w-64 flex-shrink-0">*/}
-                {/*    <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 sticky top-6">*/}
-                {/*        <h3 className="text-lg font-medium text-gray-900 mb-4">Filtry</h3>*/}
-                {/*        */}
-                {/*        /!* Category filter *!/*/}
-                {/*        <div className="mb-6">*/}
-                {/*            <label className="block text-sm font-medium text-gray-700 mb-2">*/}
-                {/*                Kategoria*/}
-                {/*            </label>*/}
-                {/*            <select*/}
-                {/*                value={tempFilters.componentType}*/}
-                {/*                onChange={(e) => setTempFilters((prev) => ({...prev, componentType: e.target.value as ComponentTypeEnum}))}*/}
-                {/*                className="w-full px-3 py-2 border border-gray-300 rounded-lg"*/}
-                {/*            >*/}
-                {/*                <option value="">Wszystkie kategorie</option>*/}
-                {/*                {componentTypes.map(type => (*/}
-                {/*                    <option key={type} value={type}>*/}
-                {/*                        {type}*/}
-                {/*                    </option>*/}
-                {/*                ))}*/}
-                {/*            </select>*/}
-                {/*        </div>*/}
-
-                {/*         /!*Price filter *!/*/}
-                {/*        <div className="mb-6">*/}
-                {/*            <label className="block text-sm font-medium text-gray-700 mb-2">*/}
-                {/*                Cena: {tempFilters.minPrize} zł – {tempFilters.maxPrize} zł*/}
-                {/*            </label>*/}
-                {/*            <div className="space-y-2">*/}
-                {/*                <input*/}
-                {/*                    type="range"*/}
-                {/*                    min="0"*/}
-                {/*                    max="10000"*/}
-                {/*                    value={tempFilters.minPrize}*/}
-                {/*                    onChange={(e) => setTempFilters(prev => ({ ...prev, minPrize: parseInt(e.target.value) }))}*/}
-                {/*                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"*/}
-                {/*                />*/}
-                {/*                <input*/}
-                {/*                    type="range"*/}
-                {/*                    min="0"*/}
-                {/*                    max="10000"*/}
-                {/*                    value={tempFilters.maxPrize}*/}
-                {/*                    onChange={(e) => setTempFilters(prev => ({ ...prev, maxPrize: parseInt(e.target.value) }))}*/}
-                {/*                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"*/}
-                {/*                />*/}
-                {/*            </div>*/}
-                {/*        </div>*/}
-
-                {/*         /!*Manufacturer filter*!/*/}
-                {/*        <div className="mb-6">*/}
-                {/*            <label className="block text-sm font-medium text-gray-700 mb-2">*/}
-                {/*                Producent*/}
-                {/*            </label>*/}
-                {/*            <select*/}
-                {/*                value={tempFilters.brand}*/}
-                {/*                onChange={(e) => setTempFilters((prev) => ({...prev, brand: e.target.value}) )}*/}
-                {/*                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"*/}
-                {/*            >*/}
-                {/*                <option value="">Wszyscy producenci</option>*/}
-                {/*                {Array.isArray(brands) && brands.map(brand => (*/}
-                {/*                    <option key={brand} value={brand}>{brand}</option>*/}
-                {/*                ))}*/}
-
-                {/*            </select>*/}
-                {/*        </div>*/}
-
-                {/*         /!*Condition filter *!/*/}
-                {/*        <div className="mb-6">*/}
-                {/*            <label className="block text-sm font-medium text-gray-700 mb-2">*/}
-                {/*                Stan*/}
-                {/*            </label>*/}
-                {/*            <select*/}
-                {/*                value={tempFilters.itemCondition}*/}
-                {/*                onChange={(e) => setTempFilters((prev) =>({...prev, itemCondition: e.target.value as ItemConditionEnum}))}*/}
-                {/*                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"*/}
-                {/*            >*/}
-                {/*                <option value="">Wszystkie stany</option>*/}
-                {/*                {componentConditions.map(condition => (*/}
-                {/*                    <option key={condition} value={condition}>*/}
-                {/*                        {condition}*/}
-                {/*                    </option>*/}
-                {/*                ))}*/}
-                {/*            </select>*/}
-                {/*        </div>*/}
-
-                {/*         /!*Shop filter*!/*/}
-                {/*        <div className="mb-6">*/}
-                {/*            <label className="block text-sm font-medium text-gray-700 mb-2">*/}
-                {/*                Sklep*/}
-                {/*            </label>*/}
-                {/*            <select*/}
-                {/*                value={tempFilters.shopName}*/}
-                {/*                onChange={(e) => setTempFilters((prev) => ({...prev, shopName: e.target.value}))}*/}
-                {/*                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"*/}
-                {/*            >*/}
-                {/*                <option value="">Wszystkie sklepy</option>*/}
-                {/*                {shopsNames.map(shop => (*/}
-                {/*                    <option key={shop} value={shop}>*/}
-                {/*                        {shop}*/}
-                {/*                    </option>*/}
-                {/*                ))}*/}
-                {/*            </select>*/}
-                {/*        </div>*/}
-
-                {/*        /!* Clear filters button *!/*/}
-                {/*        <div className="mb-6">*/}
-                {/*            <button*/}
-                {/*                onClick={applyFilters}*/}
-                {/*                className="w-full bg-ocean-dark-blue text-white py-2 rounded-lg hover:bg-ocean-blue transition mb-2"*/}
-                {/*            >*/}
-                {/*                Zastosuj filtry*/}
-                {/*            </button>*/}
-                {/*            <button*/}
-                {/*                onClick={clearFilters}*/}
-                {/*                className="w-full px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"*/}
-                {/*            >*/}
-                {/*                Wyczyść filtry*/}
-                {/*            </button>*/}
-                {/*        </div>*/}
-
-                {/*    </div>*/}
-                {/*</div>*/}
-
-                <OffersFilters chooseComponentTypeParam = {selectedComponentByComputer}/>
-                {/* Main content */}
+                <OffersSideFilters chooseComponentTypeParam = {selectedComponentByComputer}/>
                 <div className="flex-1" >
 
-                    {/* Scroll to Top Button */}
                     {showScrollTop && (
                         <button
                             onClick={scrollToTop}
@@ -245,8 +121,7 @@ function OffersUserPage() {
                             </svg>
                         </button>
                     )}
-                    <OfferUserList offers={offers} isFetching={isFetching} isLoading={isLoadingOffers}/>
-                    {/* Pagination */}
+                    <OfferUserList offers={offers} isRefetching={isRefetching} isFetching={isFetching} isLoading={isLoadingOffers} isError={isError}/>
                     <ReactPaginate
                         breakLabel="..."
                         nextLabel={<RightArrow />}

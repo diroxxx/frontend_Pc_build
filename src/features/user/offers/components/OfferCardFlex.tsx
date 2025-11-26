@@ -7,6 +7,7 @@ import {useUpdateOffersToComputer} from "../../../admin/hooks/useUpdateOffersToC
 import {validateCompatibility} from "../../hooks/validateCompatibility.ts";
 import {ImageOff, Info} from "lucide-react";
 import { CheckCircle, Wrench, AlertTriangle } from "lucide-react";
+import {ShopImageComponent} from "./ShopImageComponent.tsx";
 
 interface Props {
     offer: ComponentOffer;
@@ -57,7 +58,6 @@ const OfferCardFlex: FC<Props> = ({ offer }) => {
                 if (offer.tdp) tags.push(`${offer.tdp}W`);
                 if (offer.boostClock) tags.push(`${offer.boostClock}GHz`);
                 if (offer.integratedGraphics) tags.push(offer.integratedGraphics);
-
                 break;
 
             case "MEMORY":
@@ -189,19 +189,7 @@ const OfferCardFlex: FC<Props> = ({ offer }) => {
                         </div>
 
                         {offer.shopName && (
-                            <img
-                                src={
-                                    offer.shopName.toLowerCase() === "allegro"
-                                        ? "allegro.png"
-                                        : offer.shopName.toLowerCase() === "olx"
-                                            ? "olx.png"
-                                            : offer.shopName.toLowerCase() === "allegrolokalnie"
-                                                ? "Allegro-Lokalnie.png"
-                                                : ""
-                                }
-                                alt={offer.shopName}
-                                className="w-10 h-10 object-contain"
-                            />
+                            <ShopImageComponent shopName={offer.shopName}/>
                         )}
                     </div>
 

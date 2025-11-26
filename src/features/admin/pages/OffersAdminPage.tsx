@@ -8,7 +8,7 @@ import {useAtom, useAtomValue} from "jotai";
 import {offerPageAtom} from "../../../shared/atoms/OfferPageAtom.ts";
 import {offerLeftPanelFiltersAtom} from "../../../shared/atoms/OfferLeftPanelFiltersAtom.ts";
 import {OfferSearchFilters} from "../../../shared/components/OfferSearchFilters.tsx";
-import {OffersFilters} from "../../../shared/components/OffersFilters.tsx";
+import {OffersSideFilters} from "../../../shared/components/OffersSideFilters.tsx";
 
 const OffersAdminPage = () => {
 
@@ -24,7 +24,7 @@ const OffersAdminPage = () => {
         <div className="flex flex-row gap-4 p-4 ">
             <div className=" mr-4 flex flex-col gap-4 w-[300px]">
                 <OfferSearchFilters/>
-                <OffersFilters/>
+                <OffersSideFilters/>
             </div>
 
             <div>

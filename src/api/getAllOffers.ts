@@ -1,7 +1,7 @@
 import customAxios from "../lib/customAxios.tsx";
 import type {ComponentOffer} from "../types/OfferBase.ts";
 
-import type {OfferFiltersType} from "../shared/components/OffersFilters.tsx";
+import type {OfferFiltersType} from "../shared/components/OffersSideFilters.tsx";
 
 export interface OfferResponse {
     offers: ComponentOffer[];

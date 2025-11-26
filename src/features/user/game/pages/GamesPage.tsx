@@ -7,7 +7,7 @@ import { useFpsComponents } from "../hooks/useFpsComponents.ts";
 import type { GameFpsConfigDto } from "../types/GameFpsConfigDto.ts";
 import { resolutionList, graphicsPresetList, technologyList } from "../types/GameFpsConfigDto.ts";
 import { useReccommendedVideo } from "../hooks/useReccommendedVideo.ts";
-
+import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.tsx";
 
 const GamesPage = () => {
     const { data: games, isLoading, isError } = useGetAllGamesApi();
@@ -32,17 +32,9 @@ const isConfigComplete = (config: GameFpsConfigDto | null): config is GameFpsCon
 
 const completeConfig = isConfigComplete(gameFpsConfig) ? gameFpsConfig : null;
 
-const {data: recommendedVideoData, refetch} = useReccommendedVideo(completeConfig || undefined);
+const {data: recommendedVideoData, refetch, isError:videoError,isLoading:videoLoading, isFetching:videoFetching} = useReccommendedVideo(completeConfig || undefined);
 const canSearch = isConfigComplete(gameFpsConfig);
 
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <p className="text-gray-600">Ładowanie gier...</p>
-            </div>
-        );
-    }
 
     if (isError) {
         return (
@@ -190,7 +182,13 @@ return (
                             </div>
 
                             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
-                                {games?.map((game: GameDto) => (
+                                {isLoading ? (
+                                    <LoadingSpinner/>
+                                ) : isError ? (
+                                        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                                            <p className="text-ocean-red">Błąd podczas pobierania gier</p>
+                                        </div>
+                                    ): (games?.map((game: GameDto) => (
                                     <div
                                         key={game.id}
                                         onClick={() => {
@@ -205,21 +203,30 @@ return (
                                     >
                                         <GameCard game={game} />
                                     </div>
-                                ))}
+                                ))
+                                )}
                             </div>
                         </div>
 
-                        {recommendedVideoData ? (
+                        {
+                            videoError ? (
+                                    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                                        <p className="text-ocean-red">Błąd podczas pobierania gier</p>
+                                    </div>
+                                ) : videoLoading ? (
+                                    <LoadingSpinner />
+                            ) : videoFetching ? (
+                                <LoadingSpinner/>
+                                ) :
+                                    recommendedVideoData ? (
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                                 <div className="bg-gradient-to-r from-ocean-blue to-ocean-dark-blue p-4">
                                     <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M8 5v14l11-7z"/>
-                                        </svg>
+                                        <svg className="w-5 h-5" fill="currentColor" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>YouTube</title><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                                         Rekomendowane wideo
                                     </h2>
                                 </div>
-                                
+
                                 <div className="p-4 space-y-4">
                                     <div className="relative aspect-video rounded-lg overflow-hidden shadow-md bg-black">
                                         <iframe
@@ -235,27 +242,25 @@ return (
                                         <h3 className="text-base font-semibold text-midnight-dark line-clamp-2">
                                             {recommendedVideoData.title}
                                         </h3>
-                                        
+
                                         <a
                                             href={`https://www.youtube.com/watch?v=${recommendedVideoData.id}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg font-medium transition-all duration-200 shadow-md hover:shadow-lg"
                                         >
-                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
-                                            </svg>
+                                            <svg className="w-5 h-5" fill="currentColor" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>YouTube</title><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                                             Otwórz w YouTube
                                         </a>
                                     </div>
                                 </div>
-                            </div>
-                        ) : canSearch ? (
+                            </div>)
+                                        : recommendedVideoData === null ? (
+                                            <p>Brak dopasowania</p>
+                                    ) :
+                                        canSearch ? (
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
                                 <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center">
-                                    <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                    </svg>
                                 </div>
                                 <h3 className="text-base font-semibold text-gray-700 mb-1">
                                     Nie znaleziono wideo

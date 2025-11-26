@@ -12,7 +12,7 @@ type OffersFiltersProps = {
     chooseComponentTypeParam?: ComponentTypeEnum;
 };
 
-export const OffersFilters = ({ chooseComponentTypeParam }: OffersFiltersProps) => {
+export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersProps) => {
 
     const [offerLeftPanelFilters, setOfferLeftPanelFilters] = useAtom(offerLeftPanelFiltersAtom);
     const [tempFilters, setTempFilters] = useState<OfferFiltersType>({

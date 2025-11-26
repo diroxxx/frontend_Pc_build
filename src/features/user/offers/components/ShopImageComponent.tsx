@@ -1,11 +1,9 @@
-
-interface ShopeImageProps {
-    shopName: string
+interface ShopImageProps {
+    shopName: string;
+    size?: number;
 }
 
-
-export const ShopeImageComponent = ({shopName}: ShopeImageProps) => {
-
+export const ShopImageComponent = ({shopName, size = 10}: ShopImageProps) => {
     return (
         <img
             src={
@@ -18,7 +16,7 @@ export const ShopeImageComponent = ({shopName}: ShopeImageProps) => {
                             : ""
             }
             alt={shopName}
-            className="w-10 h-10 object-contain"
+            className={`w-${size} h-${size} object-contain`}
         />
     );
 }

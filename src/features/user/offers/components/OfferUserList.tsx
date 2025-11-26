@@ -2,7 +2,7 @@ import type {ComponentOffer} from "../../../../types/OfferBase.ts";
 import type {FC} from "react";
 import OfferCardFlex from "./OfferCardFlex.tsx";
 import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.tsx";
-import {useAtom, useAtomValue} from "jotai";
+import {useAtomValue} from "jotai";
 import {viewModeAtom} from "../atoms/OfferListViewMode.ts";
 import OfferCardGrid from "./OfferCardGrid.tsx";
 
@@ -10,29 +10,37 @@ interface OffersTableProps {
     offers: ComponentOffer[];
     isFetching: boolean;
     isLoading: boolean;
+    isError: boolean;
+    isRefetching: boolean;
 }
 
-const OfferUserList: FC<OffersTableProps> = ({offers, isFetching, isLoading}) => {
+const OfferUserList = ({offers, isLoading, isError, isRefetching}:OffersTableProps) => {
     const viewMode = useAtomValue(viewModeAtom);
 
-     if (isLoading) {
+
+    if (isLoading && (!offers || offers.length === 0)) {
         return (
-            <div className="flex items-center justify-center min-h-[400px]">
-                <div className="text-center">
-                    <LoadingSpinner />
-                    <p className="mt-4 text-midnight-dark text-sm">Ładowanie ofert...</p>
-                </div>
+            <div className="flex justify-center items-center min-h-[400px]">
+                <LoadingSpinner />
             </div>
         );
     }
+    if (isError) {
+        return (
+            <p className="p-4 text-ocean-red">Błąd podczas pobierania danych.</p>
+        )
+    }
+
 
     return (
         <div className="relative">
-            {isFetching && !isLoading && (
+
+            {isRefetching && (
                 <div className="absolute top-3 right-3 z-10">
                     <LoadingSpinner />
                 </div>
             )}
+
             <div
                 className={`${
                     viewMode === "grid"
@@ -48,9 +56,6 @@ const OfferUserList: FC<OffersTableProps> = ({offers, isFetching, isLoading}) =>
                     )
                 )}
             </div>
-
-
-
         </div>
     );
 }
