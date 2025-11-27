@@ -1,9 +1,9 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {updateComputerName} from "../api/updateComputerName.ts";
-import type {ComputerDto} from "../../../types/ComputerDto.ts";
-import {showToast} from "../../../lib/ToastContainer.tsx";
+import type {ComputerDto} from "../../../../types/ComputerDto.ts";
+import {showToast} from "../../../../lib/ToastContainer.tsx";
 import {useAtomValue} from "jotai";
-import {userAtom} from "../../../atomContext/userAtom.tsx";
+import {userAtom} from "../../../../atomContext/userAtom.tsx";
 
 
 export const useUpdateComputerName = () => {
