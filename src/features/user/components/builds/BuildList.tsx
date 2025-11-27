@@ -3,11 +3,11 @@ import type {ComputerDto} from "../../../../types/ComputerDto.ts";
 import {showToast} from "../../../../lib/ToastContainer.tsx";
 import {useAtom, useAtomValue} from "jotai";
 import {userAtom} from "../../../../atomContext/userAtom.tsx";
-import {useDeleteComputer} from "../../hooks/useDeleteComputer.ts";
+import {useDeleteComputer} from "../../computers/hooks/useDeleteComputer.ts";
 import {RemoveIcon} from "../../../../assets/icons/removeIcon.tsx";
 import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
 import { Pencil } from "lucide-react";
-import {useUpdateComputerName} from "../../hooks/updateComputerNameMutation.ts";
+import {useUpdateComputerName} from "../../computers/hooks/updateComputerNameMutation.ts";
 interface BuildListProps {
     computers: ComputerDto[];
     onSelectBuild: (index: number) => void;

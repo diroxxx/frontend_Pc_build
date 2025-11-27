@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Upload as UploadIcon, FileDown as FileDownIcon } from "lucide-react";
+import { Upload as UploadIcon } from "lucide-react";
 import type { ComponentTypeEnum } from "../../../types/BaseItemDto";
 import { postComponentsCsvFile } from "../api/postComponentsCsvFile";
 import { showToast } from "../../../lib/ToastContainer";

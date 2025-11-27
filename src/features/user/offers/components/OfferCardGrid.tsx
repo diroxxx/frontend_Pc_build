@@ -1,7 +1,7 @@
 import {ImageOff, Plus} from "lucide-react";
 import type {ComponentOffer} from "../../../../types/OfferBase.ts";
 import {showToast} from "../../../../lib/ToastContainer.tsx";
-import {validateCompatibility} from "../../hooks/validateCompatibility.ts";
+import {validateCompatibility} from "../../computers/hooks/validateCompatibility.ts";
 import {useAtomValue} from "jotai";
 import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
 import {useUpdateOffersToComputer} from "../../../admin/hooks/useUpdateOffersToComputer.ts";

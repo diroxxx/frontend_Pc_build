@@ -23,14 +23,20 @@ export const AuthRedirect = ({
     const [showForbidden, setShowForbidden] = useState(false);
 
     useEffect(() => {
-        if (!user) return;
+        if (!user) {
+            setShowForbidden(false);
+            setIsRedirecting(false);
+            return;
+        }
 
         if (requiredRole && user.role !== requiredRole) {
             setShowForbidden(true);
+            setIsRedirecting(false);
             return;
         }
 
         if (user && location.pathname !== redirectTo) {
+            setShowForbidden(false);
             setIsRedirecting(true);
             const timer = setTimeout(() => {
                 navigate(redirectTo, { replace: true });
@@ -38,6 +44,9 @@ export const AuthRedirect = ({
 
             return () => clearTimeout(timer);
         }
+
+        setShowForbidden(false);
+        setIsRedirecting(false);
     }, [user, navigate, requiredRole, redirectTo, location.pathname]);
 
     if (showForbidden) {

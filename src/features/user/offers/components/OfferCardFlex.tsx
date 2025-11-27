@@ -4,7 +4,7 @@ import { useAtomValue} from "jotai";
 import {showToast} from "../../../../lib/ToastContainer.tsx";
 import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
 import {useUpdateOffersToComputer} from "../../../admin/hooks/useUpdateOffersToComputer.ts";
-import {validateCompatibility} from "../../hooks/validateCompatibility.ts";
+import {validateCompatibility} from "../../computers/hooks/validateCompatibility.ts";
 import {ImageOff, Info} from "lucide-react";
 import { CheckCircle, Wrench, AlertTriangle } from "lucide-react";
 import {ShopImageComponent} from "./ShopImageComponent.tsx";

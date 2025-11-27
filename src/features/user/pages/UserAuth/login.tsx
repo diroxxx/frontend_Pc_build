@@ -48,7 +48,7 @@ function Login() {
 return (
        <AuthRedirect 
             requiredRole="USER"
-            redirectTo="/" 
+            redirectTo="/login"
             forbiddenRedirectTo="/admin/controlPanel"
         >
             <div className="min-h-screen bg-ocean-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
