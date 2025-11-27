@@ -1,5 +1,5 @@
 import {useQueryClient} from "@tanstack/react-query";
-import {useAtomValue, useSetAtom} from "jotai";
+import { useSetAtom} from "jotai";
 import {setAuthToken} from "../lib/Auth.tsx";
 import {userAtom} from "../atomContext/userAtom.tsx";
 

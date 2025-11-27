@@ -47,7 +47,7 @@ function Login() {
 
 return (
        <AuthRedirect 
-            requiredRole="ADMIN" 
+            requiredRole="USER"
             redirectTo="/" 
             forbiddenRedirectTo="/admin/controlPanel"
         >
