@@ -13,6 +13,8 @@ export const ShopImageComponent = ({shopName, size = 10}: ShopImageProps) => {
                         ? "olx.png"
                         : shopName.toLowerCase() === "allegrolokalnie"
                             ? "Allegro-Lokalnie.png"
+                            : shopName.toLowerCase() === "x-kom"
+                            ? "x-kom.png"
                             : ""
             }
             alt={shopName}
