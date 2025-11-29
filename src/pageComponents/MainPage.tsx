@@ -1,163 +1,103 @@
 import { useNavigate } from "react-router-dom";
 import SidePanelBuilds from "../features/user/computers/components/SidePanelBuilds.tsx";
-import {usePrefetchComputers} from "../hooks/usePrefetchComputers.ts";
+import { usePrefetchComputers } from "../hooks/usePrefetchComputers.ts";
 
 function MainPage() {
     const navigate = useNavigate();
-
-    usePrefetchComputers()
-
+    usePrefetchComputers();
 
     const partnerStores = [
-        {
-            name: "Allegro",
-            logo: "../../allegro.png",
-            website: "https://www.allegro.pl"
-        },
-        {
-            name: "Allegro lokalnie",
-            logo: "../../Allegro-Lokalnie.png",
-            website: "https://allegrolokalnie.pl"
-        },
-        {
-            name: "Olx",
-            logo: "../../olx.png",
-            website: "https://www.olx.pl"
-        }
+        { name: "Allegro", logo: "/allegro.png", website: "https://allegro.pl" },
+        { name: "Allegro Lokalnie", logo: "/Allegro-Lokalnie.png", website: "https://allegrolokalnie.pl" },
+        { name: "OLX", logo: "/olx.png", website: "https://olx.pl" },
+        { name: "X-kom", logo: "/x-kom.png", website: "https://x-kom.pl" },
     ];
 
     return (
-        <div className="bg-gray-100">
-
+        <div className="min-h-screen bg-ocean-white">
             <SidePanelBuilds />
 
-            <div className="flex justify-center gap-8 px-6 py-8">
-                <div
-                    className="flex flex-col items-center  hover:text-ocean-blue transition-colors duration-200 cursor-pointer"
-                    onClick={() => navigate("/offers")}>
-                    <div className="w-20 h-20">
-                        <img
-                            src="/components_mainPage.png"
-                            alt="OffersUserPage"
-                            className="w-full h-full object-cover rounded shadow-md hover:shadow-lg transition-shadow duration-200"
-                        />
-                        <p className="mt-2 text-sm font-medium">Oferty</p>
-                    </div>
-                </div>
+            <div className="pt-24 pb-16 px-6 md:px-12 lg:px-20">
+                <div className="max-w-7xl mx-auto">
+                    <div className="grid md:grid-cols-2 gap-12 items-center">
+                        <div className="order-2 md:order-1">
 
-                <div
-                    className="flex flex-col items-center text-gray-800 hover:text-ocean-blue transition-colors duration-200 cursor-pointer"
-                    onClick={() => navigate("/builds")}>
-                    <div className="w-20 h-20">
-                        <img
-                            src="/build_pc_main.png"
-                            alt="Tools"
-                            className="w-full h-full object-cover rounded shadow-md hover:shadow-lg transition-shadow duration-200"
-                        />
-                        <p className="mt-2 text-sm font-medium">Konfigurator</p>
-                    </div>
-                </div>
+                            <h1 className="text-5xl md:text-6xl font-black text-ocean-dark-blue leading-tight mb-8">
+                                Składasz peceta?
+                                <br />
+                                <span className="text-ocean-blue">Masz tu wszystko.</span>
+                            </h1>
 
-                <div
-                    className="flex flex-col items-center text-gray-800 hover:text-ocean-blue transition-colors duration-200 cursor-pointer"
-                    onClick={() => navigate("/community")}>
-                    <div className="w-20 h-20">
-                        <img
-                            src="/community_main.png"
-                            alt="Community"
-                            className="w-full h-full object-cover rounded shadow-md hover:shadow-lg transition-shadow duration-200"
-                        />
-                        <p className="mt-2 text-sm font-medium">Forum</p>
-                    </div>
-                </div>
+                            <p className="text-xl text-gray-700 mb-10 max-w-xl">
+                                Oferty aktualizowane co chwilę.
+                                Konfigurator, społeczność, gotowe zestawy i testy w grach. Bez ściemy, bez reklamowego bełkotu.
+                            </p>
 
-                <div
-                    className="flex flex-col items-center text-gray-800 hover:text-ocean-blue transition-colors duration-200 cursor-pointer"
-                    onClick={() => navigate("/check-games")}>
-                    <div className="w-20 h-20">
-                        <img
-                            src="/check-games.png"
-                            alt="Check Games"
-                            className="w-full h-full object-cover rounded shadow-md hover:shadow-lg transition-shadow duration-200"
-                        />
-                        <p className="mt-2 text-sm font-medium">Sprawdz gry</p>
-                    </div>
-                </div>
-
-                <div
-                    className="flex flex-col items-center text-gray-800 hover:text-ocean-blue transition-colors duration-200 cursor-pointer"
-                    onClick={() => navigate("/recommendations")}>
-                    <div className="w-20 h-20">
-                        <img
-                            src="/recommendations.png"
-                            alt="Recommendations"
-                            className="w-full h-full object-cover rounded shadow-md hover:shadow-lg transition-shadow duration-200"
-                        />
-                        <p className="mt-2 text-sm font-medium">Rekomendaje</p>
-                    </div>
-                </div>
-            </div>
-
-            <div className="flex flex-col md:flex-row items-stretch justify-center px-6 py-8">
-                <img
-                    src="/pc_photo_mainPage.png"
-                    alt="Komputer"
-                    className="w-full md:w-80 h-auto md:h-full object-cover rounded-l shadow-md"
-                />
-                <div
-                    className="bg-slate-800 text-white p-8 rounded-r w-full md:w-96 text-center flex flex-col justify-center">
-                    <h2 className="text-2xl font-bold mb-4">
-                        Stwórz idealny zestaw komputerowy i dziel się z innymi!
-                    </h2>
-                    <p className="mb-6 text-gray-300">
-                        Dołącz do społeczności, porównuj zestawy, komentuj i ulepszaj sprzęt – wszystko w jednym
-                        miejscu.
-                    </p>
-                    <button
-                        className="bg-ocean-blue hover:bg-ocean-dark-blue text-white font-semibold px-8 py-3 rounded-full transition-colors duration-200">
-                        Sprawdź
-                    </button>
-                </div>
-            </div>
-
-            
-            <div className="bg-white py-12 px-6">
-                <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-8">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                            Monitorowane sklepy
-                        </h2>
-                        <p className="text-gray-600">
-                            Automatycznie zbieramy oferty z popularnych platform sprzedażowych
-                        </p>
-                    </div>
-                    <div className="w-full px-4">
-                        <div className="grid grid-cols-3 md:grid-cols-6 gap-136 w-full">
-                            {partnerStores.map((store, index) => (
-                                <div
-                                    key={index}
-                                    className="group flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
-                                    onClick={() => window.open(store.website, '_blank')}
+                            <div className="flex flex-col sm:flex-row gap-5">
+                                <button
+                                    onClick={() => navigate("/builds")}
+                                    className="px-10 py-5 bg-ocean-blue text-white font-bold text-xl rounded-xl shadow-lg hover:bg-ocean-dark-blue transition-all hover:-translate-y-1"
                                 >
-                                    <div className="w-32 h-20 mb-3 flex items-center justify-center">
-                                        <img
-                                            src={store.logo}
-                                            alt={`${store.name} logo`}
-                                            className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-200"
-                                        />
-                                    </div>
-                                    <p className="text-xs font-medium text-gray-700 text-center">
-                                        {store.name}
-                                    </p>
-                                </div>
-                            ))}
+                                    Złóż swój zestaw
+                                </button>
+
+                                <button
+                                    onClick={() => navigate("/offers")}
+                                    className="px-10 py-5 border-4 border-ocean-blue text-ocean-blue font-bold text-xl rounded-xl bg-white hover:bg-ocean-blue hover:text-white transition-all"
+                                >
+                                    Zobacz aktualne ceny
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="order-1 md:order-2">
+                            <div className="relative">
+                                <img
+                                    src="/pc_photo_mainPage.png"
+                                    alt="Składanie peceta"
+                                    className="relative z-10 rounded-2xl shadow-2xl border-8 border-white"
+                                />
+                            </div>
                         </div>
                     </div>
-                    <div className="text-center mt-8">
-                        <p className="text-sm text-gray-500">
-                            * Oferty aktualizowane są na bieżąco
-                        </p>
+                </div>
+            </div>
+
+            <div className="bg-ocean-dark-blue py-20">
+                <div className="min-h-96 flex flex-col items-center justify-center px-6">
+
+                    <h2 className="text-4xl md:text-5xl font-black text-center text-ocean-white mb-4">
+                        Obsługiwane sklepy
+                    </h2>
+                    <p className="text-ocean-light-blue text-center text-lg mb-12">
+                        kolejne sklepy będą dodawane w przyszłości
+                    </p>
+
+                    <div className="flex justify-center gap-2 max-w-5xl w-full">
+                        {partnerStores.map((store) => (
+                            <a
+                                key={store.name}
+                                href={store.website}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group flex flex-col items-center"
+                            >
+                                <div className="bg-white p-6 rounded-2xl shadow-xl group-hover:shadow-2xl transition-shadow duration-300">
+                                    <img
+                                        src={store.logo}
+                                        alt={store.name}
+                                        className="h-16 object-contain"
+                                    />
+                                </div>
+                                <span className="mt-4 text-ocean-light-blue font-medium group-hover:text-white transition-colors">
+            {store.name}
+          </span>
+                            </a>
+                        ))}
                     </div>
+                    <p className="mt-12 text-center text-ocean-light-blue/70 text-sm">
+                        Aktualizacje automatycznie w ciągu dnia
+                    </p>
                 </div>
             </div>
         </div>

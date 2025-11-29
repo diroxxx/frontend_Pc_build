@@ -107,7 +107,7 @@ return (
             </div>
 
             {/* Navigation - tylko gdy nie jesteśmy na home */}
-            {location.pathname !== "/" && (
+            { (
                 <div className="border-t border-white border-opacity-20">
                     <nav className="px-6 py-3">
                         <div className="flex gap-1 justify-center">

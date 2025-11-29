@@ -13,9 +13,23 @@ interface OffersTableProps {
     isRefetching: boolean;
 }
 
-const OfferUserList = ({offers, isLoading, isError, isRefetching}:OffersTableProps) => {
+const OfferUserList = ({offers, isLoading, isError, isRefetching, isFetching}:OffersTableProps) => {
     const viewMode = useAtomValue(viewModeAtom);
 
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center min-h-[400px]">
+                <LoadingSpinner />
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <p className="p-4 text-ocean-red">Błąd podczas pobierania danych.</p>
+        );
+    }
 
     if (!offers || offers.length === 0) {
         return (
@@ -24,18 +38,13 @@ const OfferUserList = ({offers, isLoading, isError, isRefetching}:OffersTablePro
             </div>
         );
     }
-    if (isError) {
-        return (
-            <p className="p-4 text-ocean-red">Błąd podczas pobierania danych.</p>
-        )
-    }
-
+    const showOverlay = Boolean(isRefetching || isFetching);
 
     return (
         <div className="relative">
 
-            {isRefetching && isLoading && (
-                <div className="flex justify-center items-center min-h-[400px]">
+            {showOverlay && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
                     <LoadingSpinner />
                 </div>
             )}
