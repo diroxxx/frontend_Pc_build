@@ -30,7 +30,7 @@ function MainPage() {
 
                             <p className="text-xl text-gray-700 mb-10 max-w-xl">
                                 Oferty aktualizowane co chwilę.
-                                Konfigurator, społeczność, gotowe zestawy i testy w grach. Bez ściemy, bez reklamowego bełkotu.
+                                Konfigurator, społeczność, testy w grach.s
                             </p>
 
                             <div className="flex flex-col sm:flex-row gap-5">
