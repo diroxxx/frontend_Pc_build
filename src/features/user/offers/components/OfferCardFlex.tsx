@@ -1,24 +1,29 @@
 import type {ComponentOffer} from "../../../../types/OfferBase.ts";
-import {type FC, useState} from "react";
-import { useAtomValue} from "jotai";
+import {useState} from "react";
+import {useAtom, useAtomValue} from "jotai";
 import {showToast} from "../../../../lib/ToastContainer.tsx";
 import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
 import {useUpdateOffersToComputer} from "../../../admin/hooks/useUpdateOffersToComputer.ts";
 import {validateCompatibility} from "../../computers/hooks/validateCompatibility.ts";
-import {ImageOff, Info} from "lucide-react";
-import { CheckCircle, Wrench, AlertTriangle } from "lucide-react";
+import {ImageOff} from "lucide-react";
 import {ShopImageComponent} from "./ShopImageComponent.tsx";
+import {userAtom} from "../../../../atomContext/userAtom.tsx";
 
 interface Props {
     offer: ComponentOffer;
 }
 
-const OfferCardFlex: FC<Props> = ({ offer }) => {
+const OfferCardFlex = ({ offer } : Props) => {
     const selectedComputer = useAtomValue(selectedComputerAtom);
     const updateMutation = useUpdateOffersToComputer();
     const [imgError, setImgError] = useState(false);
+    const [user, setUser] =useAtom(userAtom);
+
+    // const [guestComputers, setGuestComputers] = useAtom(guestComputersAtom);
 
     async function updateComputer() {
+
+
         if (!selectedComputer) {
             showToast.warning("Najpierw wybierz zestaw komputerowy");
             return;
@@ -30,12 +35,12 @@ const OfferCardFlex: FC<Props> = ({ offer }) => {
             return;
         }
 
-        updateMutation.mutate({
-            computerId: selectedComputer.id,
-            offerUrl: offer.websiteUrl,
-        });
+            updateMutation.mutate({
+                computerId: selectedComputer.id,
+                offerUrl: offer.websiteUrl,
+            });
 
-        showToast.success("Podzespół został dodany do zestawu!");
+                showToast.success("Podzespół został dodany do zestawu!");
     }
 
     const renderSpecTags = () => {

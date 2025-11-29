@@ -1,13 +1,13 @@
-import React, {useState} from "react";
+import {useEffect, useState} from "react";
 import type {ComputerDto} from "../../../../types/ComputerDto.ts";
 import {showToast} from "../../../../lib/ToastContainer.tsx";
 import {useAtom, useAtomValue} from "jotai";
 import {userAtom} from "../../../../atomContext/userAtom.tsx";
-import {useDeleteComputer} from "../../computers/hooks/useDeleteComputer.ts";
+import {useDeleteComputer} from "../hooks/useDeleteComputer.ts";
 import {RemoveIcon} from "../../../../assets/icons/removeIcon.tsx";
 import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
 import { Pencil } from "lucide-react";
-import {useUpdateComputerName} from "../../computers/hooks/updateComputerNameMutation.ts";
+import {useUpdateComputerName} from "../hooks/updateComputerNameMutation.ts";
 interface BuildListProps {
     computers: ComputerDto[];
     onSelectBuild: (index: number) => void;
@@ -15,17 +15,20 @@ interface BuildListProps {
     isLoading: boolean;
 }
 
-const BuildList: React.FC<BuildListProps> = ({
+const BuildList = ({
                                                  computers,
                                                  onSelectBuild,
                                                  onCreateNew,
                                                  isLoading,
-                                             }) => {
+                                             } : BuildListProps) => {
 
     const user = useAtomValue(userAtom)
     const deleteMutation = useDeleteComputer(user?.email);
     const [selectedComputer, setSelectedComputer] = useAtom(selectedComputerAtom);
+    const disabled = !user?.email;
+    // console.log("user:", user, "disabled:", disabled);
 
+    
 
     const updateNameMutation = useUpdateComputerName();
 
@@ -64,9 +67,18 @@ const BuildList: React.FC<BuildListProps> = ({
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-midnight-dark">Twoje zestawy</h2>
                 <button
-                    onClick={onCreateNew}
-                    className="bg-gradient-ocean hover:bg-gradient-ocean-hover text-white px-4 py-2 rounded-lg font-medium"
-                >
+                    type="button"
+                    onClick={() => {
+                        if (disabled) {
+                            showToast.warning("Musisz być zalogowany, aby utworzyć zestaw");
+                            return;
+                        }
+                        onCreateNew();
+                    }}
+                    disabled={disabled}
+                    className={`px-4 py-2 rounded-lg font-medium text-white ${
+                        disabled ? "opacity-50 cursor-not-allowed pointer-events-none bg-gray-400" : "bg-gradient-ocean hover:bg-gradient-ocean-hover"
+                    }`}               >
                     + Nowy zestaw
                 </button>
             </div>

@@ -1,14 +1,14 @@
-import Login from "../features/user/pages/UserAuth/login.tsx";
-import MainPage from "../pages/MainPage.tsx";
+import Login from "../features/user/userProfile/pages/login.tsx";
+import MainPage from "../pageComponents/MainPage.tsx";
 import {RoleProtectedRoute} from "./router/RoleProtectedRoute.tsx";
 import {Routes, Route } from "react-router-dom";
-import Unauthorized from "../pages/Unauthorized.tsx";
-import Register from "../features/user/pages/UserAuth/Register.tsx";
+import Unauthorized from "../pageComponents/Unauthorized.tsx";
+import Register from "../features/user/userProfile/pages/Register.tsx";
 import Layout from "../pageComponents/Layout.tsx";
 import OffersUserPage from "../features/user/offers/pages/OffersUserPage.tsx";
-import UserPage from "../features/user/pages/UserPage.tsx";
+import UserPage from "../features/user/userProfile/pages/UserPage.tsx";
 import Community from "../pages/UserPage/Community/community.tsx";
-import Builds from "../features/user/components/builds/Builds.tsx";
+import Builds from "../features/user/computers/pages/Builds.tsx";
 
 import AdminLoginPage from "../features/admin/pages/adminLoginPage.tsx";
 import AdminControlPanel from "../features/admin/pages/adminControlPanel.tsx";

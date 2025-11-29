@@ -91,7 +91,7 @@ const PostImage: React.FC<PostImageUploaderProps> = ({
 
         if (!hasError) {
             setFilesToUpload([]);
-            // ⬅️ Wywołanie callbacka, aby poinformować komponent nadrzędny o sukcesie
+            // Wywołanie callbacka, aby poinformować komponent nadrzędny o sukcesie
             onUploadSuccess(successfulUploads);
         }
     };

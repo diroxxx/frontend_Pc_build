@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import SidePanelBuilds from "../features/user/components/builds/SidePanelBuilds.tsx";
+import SidePanelBuilds from "../features/user/computers/components/SidePanelBuilds.tsx";
 import {usePrefetchComputers} from "../hooks/usePrefetchComputers.ts";
 
 function MainPage() {

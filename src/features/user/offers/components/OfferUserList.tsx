@@ -1,5 +1,4 @@
 import type {ComponentOffer} from "../../../../types/OfferBase.ts";
-import type {FC} from "react";
 import OfferCardFlex from "./OfferCardFlex.tsx";
 import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.tsx";
 import {useAtomValue} from "jotai";
@@ -18,10 +17,10 @@ const OfferUserList = ({offers, isLoading, isError, isRefetching}:OffersTablePro
     const viewMode = useAtomValue(viewModeAtom);
 
 
-    if (isLoading && (!offers || offers.length === 0)) {
+    if (!offers || offers.length === 0) {
         return (
             <div className="flex justify-center items-center min-h-[400px]">
-                <LoadingSpinner />
+                <p>Brak ofert spełniających wybrane kryteria</p>
             </div>
         );
     }
@@ -35,8 +34,8 @@ const OfferUserList = ({offers, isLoading, isError, isRefetching}:OffersTablePro
     return (
         <div className="relative">
 
-            {isRefetching && (
-                <div className="absolute top-3 right-3 z-10">
+            {isRefetching && isLoading && (
+                <div className="flex justify-center items-center min-h-[400px]">
                     <LoadingSpinner />
                 </div>
             )}

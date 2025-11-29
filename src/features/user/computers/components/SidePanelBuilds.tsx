@@ -4,7 +4,7 @@ import type {ComponentOffer} from "../../../../types/OfferBase.ts";
 import {useAtom} from "jotai";
 import {useFetchComputersByEmail} from "../../../../hooks/useFetchComputersByEmail.ts";
 import {userAtom} from "../../../../atomContext/userAtom.tsx";
-import {selectedComputerAtom, selectedComputerIndexAtom} from "../../../../atomContext/computerAtom.tsx";
+import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
 
 export default function SidePanelBuilds() {
     const [hovered, setHovered] = useState(false);

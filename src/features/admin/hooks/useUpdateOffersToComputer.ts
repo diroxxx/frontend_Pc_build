@@ -3,6 +3,7 @@ import {UpdateOffersToComputer} from "../../../api/UpdateOffersToComputer.ts";
 import {useAtomValue} from "jotai";
 import {userAtom} from "../../../atomContext/userAtom.tsx";
 
+
 export const useUpdateOffersToComputer = () => {
     const queryClient = useQueryClient();
     const user = useAtomValue(userAtom);
