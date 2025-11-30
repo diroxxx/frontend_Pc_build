@@ -988,6 +988,74 @@ const formatDate = (date: Date) => {
 
 
 // 🖼️ KOMPONENT POSTGALLERY Z WŁASNĄ LOGIKĄ POBIERANIA ZDJĘĆ
+// interface PostGalleryProps {
+//     postId: number;
+// }
+//
+// const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
+//
+//     const [images, setImages] = useState<PostImageDTO[]>([]);
+//     const [loading, setLoading] = useState(true);
+//     const [error, setError] = useState<string | null>(null);
+//
+//     useEffect(() => {
+//         if (!postId) {
+//             console.warn("PostGallery: postId jest pusty — przerwano fetch.");
+//             setLoading(false);
+//             return;
+//         }
+//
+//         const fetchImages = async () => {
+//             setLoading(true);
+//             try {
+//                 // ⭐ PRZYWRÓCONA LOGIKA POBIERANIA ZDJĘĆ Z BACKENDU
+//                 const response = await customAxios.get<PostImageDTO[]>(`/community/posts/${postId}/images`);
+//                 setImages(response.data);
+//                 console.log(response.data);
+//             } catch (err) {
+//                 console.error("Błąd pobierania listy zdjęć:", err);
+//                 setError("Nie udało się załadować listy zdjęć.");
+//             } finally {
+//                 setLoading(false);
+//             }
+//         };
+//
+//         fetchImages();
+//
+//     }, [postId]);
+//
+//
+//     if (loading) return <p className="text-blue-500 mt-4">Ładowanie zdjęć...</p>;
+//     if (error) return <p style={{ color: 'red' }} className="mt-4">Błąd: {error}</p>;
+//     if (images.length === 0) return <p className="text-gray-500 mt-4 italic">Brak zdjęć do wyświetlenia.</p>;
+//
+//
+//     return (
+//         <div className="mt-6 border-t pt-6">
+//             <h3 className="text-xl font-bold text-gray-800 mb-4">Zdjęcia:</h3>
+//             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+//                 {images.map((img) => (
+//                     <div
+//                         key={img.id}
+//                         className="relative overflow-hidden rounded-lg shadow-md border border-gray-200 cursor-pointer group"
+//                     >
+//                         <img
+//                             src={img.imageUrl}
+//                             alt={img.filename}
+//                             className="w-full h-40 object-cover transition duration-300 group-hover:opacity-90"
+//                             onError={(e) => {
+//                                 e.currentTarget.src = 'https://placehold.co/300x300?text=Błąd+Ładowania';
+//                             }}
+//                         />
+//                         <div className="absolute inset-x-0 bottom-0 bg-black bg-opacity-50 text-white text-xs p-1 truncate">
+//                             {img.filename}
+//                         </div>
+//                     </div>
+//                 ))}
+//             </div>
+//         </div>
+//     );
+// };
 interface PostGalleryProps {
     postId: number;
 }
@@ -1008,10 +1076,11 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
         const fetchImages = async () => {
             setLoading(true);
             try {
-                // ⭐ PRZYWRÓCONA LOGIKA POBIERANIA ZDJĘĆ Z BACKENDU
-                const response = await customAxios.get<PostImageDTO[]>(`/community/posts/${postId}/images`);
+                const response = await customAxios.get<PostImageDTO[]>(
+                    `/community/posts/${postId}/images`
+                );
+
                 setImages(response.data);
-                console.log(response.data);
             } catch (err) {
                 console.error("Błąd pobierania listy zdjęć:", err);
                 setError("Nie udało się załadować listy zdjęć.");
@@ -1021,32 +1090,34 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
         };
 
         fetchImages();
-
     }, [postId]);
 
 
     if (loading) return <p className="text-blue-500 mt-4">Ładowanie zdjęć...</p>;
-    if (error) return <p style={{ color: 'red' }} className="mt-4">Błąd: {error}</p>;
+    if (error) return <p className="text-red-500 mt-4">{error}</p>;
     if (images.length === 0) return <p className="text-gray-500 mt-4 italic">Brak zdjęć do wyświetlenia.</p>;
 
 
     return (
         <div className="mt-6 border-t pt-6">
             <h3 className="text-xl font-bold text-gray-800 mb-4">Zdjęcia:</h3>
+
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {images.map((img) => (
                     <div
                         key={img.id}
-                        className="relative overflow-hidden rounded-lg shadow-md border border-gray-200 cursor-pointer group"
+                        className="relative overflow-hidden rounded-lg shadow-md border border-gray-200"
                     >
                         <img
-                            src={img.imageUrl}
+                            src={img.imageUrl}                    // ⭐ najważniejsze
                             alt={img.filename}
-                            className="w-full h-40 object-cover transition duration-300 group-hover:opacity-90"
+                            className="w-full h-40 object-cover"
                             onError={(e) => {
-                                e.currentTarget.src = 'https://placehold.co/300x300?text=Błąd+Ładowania';
+                                e.currentTarget.src =
+                                    "https://placehold.co/300x300?text=Błąd+ładowania";
                             }}
                         />
+
                         <div className="absolute inset-x-0 bottom-0 bg-black bg-opacity-50 text-white text-xs p-1 truncate">
                             {img.filename}
                         </div>
