@@ -22,7 +22,7 @@ function Register() {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        
+
         if (!validateAllFields()) {
             return;
         }
@@ -132,7 +132,9 @@ return (
                         <span className="text-sm text-gray-600">
                             Masz już konto?{' '}
                             <a
-                                href="/src/features/user/userProfile/pages/login"
+                                href="/login"
+
+
                                 className="font-medium text-ocean-blue hover:text-ocean-dark-blue transition-colors duration-200"
                             >
                                 Zaloguj się
@@ -142,7 +144,7 @@ return (
                 </div>
                 <div className="text-center mt-6">
                     <a
-                        href="/public"
+                        href="/"
                         className="text-sm text-ocean-blue hover:text-ocean-dark-blue transition-colors duration-200"
                     >
                         Wróć na strone główną
