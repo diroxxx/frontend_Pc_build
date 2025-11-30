@@ -4,12 +4,13 @@ import {selectedCategoryAtom} from '../../../../atomContext/offerAtom.tsx';
 import {userAtom} from "../../../../atomContext/userAtom.tsx";
 import {useFetchComputersByEmail} from "../../../../hooks/useFetchComputersByEmail.ts";
 import {useEffect} from "react";
-import BuildList from "./BuildList.tsx";
-import BuildConfiguration from "./BuildConfiguration.tsx";
+import BuildList from "../components/BuildList.tsx";
+import BuildConfiguration from "../components/BuildConfiguration.tsx";
 import {useSaveComputerByUserEmail} from "../../../../hooks/useSaveComputersByUserEmail.ts";
 import type {ComputerDto} from "../../../../types/ComputerDto.ts";
 import  {ComponentTypeEnum} from "../../../../types/BaseItemDto.ts";
 import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
+import {showToast} from "../../../../lib/ToastContainer.tsx";
 
 
 export default function Builds() {
@@ -55,7 +56,10 @@ export default function Builds() {
 
     const handleCreateNewBuild = () => {
 
-        if (!user?.email) return;
+        if (!user?.email){
+            // showToast.error()
+            return;
+        }
 
         const nextNumber = fetchedComputers.length + 1;
 

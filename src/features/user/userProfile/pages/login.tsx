@@ -48,7 +48,7 @@ function Login() {
 return (
        <AuthRedirect 
             requiredRole="USER"
-            redirectTo="/" 
+            redirectTo="/login"
             forbiddenRedirectTo="/admin/controlPanel"
         >
             <div className="min-h-screen bg-ocean-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -129,7 +129,7 @@ return (
                         <span className="text-sm text-gray-600">
                             Nie masz jeszcze konta?{' '}
                             <a
-                                href="/register"
+                                href="/src/features/user/userProfile/pages/Register"
                                 className="font-medium text-ocean-blue hover:text-ocean-dark-blue transition-colors duration-200"
                             >
                                 Zarejestruj się

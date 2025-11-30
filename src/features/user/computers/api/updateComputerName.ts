@@ -1,4 +1,4 @@
-import customAxios from "../../../lib/customAxios.tsx";
+import customAxios from "../../../../lib/customAxios.tsx";
 
 export const updateComputerName = async (name: string, computerId: number ) => {
 

@@ -48,9 +48,9 @@ const AdminLoginPage = () => {
     return (
 
         <AuthRedirect 
-            requiredRole="USER" 
+            requiredRole="ADMIN"
             redirectTo="/admin/controlPanel"
-            forbiddenRedirectTo="/"
+            forbiddenRedirectTo="/login"
         >
             <div className="min-h-screen bg-ocean-white font-sans">
              <div className="bg-ocean-dark-blue text-white py-12 mb-8">

@@ -75,7 +75,7 @@ const Community: React.FC = () => {
     const [filter, setFilter] = useState<"oldest" | "newest">("newest");
     const [isCreatingPost, setIsCreatingPost] = useState(false);
 
-    // ⭐ NOWY STAN: Przechowuje obiekt posta zwrócony po pomyślnym utworzeniu (krok 1)
+    // NOWY STAN: Przechowuje obiekt posta zwrócony po pomyślnym utworzeniu (krok 1)
     const [newlyCreatedPost, setNewlyCreatedPost] = useState<Post | null>(null);
 
     const [user] = useAtom(userAtom);
@@ -93,7 +93,7 @@ const Community: React.FC = () => {
 
     const fetchPosts = async () => {
         try {
-            // ⭐ UWAGA: Jeśli serwer obsługuje filtrowanie, dodaj selectedFilterCategoryId do zapytania
+            // UWAGA: Jeśli serwer obsługuje filtrowanie, dodaj selectedFilterCategoryId do zapytania
             const endpoint = selectedFilterCategoryId && selectedFilterCategoryId !== 'all'
                 ? `community/byCategory/${selectedFilterCategoryId}`
                 : `community/`;
@@ -157,7 +157,7 @@ const Community: React.FC = () => {
     };
 
     /**
-     * ⭐ ZMODYFIKOWANA FUNKCJA: Obsługuje tylko tworzenie posta (tekst)
+     * ZMODYFIKOWANA FUNKCJA: Obsługuje tylko tworzenie posta (tekst)
      */
     const handleCreatePostSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -186,7 +186,7 @@ const Community: React.FC = () => {
             const createdPost = response.data;
 
             setPostStatus(`Sukces! Post został utworzony.`);
-            // ⭐ Krok 1 zakończony - przejdź do kroku 2 (ładowanie zdjęć)
+            // Krok 1 zakończony - przejdź do kroku 2 (ładowanie zdjęć)
             setNewlyCreatedPost(createdPost);
 
         } catch (err: any) {
@@ -218,7 +218,7 @@ const Community: React.FC = () => {
         if (formLoading) return <div className="p-6 text-center">Ładowanie formularza...</div>;
         if (formError) return <div className="p-6 text-center text-red-600">Błąd: {formError}</div>;
 
-        // ⭐ WIDOK ŁADOWANIA ZDJĘĆ (Krok 2)
+        // WIDOK ŁADOWANIA ZDJĘĆ (Krok 2)
         if (newlyCreatedPost) {
             return (
                 <div className="p-6 bg-gray-100 min-h-screen">
@@ -365,7 +365,7 @@ const Community: React.FC = () => {
 
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
-            <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Forum Społeczności 💻</h1>
+            <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Forum Społeczności</h1>
 
             <div className="flex justify-center items-center mb-6 space-x-4">
                 <select

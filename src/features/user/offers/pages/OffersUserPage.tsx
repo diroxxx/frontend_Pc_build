@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import SidePanelBuilds from '../../components/builds/SidePanelBuilds.tsx';
+import SidePanelBuilds from '../../computers/components/SidePanelBuilds.tsx';
 import {useFetchOffers} from "../../../../shared/useFetchOffers.ts";
 import {ComponentTypeEnum} from "../../../../types/BaseItemDto.ts";
 import OfferUserList from "../components/OfferUserList.tsx";
@@ -144,5 +144,4 @@ function OffersUserPage() {
         </div>
     );
 }
-
 export default OffersUserPage;

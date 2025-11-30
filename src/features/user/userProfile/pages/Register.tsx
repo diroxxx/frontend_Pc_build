@@ -132,7 +132,7 @@ return (
                         <span className="text-sm text-gray-600">
                             Masz już konto?{' '}
                             <a
-                                href="/login"
+                                href="/src/features/user/userProfile/pages/login"
                                 className="font-medium text-ocean-blue hover:text-ocean-dark-blue transition-colors duration-200"
                             >
                                 Zaloguj się

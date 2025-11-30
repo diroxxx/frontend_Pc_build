@@ -1,6 +1,6 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {deleteComputerById} from "../api/deleteComputerById.ts";
-import {showToast} from "../../../lib/ToastContainer.tsx";
+import {showToast} from "../../../../lib/ToastContainer.tsx";
 
 export const useDeleteComputer = (userEmail?: string) => {
     const queryClient = useQueryClient();
