@@ -15,13 +15,14 @@ interface PostImageUploaderProps {
     initialImages: PostImageDTO[]; // Aktualnie załadowane zdjęcia (stan z PostDetails)
     MAX_IMAGES?: number; // Opcjonalny limit (domyślnie 5)
     onUploadSuccess: (newImages: PostImageDTO[]) => void; // Callback po udanym przesłaniu
+
 }
 
 // --- KOMPONENT ---
 const PostImage: React.FC<PostImageUploaderProps> = ({
                                                                  postId,
                                                                  initialImages,
-                                                                 MAX_IMAGES = 5,
+                                                                 MAX_IMAGES = 10,
                                                                  onUploadSuccess
                                                              }) => {
 

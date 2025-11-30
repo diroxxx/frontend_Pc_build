@@ -6,6 +6,7 @@ import PostDetails from "./PostDetails.tsx";
 import PostImage from "./PostImage.tsx";
 import { FaArrowLeft } from 'react-icons/fa';
 import PaginatedList from "./PaginatedPosts.tsx";
+import { parseDateArray, formatDate, timeAgo } from "./PostTime.tsx";
 
 
 interface User {
@@ -28,44 +29,13 @@ interface Post {
     user: User;
     createdAt: number[];
     category?: Category;
-    images: PostImageDTO[]; // Dodano listę zdjęć
+    images: PostImageDTO[];
 }
 
 interface Category {
     id: number;
     name: string;
 }
-
-const parseDateArray = (dateArray: number[] | undefined) => {
-    if (!dateArray || dateArray.length < 6) return new Date();
-    const [year, month, day, hour, minute, second] = dateArray;
-    return new Date(year, month - 1, day, hour, minute, second);
-};
-
-const formatDate = (date: Date) => {
-    return date.toLocaleString("pl-PL", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
-};
-
-const timeAgo = (date: Date) => {
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMinutes = Math.floor(diffMs / 60000);
-
-    if (diffMinutes < 1) return "przed chwilą";
-    if (diffMinutes < 60) return `${diffMinutes} min. temu`;
-    const diffHours = Math.floor(diffMinutes / 60);
-    if (diffHours < 24) return `${diffHours} godz. temu`;
-    const diffDays = Math.floor(diffHours / 24);
-    if (diffDays < 30) return `${diffDays} dni temu`;
-
-    return date.toLocaleDateString("pl-PL");
-};
 
 
 
@@ -102,7 +72,7 @@ const Community: React.FC = () => {
             setPosts(response.data);
         } catch (error) {
             console.error("Fetch posts error:", error);
-            setPosts([]); // Ustaw na pustą tablicę w przypadku błędu
+            setPosts([]);
         }
     };
 
@@ -118,7 +88,7 @@ const Community: React.FC = () => {
 
                 if (defaultCategory) {
                     setCategoryId(defaultCategory.id.toString());
-                } else if (!categoryId) { // Ustaw domyślną tylko jeśli nie jest ustawiona
+                } else if (!categoryId) {
                     setCategoryId(data[0].id.toString());
                 }
             }
@@ -134,7 +104,6 @@ const Community: React.FC = () => {
     useEffect(() => {
         fetchPosts();
         fetchCategories();
-        // Wywołaj fetchPosts ponownie, gdy zmieni się filtr kategorii
     }, [selectedFilterCategoryId]);
 
 
@@ -142,6 +111,7 @@ const Community: React.FC = () => {
     const getSortedPosts = () => {
         // Logika sortowania
         return [...posts].sort((a, b) => {
+            // ⭐ Użycie zaimportowanej funkcji
             const dateA = parseDateArray(a.createdAt).getTime();
             const dateB = parseDateArray(b.createdAt).getTime();
             return filter === "oldest" ? dateA - dateB : dateB - dateA;
@@ -153,7 +123,7 @@ const Community: React.FC = () => {
      */
     const handleBackToList = () => {
         setSelectedPost(null);
-        fetchPosts(); // Odśwież posty na wypadek zmian (np. nowych komentarzy)
+        fetchPosts();
     };
 
     /**
@@ -200,7 +170,6 @@ const Community: React.FC = () => {
         }
     };
 
-    // --- WARUNKOWE RENDEROWANIE WIDOKÓW ---
 
     // 1. Widok Szczegółów Posta
     if (selectedPost) {
@@ -238,7 +207,6 @@ const Community: React.FC = () => {
                         <PostImage
                             postId={newlyCreatedPost.id}
                             // Przekaż puste zdjęcia, bo dopiero je dodajemy.
-                            // W przypadku edycji, pobieralibyśmy je z newlyCreatedPost.images
                             initialImages={newlyCreatedPost.images || []}
                             onUploadSuccess={(uploadedImages) => {
                                 // Po pomyślnym przesłaniu wszystkich zdjęć
@@ -290,7 +258,6 @@ const Community: React.FC = () => {
                         setPostStatus(null);
                         setTitle('');
                         setContent('');
-                        // categoryId pozostawiamy domyślne/wybrane
                     }}
                 >
                     <FaArrowLeft className="mr-2"/> Wróć do listy postów
@@ -307,7 +274,7 @@ const Community: React.FC = () => {
                     <h2 className="text-2xl font-bold mb-4">Utwórz Nowy Post 📝</h2>
 
                     <p className="text-sm text-gray-500 mb-4">
-                        Tworzysz jako: **{user?.nickname || 'Niezalogowany'}**
+                        Tworzysz jako: {user?.nickname || 'Niezalogowany'}
                     </p>
 
                     <form onSubmit={handleCreatePostSubmit}>
@@ -376,86 +343,10 @@ const Community: React.FC = () => {
         );
     }
 
-    // 3. Widok Listy Postów (domyślny)
+
+
     const sortedPosts = getSortedPosts();
 
-
-//     return (
-//         <div className="p-6 bg-gray-100 min-h-screen">
-//             <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Forum Społeczności</h1>
-//
-//             <div className="flex justify-center items-center mb-6 space-x-4">
-//                 <select
-//                     className="border border-gray-300 rounded px-4 py-2 shadow-sm"
-//                     value={selectedFilterCategoryId || 'all'}
-//                     onChange={(e) => setSelectedFilterCategoryId(e.target.value)}
-//                 >
-//                     <option value="all">Wszystkie kategorie</option>
-//                     {categories.map((cat) => (
-//                         <option key={cat.id} value={cat.id.toString()}>
-//                             {cat.name}
-//                         </option>
-//                     ))}
-//                 </select>
-//                 <button
-//                     className={`px-4 py-2 rounded shadow-md transition duration-150 ${isAuthenticated ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}
-//                     onClick={() => isAuthenticated && setIsCreatingPost(true)}
-//                     disabled={!isAuthenticated}
-//                     title={isAuthenticated ? "Utwórz nowy post" : "Zaloguj się, aby tworzyć posty"}
-//                 >
-//                     + Utwórz Post
-//                 </button>
-//
-//
-//                 <select
-//                     className="border border-gray-300 rounded px-4 py-2 shadow-sm"
-//                     value={filter}
-//                     onChange={(e) => setFilter(e.target.value as "oldest" | "newest")}
-//                 >
-//                     <option value="newest">Najnowsze</option>
-//                     <option value="oldest">Najstarsze</option>
-//                 </select>
-//             </div>
-//
-//             <ul className="space-y-4">
-//                 {posts.length === 0 ? (
-//                     <p className="text-center text-gray-500">Brak postów do wyświetlenia w tej kategorii.</p>
-//                 ) : (
-//                     sortedPosts.map((post) => {
-//                         const date = parseDateArray(post.createdAt);
-//                         const categoryName = post.category?.name || 'Brak kategorii';
-//
-//                         return (
-//                             <li
-//                                 key={post.id}
-//                                 onClick={() => setSelectedPost(post)}
-//                                 className="cursor-pointer bg-white p-4 rounded shadow-lg hover:shadow-xl transition duration-200 flex justify-between items-start border-l-4 border-blue-500"
-//                             >
-//                                 <div className="flex-1 min-w-0 pr-4">
-//                                     <h3 className="text-xl font-bold text-gray-800 truncate">
-//                                         [{categoryName}] {post.title}
-//                                     </h3>
-//
-//                                     <p className="text-gray-600 mt-1">
-//                                         {post.content.substring(0, 100)}
-//                                         {post.content.length > 100 ? '...' : ''}
-//                                     </p>
-//                                     <p className="text-gray-500 text-sm mt-2">
-//                                         Autor: **{post.user.username}**
-//                                     </p>
-//                                 </div>
-//                                 <div className="text-gray-400 text-sm text-right flex-shrink-0 pt-1">
-//                                     <span className="block">{formatDate(date)}</span>
-//                                     <span className="block text-xs">({timeAgo(date)})</span>
-//                                 </div>
-//                             </li>
-//                         );
-//                     })
-//                 )}
-//             </ul>
-//         </div>
-//     );
-// };
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
             <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Forum Społeczności</h1>
@@ -500,8 +391,9 @@ const Community: React.FC = () => {
             ) : (
                 <PaginatedList
                     items={sortedPosts}
-                    itemsPerPage={12} // liczba postów na stronę
+                    itemsPerPage={12}
                     renderItem={(post) => {
+                        // ⭐ Użycie zaimportowanych funkcji
                         const date = parseDateArray(post.createdAt);
                         const categoryName = post.category?.name || 'Brak kategorii';
 
@@ -512,16 +404,26 @@ const Community: React.FC = () => {
                                 className="cursor-pointer bg-white p-4 rounded shadow-lg hover:shadow-xl transition duration-200 flex justify-between items-start border-l-4 border-blue-500"
                             >
                                 <div className="flex-1 min-w-0 pr-4">
-                                    <h3 className="text-xl font-bold text-gray-800 truncate">
-                                        [{categoryName}] {post.title}
-                                    </h3>
+                                    {/* ⭐ ZMODYFIKOWANY NAGŁÓWEK POSTA ⭐ */}
+                                    <div className="flex items-center mb-2">
+                                        {/* Ramka Kategori: Używam koloru teal-500, który jest zbliżony do turkusu z obrazka */}
+                                        <span className="inline-block bg-teal-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md">
+                                            {categoryName}
+                                        </span>
+
+                                        {/* Tytuł Posta */}
+                                        <h3 className="text-xl font-bold text-gray-800 truncate">
+                                            {post.title}
+                                        </h3>
+                                    </div>
+                                    {/* KONIEC ZMODYFIKOWANEGO NAGŁÓWKA */}
 
                                     <p className="text-gray-600 mt-1">
                                         {post.content.substring(0, 100)}
                                         {post.content.length > 100 ? '...' : ''}
                                     </p>
                                     <p className="text-gray-500 text-sm mt-2">
-                                        Autor: **{post.user.username}**
+                                        Autor: <strong className="text-gray-900">{post.user.username}</strong>
                                     </p>
                                 </div>
                                 <div className="text-gray-400 text-sm text-right flex-shrink-0 pt-1">
