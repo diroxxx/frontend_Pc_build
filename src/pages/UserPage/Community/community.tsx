@@ -3,14 +3,15 @@ import { useAtom } from "jotai";
 import { userAtom } from "../../../atomContext/userAtom.tsx";
 import customAxios from "../../../lib/customAxios.tsx";
 import PostDetails from "./PostDetails.tsx";
-import PostImage from "./PostImage.tsx"; // Import nowego komponentu do ładowania zdjęć
+import PostImage from "./PostImage.tsx";
 import { FaArrowLeft } from 'react-icons/fa';
+import PaginatedList from "./PaginatedPosts.tsx";
 
 
 interface User {
     id: number;
     username: string;
-    nickname: string; // Dodano nickname dla ułatwienia
+    nickname: string;
 }
 
 interface PostImageDTO {
@@ -93,7 +94,6 @@ const Community: React.FC = () => {
 
     const fetchPosts = async () => {
         try {
-            // UWAGA: Jeśli serwer obsługuje filtrowanie, dodaj selectedFilterCategoryId do zapytania
             const endpoint = selectedFilterCategoryId && selectedFilterCategoryId !== 'all'
                 ? `community/byCategory/${selectedFilterCategoryId}`
                 : `community/`;
@@ -214,7 +214,8 @@ const Community: React.FC = () => {
 
     // 2. Widok Formularza Tworzenia Posta / Ładowania Zdjęć (Nowa implementacja)
     if (isCreatingPost) {
-        if (!isAuthenticated) return <div className="p-6 text-center text-red-600">Musisz być zalogowany, aby tworzyć posty!</div>;
+        if (!isAuthenticated) return <div className="p-6 text-center text-red-600">Musisz być zalogowany, aby tworzyć
+            posty!</div>;
         if (formLoading) return <div className="p-6 text-center">Ładowanie formularza...</div>;
         if (formError) return <div className="p-6 text-center text-red-600">Błąd: {formError}</div>;
 
@@ -222,9 +223,17 @@ const Community: React.FC = () => {
         if (newlyCreatedPost) {
             return (
                 <div className="p-6 bg-gray-100 min-h-screen">
-                    <div style={{ maxWidth: '600px', margin: '50px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px', background: 'white' }}>
+                    <div style={{
+                        maxWidth: '600px',
+                        margin: '50px auto',
+                        padding: '20px',
+                        border: '1px solid #ccc',
+                        borderRadius: '8px',
+                        background: 'white'
+                    }}>
                         <h2 className="text-3xl font-bold mb-4 text-green-600">Post Opublikowany! 🎉</h2>
-                        <p className="mb-6 text-gray-700">Teraz możesz opcjonalnie dodać zdjęcia do postu: **{newlyCreatedPost.title}**</p>
+                        <p className="mb-6 text-gray-700">Teraz możesz opcjonalnie dodać zdjęcia do postu:
+                            **{newlyCreatedPost.title}**</p>
 
                         <PostImage
                             postId={newlyCreatedPost.id}
@@ -287,7 +296,14 @@ const Community: React.FC = () => {
                     <FaArrowLeft className="mr-2"/> Wróć do listy postów
                 </button>
 
-                <div style={{ maxWidth: '600px', margin: '50px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px', background: 'white' }}>
+                <div style={{
+                    maxWidth: '600px',
+                    margin: '50px auto',
+                    padding: '20px',
+                    border: '1px solid #ccc',
+                    borderRadius: '8px',
+                    background: 'white'
+                }}>
                     <h2 className="text-2xl font-bold mb-4">Utwórz Nowy Post 📝</h2>
 
                     <p className="text-sm text-gray-500 mb-4">
@@ -329,7 +345,8 @@ const Community: React.FC = () => {
 
                         {/* Pole Treści */}
                         <div>
-                            <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">Treść:</label>
+                            <label htmlFor="content"
+                                   className="block text-sm font-medium text-gray-700 mb-1">Treść:</label>
                             <textarea
                                 id="content"
                                 value={content}
@@ -363,10 +380,87 @@ const Community: React.FC = () => {
     const sortedPosts = getSortedPosts();
 
 
+//     return (
+//         <div className="p-6 bg-gray-100 min-h-screen">
+//             <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Forum Społeczności</h1>
+//
+//             <div className="flex justify-center items-center mb-6 space-x-4">
+//                 <select
+//                     className="border border-gray-300 rounded px-4 py-2 shadow-sm"
+//                     value={selectedFilterCategoryId || 'all'}
+//                     onChange={(e) => setSelectedFilterCategoryId(e.target.value)}
+//                 >
+//                     <option value="all">Wszystkie kategorie</option>
+//                     {categories.map((cat) => (
+//                         <option key={cat.id} value={cat.id.toString()}>
+//                             {cat.name}
+//                         </option>
+//                     ))}
+//                 </select>
+//                 <button
+//                     className={`px-4 py-2 rounded shadow-md transition duration-150 ${isAuthenticated ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}
+//                     onClick={() => isAuthenticated && setIsCreatingPost(true)}
+//                     disabled={!isAuthenticated}
+//                     title={isAuthenticated ? "Utwórz nowy post" : "Zaloguj się, aby tworzyć posty"}
+//                 >
+//                     + Utwórz Post
+//                 </button>
+//
+//
+//                 <select
+//                     className="border border-gray-300 rounded px-4 py-2 shadow-sm"
+//                     value={filter}
+//                     onChange={(e) => setFilter(e.target.value as "oldest" | "newest")}
+//                 >
+//                     <option value="newest">Najnowsze</option>
+//                     <option value="oldest">Najstarsze</option>
+//                 </select>
+//             </div>
+//
+//             <ul className="space-y-4">
+//                 {posts.length === 0 ? (
+//                     <p className="text-center text-gray-500">Brak postów do wyświetlenia w tej kategorii.</p>
+//                 ) : (
+//                     sortedPosts.map((post) => {
+//                         const date = parseDateArray(post.createdAt);
+//                         const categoryName = post.category?.name || 'Brak kategorii';
+//
+//                         return (
+//                             <li
+//                                 key={post.id}
+//                                 onClick={() => setSelectedPost(post)}
+//                                 className="cursor-pointer bg-white p-4 rounded shadow-lg hover:shadow-xl transition duration-200 flex justify-between items-start border-l-4 border-blue-500"
+//                             >
+//                                 <div className="flex-1 min-w-0 pr-4">
+//                                     <h3 className="text-xl font-bold text-gray-800 truncate">
+//                                         [{categoryName}] {post.title}
+//                                     </h3>
+//
+//                                     <p className="text-gray-600 mt-1">
+//                                         {post.content.substring(0, 100)}
+//                                         {post.content.length > 100 ? '...' : ''}
+//                                     </p>
+//                                     <p className="text-gray-500 text-sm mt-2">
+//                                         Autor: **{post.user.username}**
+//                                     </p>
+//                                 </div>
+//                                 <div className="text-gray-400 text-sm text-right flex-shrink-0 pt-1">
+//                                     <span className="block">{formatDate(date)}</span>
+//                                     <span className="block text-xs">({timeAgo(date)})</span>
+//                                 </div>
+//                             </li>
+//                         );
+//                     })
+//                 )}
+//             </ul>
+//         </div>
+//     );
+// };
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
             <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Forum Społeczności</h1>
 
+            {/* Filtry i przycisk dodawania posta */}
             <div className="flex justify-center items-center mb-6 space-x-4">
                 <select
                     className="border border-gray-300 rounded px-4 py-2 shadow-sm"
@@ -380,6 +474,7 @@ const Community: React.FC = () => {
                         </option>
                     ))}
                 </select>
+
                 <button
                     className={`px-4 py-2 rounded shadow-md transition duration-150 ${isAuthenticated ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}
                     onClick={() => isAuthenticated && setIsCreatingPost(true)}
@@ -388,7 +483,6 @@ const Community: React.FC = () => {
                 >
                     + Utwórz Post
                 </button>
-
 
                 <select
                     className="border border-gray-300 rounded px-4 py-2 shadow-sm"
@@ -400,11 +494,14 @@ const Community: React.FC = () => {
                 </select>
             </div>
 
-            <ul className="space-y-4">
-                {posts.length === 0 ? (
-                    <p className="text-center text-gray-500">Brak postów do wyświetlenia w tej kategorii.</p>
-                ) : (
-                    sortedPosts.map((post) => {
+            {/* Lista postów z paginacją */}
+            {posts.length === 0 ? (
+                <p className="text-center text-gray-500">Brak postów do wyświetlenia w tej kategorii.</p>
+            ) : (
+                <PaginatedList
+                    items={sortedPosts}
+                    itemsPerPage={12} // liczba postów na stronę
+                    renderItem={(post) => {
                         const date = parseDateArray(post.createdAt);
                         const categoryName = post.category?.name || 'Brak kategorii';
 
@@ -433,11 +530,11 @@ const Community: React.FC = () => {
                                 </div>
                             </li>
                         );
-                    })
-                )}
-            </ul>
+                    }}
+                />
+            )}
         </div>
     );
-};
+}
 
 export default Community;

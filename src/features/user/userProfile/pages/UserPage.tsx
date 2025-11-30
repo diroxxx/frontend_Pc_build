@@ -474,7 +474,7 @@ function UserPage() {
                                         <p className="text-gray-700 mt-1">{post.content}</p>
                                         {post.category?.name && (
                                             <p className="text-gray-400 text-sm mt-2">
-                                                Category: {post.category.name}
+                                                Kategoria: {post.category.name}
                                             </p>
                                         )}
                                     </div>
