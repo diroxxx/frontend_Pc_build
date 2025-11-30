@@ -176,7 +176,10 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     const [isEditing, setIsEditing] = useState(false);
     // Stan do przechowywania aktualnej treści posta (aby odświeżyć widok po edycji)
     const [currentContent, setCurrentContent] = useState(post.content);
-
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    const [toastMessage, setToastMessage] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+    const closeToast = () => setToastMessage(null);
 
     const [user] = useAtom(userAtom);
     const isAuthor = user && user.nickname === post.user.username;
@@ -195,6 +198,24 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
             setLoadingComments(false);
         }
     };
+    useEffect(() => {
+        // Przewiń okno na samą górę, gdy komponent się montuje
+        window.scrollTo(0, 0);
+    }, [post.id]); // Uruchamiamy za każdym razem, gdy zmienia się post (dla pewności)
+
+    // ⭐ HAK ZARZĄDZAJĄCY SCROLLOWANIEM W MODALU ⭐
+    useEffect(() => {
+        if (showDeleteModal) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [showDeleteModal]);
+
 
     const fetchVoteStatus = async () => {
         try {
@@ -219,7 +240,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         <div className="inline-flex items-center space-x-4 border p-3 rounded-lg bg-gray-50 mb-6">
             <button
                 className={`flex items-center p-2 rounded-full transition ${
-                    userVoteStatus === 'upvote' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    userVoteStatus === 'upvote' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
                 onClick={() => handleVote('upvote')}
                 title="Upvote (Like)"
@@ -229,7 +250,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
             <span
                 className={`text-xl font-bold ${
-                    netScore > 0 ? 'text-green-700' : netScore < 0 ? 'text-red-700' : 'text-gray-700'
+                    netScore > 0 ? 'text-gray-700' : netScore < 0 ? 'text-red-700' : 'text-gray-700'
                 }`}
             >
             {netScore}
@@ -335,7 +356,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                         </button>
                         <button
                             type="submit"
-                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition disabled:bg-gray-400"
+                            className="px-4 py-2 bg-blue-700-600 text-white rounded hover:bg-green-700 transition disabled:bg-gray-400"
                             disabled={loading || !content.trim()}
                         >
                             {loading ? 'Zapisywanie...' : 'Zapisz Zmiany'}
@@ -345,27 +366,107 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
             </div>
         );
     };
-
-    const handleDeletePost = async () => {
+    const handleInitiateDelete = () => {
         if (!isAuthor) {
-            alert("Nie masz uprawnień do usunięcia tego posta.");
+            alert("Brak uprawnień do usunięcia tego posta.");
             return;
         }
+        setShowDeleteModal(true);
+    };
 
-        if (window.confirm("Czy na pewno chcesz usunąć ten post? Tej operacji nie można cofnąć!")) {
-            try {
-                await customAxios.delete(`/community/posts/${post.id}`);
 
-                alert(`Post "${post.title}" został pomyślnie usunięty.`);
+    const handleDeletePost = async () => {
+        setDeleteLoading(true);
 
-                onBack();
+        try {
+            await customAxios.delete(`/community/posts/delete/${post.id}`);
 
-            } catch (error: any) {
-                console.error("Błąd usuwania posta:", error);
-                const errorMessage = error.response?.data?.message || 'Wystąpił nieznany błąd podczas usuwania posta.';
-                alert(`Błąd: ${errorMessage}`);
-            }
+            setToastMessage({ message: `Pomyślnie usunięto post`, type: 'success' });
+
+            setShowDeleteModal(false);
+            setTimeout(onBack, 1000);
+
+        } catch (error: any) {
+            console.error("Błąd usuwania posta:", error);
+            const errorMessage = error.response?.data?.message || 'Wystąpił nieznany błąd podczas usuwania posta.';
+
+
+            setToastMessage({ message: `Nie udało się: ${errorMessage}`, type: 'error' });
+
+            setShowDeleteModal(false);
+        } finally {
+            setDeleteLoading(false);
         }
+    };
+
+    const DeleteConfirmationModal: React.FC = () => {
+        if (!showDeleteModal) return null;
+
+        return (
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                {/* ⭐ OKNO MODALA ⭐ */}
+                <div className="bg-gray-800 text-white rounded-xl shadow-2xl max-w-sm w-full p-6 relative">
+
+                    {/* Ikona X do zamknięcia */}
+                    <button
+                        onClick={() => setShowDeleteModal(false)}
+                        className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
+                        aria-label="Zamknij"
+                    >
+                        <FaTimes className="w-5 h-5"/>
+                    </button>
+
+                    {/* Nagłówek modala */}
+                    <h3 className="text-2xl font-bold mb-2">Usunąć post?</h3>
+
+                    {/* Treść / Wiadomość */}
+                    <p className="text-gray-400 mb-8">
+                        Czy na pewno chcesz usunąć post?
+                    </p>
+
+                    {/* Kontener przycisków */}
+                    <div className="flex justify-end space-x-4">
+                        <button
+                            onClick={() => setShowDeleteModal(false)}
+                            className="px-6 py-2 bg-gray-600 text-white rounded-full hover:bg-gray-700 transition font-semibold"
+                            disabled={deleteLoading}
+                        >
+                            Wróć
+                        </button>
+                        <button
+                            onClick={handleDeletePost}
+                            className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition font-semibold disabled:bg-red-400"
+                            disabled={deleteLoading}
+                        >
+                            {deleteLoading ? 'Usuwam...' : 'Tak, usuń'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+    const ToastNotification: React.FC = () => {
+        if (!toastMessage) return null;
+
+        // Używamy setTimeout do automatycznego ukrycia po 4 sekundach
+        useEffect(() => {
+            const timer = setTimeout(closeToast, 4000);
+            return () => clearTimeout(timer);
+        }, [toastMessage]);
+
+        // const bgColor = toastMessage.type === 'success' ? 'bg-green-600' : 'bg-red-600';
+        const Icon = toastMessage.type === 'success' ? FaThumbsUp : FaTimes;
+
+
+        return (
+            <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 p-4 rounded-xl shadow-2xl transition-opacity duration-300 z-50 flex items-center space-x-3 text-white" style={{ backgroundColor: '#2d2d2d' }}>
+                <Icon className="w-5 h-5" />
+                <span className="font-semibold">{toastMessage.message}</span>
+                <button onClick={closeToast} className="ml-4 text-gray-400 hover:text-white">
+                    <FaTimes className="w-4 h-4" />
+                </button>
+            </div>
+        );
     };
 
     const handleVote = async (voteType: 'upvote' | 'downvote') => {
@@ -397,139 +498,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     }, [post.id]);
 
     const sortedComments = getSortedComments();
-//     return (
-//         <div className="p-6 bg-gray-100 min-h-screen">
-//             <button
-//                 className="mb-6 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 font-medium transition"
-//                 onClick={onBack}
-//             >
-//                 ← Powrót do Forum
-//             </button>
-//
-//             {/*<div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-2xl border-t-4 border-blue-600">*/}
-//             {/* ⭐ ZMODYFIKOWANY KONTENER GŁÓWNY POSTA ⭐ */}
-//             <div className="relative max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-2xl border-t-4 border-blue-600">
-//                 {isAuthor && (
-//                     <div className="absolute top-4 right-4 flex space-x-2">
-//                         <button
-//                             onClick={handleEditPost}
-//                             className="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition duration-150"
-//                             title="Edytuj post"
-//                         >
-//                             <FaEdit className="w-4 h-4" />
-//                         </button>
-//                         <button
-//                             onClick={handleDeletePost}
-//                             className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition duration-150"
-//                             title="Usuń post"
-//                         >
-//                             <FaTimes className="w-4 h-4" />
-//                         </button>
-//                     </div>
-//                 )}
-//                 {/* Reszta zawartości posta jest tutaj */}
-//                 {/* ... (pozostały kod PostDetails - nagłówek, galeria, treść itd.) ... */}
-//
-//                 {/* ⭐ ZMODYFIKOWANA SEKCJA NAGŁÓWKA ⭐ */}
-//                 <div className="flex items-center mb-4">
-//                     {/* Ramka Kategori (styl 'pigułki' z turkusowym tłem) */}
-//                     <span className="inline-block bg-teal-500 text-white text-base font-bold px-3 py-1  mr-4 shadow-md">
-//                         {categoryName}
-//                     </span>
-//
-//                     {/* Tytuł Posta */}
-//                     <h1 className="text-4xl font-extrabold text-gray-900 leading-tight">{post.title}</h1>
-//                 </div>
-//
-//                 <div className="flex items-center text-sm text-gray-500 mb-6 space-x-4">
-//
-//
-//                     <span>Autor: <strong className="text-gray-700">{post.user.username}</strong></span>
-//                     <span>|</span>
-//                     <span>Opublikowano: {formatDate(creationDate)}</span>
-//                 </div>
-//
-//                 <hr className="my-8 border-gray-300"/>
-//
-//
-//                 <PostGallery postId={post.id}/>
-//
-//                 <hr className="my-4 border-gray-300"/>
-//
-//                 <VoteSection/>
-//
-//                 <hr className="my-4 border-black"/>
-//
-//
-//                 <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap my-8">
-//                     <p>{post.content}</p>
-//                 </div>
-//
-//                 <hr className="my-8 border-black"/>
-//
-//                 {/* ⭐ ZMODYFIKOWANA SEKCJA KOMENTARZY - NAGŁÓWEK I SORTOWANIE ⭐ */}
-//                 <div className="flex justify-between items-center mb-4">
-//                     <h2 className="text-2xl font-bold text-gray-800">Komentarze ({comments.length})</h2>
-//
-//                     {comments.length > 1 && (
-//                         <select
-//                             value={commentSort}
-//                             onChange={(e) => setCommentSort(e.target.value as 'newest' | 'oldest')}
-//                             className="p-2 border border-gray-300 rounded text-sm bg-white"
-//                         >
-//                             <option value="newest">Najnowsze</option>
-//                             <option value="oldest">Najstarsze</option>
-//                         </select>
-//                     )}
-//                 </div>
-//                 {/* KONIEC NAGŁÓWKA SORTOWANIA */}
-//
-//                 {loadingComments && (<p className="text-gray-500">Ładowanie komentarzy...</p>)}
-//                 {commentsError && (<p className="text-red-600 font-semibold">{commentsError}</p>)}
-//
-//
-//
-//                 {!loadingComments && !commentsError && (
-//                     <div className="space-y-4">
-//                         {comments.length === 0 ? (
-//                             <p className="text-gray-500 italic">Brak komentarzy. Bądź pierwszy!</p>
-//                         ) : (
-//                             sortedComments.map(comment => {
-//                                 const commentDate = parseDateArray(comment.createdAt);
-//                                 return (
-//                                     <div key={comment.id} className="bg-gray-50 p-4 rounded border border-gray-200">
-//                                         <div className="flex justify-between items-start text-sm mb-1">
-//                                             {/* ⭐ ZAKTUALIZOWANA SEKCJA NAZWY UŻYTKOWNIKA KOMENTARZA ⭐ */}
-//                                             <div className="flex items-center space-x-2"> {/* Kontener dla ikony i nazwy */}
-//                                                 <FaUserCircle className="w-4 h-4 text-gray-500" /> {/* Ikona */}
-//                                                 <span className="font-bold text-gray-800">{comment.username}</span> {/* Nazwa użytkownika */}
-//                                             </div>
-//                                             {/* KONIEC ZAKTUALIZOWANEJ SEKCJI */}
-//
-//                                             <div className="text-right text-gray-500 text-xs">
-//                                                 <span className="block">{formatDate(commentDate)}</span>
-//                                                 <span className="block font-medium text-gray-600">
-//                                     ({timeAgo(commentDate)})
-//                                 </span>
-//                                             </div>
-//                                         </div>
-//                                         <p className="text-gray-700 whitespace-pre-wrap">{comment.content}</p>
-//                                     </div>
-//                                 );
-//                             })
-//                         )}
-//                     </div>
-//                 )}
-//                 <div className="mt-6 p-4 border-t border-gray-300 pt-6">
-//                     <AddCommentForm
-//                         postId={post.id}
-//                         onCommentAdded={fetchComments}
-//                     />
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// };
+
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
             <button
@@ -542,22 +511,23 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
             {/* ⭐ GŁÓWNY KONTENER POSTA - POZYCJONOWANIE IKON ⭐ */}
             <div className="relative max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-2xl border-t-4 border-blue-600">
 
-                {/* IKONY EDYCJI/USUWANIA (WARUNKOWE) */}
-                {isAuthor && !isEditing && (
+                {isAuthor && !isEditing && ( // Wyświetlaj, tylko jeśli jest autorem i nie edytuje
                     <div className="absolute top-4 right-4 flex space-x-2">
                         <button
-                            onClick={() => setIsEditing(true)} // ⭐ PRZEŁĄCZANIE W TRYB EDYCJI ⭐
+                            onClick={() => setIsEditing(true)}
                             className="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition duration-150"
                             title="Edytuj post"
                         >
-                            <FaEdit className="w-4 h-4"/>
+                            <FaEdit className="w-4 h-4" />
                         </button>
+
+                        {/* ⭐ PRZYCISK USUWANIA POSTA - WYWOŁUJE MODAL ⭐ */}
                         <button
-                            onClick={handleDeletePost}
+                            onClick={handleInitiateDelete} // Użycie funkcji otwierającej niestandardowy modal
                             className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition duration-150"
                             title="Usuń post"
                         >
-                            <FaTimes className="w-4 h-4"/>
+                            <FaTimes className="w-4 h-4" />
                         </button>
                     </div>
                 )}
@@ -598,7 +568,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                     <EditForm/>
                 ) : (
                     <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap my-8">
-                        <p>{currentContent}</p> {/* Wyświetla zaktualizowaną treść */}
+                        <p>{currentContent}</p>
                     </div>
                 )}
 
@@ -665,8 +635,11 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                     />
                 </div>
             </div>
+
+            <DeleteConfirmationModal />
+            <ToastNotification />
         </div>
     );
-}
+};
 
 export default PostDetails;
