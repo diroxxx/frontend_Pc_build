@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import customAxios from "../../../lib/customAxios.tsx";
 import AddCommentForm from "./AddComment.tsx";
 import {FaThumbsUp, FaThumbsDown, FaChevronLeft, FaChevronRight} from 'react-icons/fa';
+import {timeAgo} from "./PostTime.tsx";
 
 
 interface User {
@@ -38,7 +39,7 @@ interface PostDetailProps {
     onBack: () => void;
 }
 
-// Przeniesione funkcje czasowe (dla pewności, że działają, jeśli PostTime nie jest zaimportowany)
+
 const parseDateArray = (dateArray: number[] | undefined) => {
     if (!dateArray || dateArray.length < 6) return new Date();
     const [year, month, day, hour, minute, second] = dateArray;
@@ -169,6 +170,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     const [netScore, setNetScore] = useState<number>(0);
     const [userVoteStatus, setUserVoteStatus] = useState<'upvote' | 'downvote' | null>(null);
     const [voteError, setVoteError] = useState<string | null>(null);
+    const [commentSort, setCommentSort] = useState<'newest' | 'oldest'>('newest')
 
     // FUNKCJA POBIERAJĄCA KOMENTARZE
     const fetchComments = async () => {
@@ -240,6 +242,23 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         </div>
     );
 
+    const getSortedComments = () => {
+        // Tworzymy kopię, aby sortowanie nie modyfikowało stanu
+        const sortedComments = [...comments];
+
+        sortedComments.sort((a, b) => {
+            // Używamy zdefiniowanej wcześniej funkcji parseDateArray
+            const dateA = parseDateArray(a.createdAt).getTime();
+            const dateB = parseDateArray(b.createdAt).getTime();
+
+            // 'newest' (najnowsze) = dateB - dateA (malejąco)
+            // 'oldest' (najstarsze) = dateA - dateB (rosnąco)
+            return commentSort === 'newest' ? dateB - dateA : dateA - dateB;
+        });
+
+        return sortedComments;
+    };
+
     const handleVote = async (voteType: 'upvote' | 'downvote') => {
         setVoteError(null);
         try {
@@ -268,7 +287,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         fetchVoteStatus();
     }, [post.id]);
 
-
+    const sortedComments = getSortedComments();
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
             <button
@@ -317,7 +336,22 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
                 <hr className="my-8 border-black"/>
 
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Komentarze ({comments.length})</h2>
+                {/* ⭐ ZMODYFIKOWANA SEKCJA KOMENTARZY - NAGŁÓWEK I SORTOWANIE ⭐ */}
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-2xl font-bold text-gray-800">Komentarze ({comments.length})</h2>
+
+                    {comments.length > 1 && (
+                        <select
+                            value={commentSort}
+                            onChange={(e) => setCommentSort(e.target.value as 'newest' | 'oldest')}
+                            className="p-2 border border-gray-300 rounded text-sm bg-white"
+                        >
+                            <option value="newest">Najnowsze</option>
+                            <option value="oldest">Najstarsze</option>
+                        </select>
+                    )}
+                </div>
+                {/* KONIEC NAGŁÓWKA SORTOWANIA */}
 
                 {loadingComments && (<p className="text-gray-500">Ładowanie komentarzy...</p>)}
                 {commentsError && (<p className="text-red-600 font-semibold">{commentsError}</p>)}
@@ -327,15 +361,23 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                         {comments.length === 0 ? (
                             <p className="text-gray-500 italic">Brak komentarzy. Bądź pierwszy!</p>
                         ) : (
-                            comments.map(comment => {
+                            sortedComments.map(comment => {
                                 const commentDate = parseDateArray(comment.createdAt);
                                 return (
                                     <div key={comment.id} className="bg-gray-50 p-4 rounded border border-gray-200">
                                         <div className="flex justify-between items-start text-sm mb-1">
                                             <span className="font-bold text-gray-800">{comment.username}</span>
-                                            <span className="text-gray-500 text-xs">
-                                                {formatDate(commentDate)}
-                                            </span>
+
+                                            {/* ⭐ ZAKTUALIZOWANA SEKCJA DATY ⭐ */}
+                                            <div className="text-right text-gray-500 text-xs">
+                                                <span className="block">{formatDate(commentDate)}</span>
+                                                {/* Wyświetla, ile czasu temu został dodany */}
+                                                <span className="block font-medium text-gray-500">
+                                                    ({timeAgo(commentDate)})
+                                                </span>
+                                            </div>
+
+
                                         </div>
                                         <p className="text-gray-700 whitespace-pre-wrap">{comment.content}</p>
                                     </div>
@@ -350,7 +392,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                         onCommentAdded={fetchComments}
                     />
                 </div>
-
             </div>
         </div>
     );
