@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import customAxios from "../../../lib/customAxios.tsx";
 import AddCommentForm from "./AddComment.tsx";
-import {FaThumbsUp, FaThumbsDown, FaChevronLeft, FaChevronRight} from 'react-icons/fa';
+import {FaThumbsUp, FaThumbsDown, FaChevronLeft, FaChevronRight, FaUserCircle, FaTimes, FaEdit} from 'react-icons/fa';
 import {timeAgo} from "./PostTime.tsx";
+import {useAtom} from "jotai";
+import {userAtom} from "../../../atomContext/userAtom.tsx";
 
 
 interface User {
@@ -171,6 +173,13 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     const [userVoteStatus, setUserVoteStatus] = useState<'upvote' | 'downvote' | null>(null);
     const [voteError, setVoteError] = useState<string | null>(null);
     const [commentSort, setCommentSort] = useState<'newest' | 'oldest'>('newest')
+    const [isEditing, setIsEditing] = useState(false);
+    // Stan do przechowywania aktualnej treści posta (aby odświeżyć widok po edycji)
+    const [currentContent, setCurrentContent] = useState(post.content);
+
+
+    const [user] = useAtom(userAtom);
+    const isAuthor = user && user.nickname === post.user.username;
 
     // FUNKCJA POBIERAJĄCA KOMENTARZE
     const fetchComments = async () => {
@@ -215,7 +224,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                 onClick={() => handleVote('upvote')}
                 title="Upvote (Like)"
             >
-                <FaThumbsUp className="w-5 h-5" />
+                <FaThumbsUp className="w-5 h-5"/>
             </button>
 
             <span
@@ -233,7 +242,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                 onClick={() => handleVote('downvote')}
                 title="Downvote (Dislike)"
             >
-                <FaThumbsDown className="w-5 h-5" />
+                <FaThumbsDown className="w-5 h-5"/>
             </button>
 
             {voteError && (
@@ -257,6 +266,106 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         });
 
         return sortedComments;
+    };
+
+    const handleUpdateContent = async (updatedContent: string) => {
+        const updatedData = {content: updatedContent};
+
+        try {
+            await customAxios.put(`community/posts/${post.id}`, updatedData);
+
+            // 1. Zaktualizuj lokalny stan treści, aby widok od razu się zmienił
+            setCurrentContent(updatedContent);
+            // 2. Wyłącz tryb edycji
+            setIsEditing(false);
+
+            alert("Treść posta została zaktualizowana!");
+
+        } catch (err: any) {
+            console.error("Błąd aktualizacji posta:", err);
+            alert("Nie udało się zaktualizować treści posta. Sprawdź konsolę.");
+        }
+    };
+
+    const EditForm: React.FC = () => {
+        const [content, setContent] = useState(currentContent);
+        const [loading, setLoading] = useState(false);
+        const [error, setError] = useState<string | null>(null);
+
+        const handleSubmit = async (e: React.FormEvent) => {
+            e.preventDefault();
+            if (!content.trim()) {
+                setError('Treść nie może być pusta!');
+                return;
+            }
+            if (content === currentContent) {
+                setIsEditing(false); // Nic się nie zmieniło
+                return;
+            }
+
+            setLoading(true);
+            setError(null);
+            await handleUpdateContent(content); // Wywołaj funkcję aktualizującą
+            setLoading(false);
+        };
+
+        return (
+            <div className="bg-gray-50 p-6 rounded-lg my-6 border border-blue-200">
+                <h3 className="text-xl font-bold mb-4 text-blue-700">Edytujesz treść posta:</h3>
+
+                <form onSubmit={handleSubmit}>
+                    <textarea
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        rows={6}
+                        required
+                        className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                        disabled={loading}
+                    />
+
+                    {error && <p className="text-red-600 font-medium mt-2">{error}</p>}
+
+                    <div className="flex justify-end space-x-3 mt-4">
+                        <button
+                            type="button"
+                            onClick={() => setIsEditing(false)}
+                            className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
+                        >
+                            Anuluj
+                        </button>
+                        <button
+                            type="submit"
+                            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition disabled:bg-gray-400"
+                            disabled={loading || !content.trim()}
+                        >
+                            {loading ? 'Zapisywanie...' : 'Zapisz Zmiany'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        );
+    };
+
+    const handleDeletePost = async () => {
+        if (!isAuthor) {
+            alert("Nie masz uprawnień do usunięcia tego posta.");
+            return;
+        }
+
+        if (window.confirm("Czy na pewno chcesz usunąć ten post? Tej operacji nie można cofnąć!")) {
+            try {
+                await customAxios.delete(`/community/posts/${post.id}`);
+
+                alert(`Post "${post.title}" został pomyślnie usunięty.`);
+
+                onBack();
+
+            } catch (error: any) {
+                console.error("Błąd usuwania posta:", error);
+                const errorMessage = error.response?.data?.message || 'Wystąpił nieznany błąd podczas usuwania posta.';
+                alert(`Błąd: ${errorMessage}`);
+            }
+        }
     };
 
     const handleVote = async (voteType: 'upvote' | 'downvote') => {
@@ -288,6 +397,139 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     }, [post.id]);
 
     const sortedComments = getSortedComments();
+//     return (
+//         <div className="p-6 bg-gray-100 min-h-screen">
+//             <button
+//                 className="mb-6 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 font-medium transition"
+//                 onClick={onBack}
+//             >
+//                 ← Powrót do Forum
+//             </button>
+//
+//             {/*<div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-2xl border-t-4 border-blue-600">*/}
+//             {/* ⭐ ZMODYFIKOWANY KONTENER GŁÓWNY POSTA ⭐ */}
+//             <div className="relative max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-2xl border-t-4 border-blue-600">
+//                 {isAuthor && (
+//                     <div className="absolute top-4 right-4 flex space-x-2">
+//                         <button
+//                             onClick={handleEditPost}
+//                             className="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition duration-150"
+//                             title="Edytuj post"
+//                         >
+//                             <FaEdit className="w-4 h-4" />
+//                         </button>
+//                         <button
+//                             onClick={handleDeletePost}
+//                             className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition duration-150"
+//                             title="Usuń post"
+//                         >
+//                             <FaTimes className="w-4 h-4" />
+//                         </button>
+//                     </div>
+//                 )}
+//                 {/* Reszta zawartości posta jest tutaj */}
+//                 {/* ... (pozostały kod PostDetails - nagłówek, galeria, treść itd.) ... */}
+//
+//                 {/* ⭐ ZMODYFIKOWANA SEKCJA NAGŁÓWKA ⭐ */}
+//                 <div className="flex items-center mb-4">
+//                     {/* Ramka Kategori (styl 'pigułki' z turkusowym tłem) */}
+//                     <span className="inline-block bg-teal-500 text-white text-base font-bold px-3 py-1  mr-4 shadow-md">
+//                         {categoryName}
+//                     </span>
+//
+//                     {/* Tytuł Posta */}
+//                     <h1 className="text-4xl font-extrabold text-gray-900 leading-tight">{post.title}</h1>
+//                 </div>
+//
+//                 <div className="flex items-center text-sm text-gray-500 mb-6 space-x-4">
+//
+//
+//                     <span>Autor: <strong className="text-gray-700">{post.user.username}</strong></span>
+//                     <span>|</span>
+//                     <span>Opublikowano: {formatDate(creationDate)}</span>
+//                 </div>
+//
+//                 <hr className="my-8 border-gray-300"/>
+//
+//
+//                 <PostGallery postId={post.id}/>
+//
+//                 <hr className="my-4 border-gray-300"/>
+//
+//                 <VoteSection/>
+//
+//                 <hr className="my-4 border-black"/>
+//
+//
+//                 <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap my-8">
+//                     <p>{post.content}</p>
+//                 </div>
+//
+//                 <hr className="my-8 border-black"/>
+//
+//                 {/* ⭐ ZMODYFIKOWANA SEKCJA KOMENTARZY - NAGŁÓWEK I SORTOWANIE ⭐ */}
+//                 <div className="flex justify-between items-center mb-4">
+//                     <h2 className="text-2xl font-bold text-gray-800">Komentarze ({comments.length})</h2>
+//
+//                     {comments.length > 1 && (
+//                         <select
+//                             value={commentSort}
+//                             onChange={(e) => setCommentSort(e.target.value as 'newest' | 'oldest')}
+//                             className="p-2 border border-gray-300 rounded text-sm bg-white"
+//                         >
+//                             <option value="newest">Najnowsze</option>
+//                             <option value="oldest">Najstarsze</option>
+//                         </select>
+//                     )}
+//                 </div>
+//                 {/* KONIEC NAGŁÓWKA SORTOWANIA */}
+//
+//                 {loadingComments && (<p className="text-gray-500">Ładowanie komentarzy...</p>)}
+//                 {commentsError && (<p className="text-red-600 font-semibold">{commentsError}</p>)}
+//
+//
+//
+//                 {!loadingComments && !commentsError && (
+//                     <div className="space-y-4">
+//                         {comments.length === 0 ? (
+//                             <p className="text-gray-500 italic">Brak komentarzy. Bądź pierwszy!</p>
+//                         ) : (
+//                             sortedComments.map(comment => {
+//                                 const commentDate = parseDateArray(comment.createdAt);
+//                                 return (
+//                                     <div key={comment.id} className="bg-gray-50 p-4 rounded border border-gray-200">
+//                                         <div className="flex justify-between items-start text-sm mb-1">
+//                                             {/* ⭐ ZAKTUALIZOWANA SEKCJA NAZWY UŻYTKOWNIKA KOMENTARZA ⭐ */}
+//                                             <div className="flex items-center space-x-2"> {/* Kontener dla ikony i nazwy */}
+//                                                 <FaUserCircle className="w-4 h-4 text-gray-500" /> {/* Ikona */}
+//                                                 <span className="font-bold text-gray-800">{comment.username}</span> {/* Nazwa użytkownika */}
+//                                             </div>
+//                                             {/* KONIEC ZAKTUALIZOWANEJ SEKCJI */}
+//
+//                                             <div className="text-right text-gray-500 text-xs">
+//                                                 <span className="block">{formatDate(commentDate)}</span>
+//                                                 <span className="block font-medium text-gray-600">
+//                                     ({timeAgo(commentDate)})
+//                                 </span>
+//                                             </div>
+//                                         </div>
+//                                         <p className="text-gray-700 whitespace-pre-wrap">{comment.content}</p>
+//                                     </div>
+//                                 );
+//                             })
+//                         )}
+//                     </div>
+//                 )}
+//                 <div className="mt-6 p-4 border-t border-gray-300 pt-6">
+//                     <AddCommentForm
+//                         postId={post.id}
+//                         onCommentAdded={fetchComments}
+//                     />
+//                 </div>
+//             </div>
+//         </div>
+//     );
+// };
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
             <button
@@ -297,29 +539,51 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                 ← Powrót do Forum
             </button>
 
-            <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-2xl border-t-4 border-blue-600">
+            {/* ⭐ GŁÓWNY KONTENER POSTA - POZYCJONOWANIE IKON ⭐ */}
+            <div className="relative max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-2xl border-t-4 border-blue-600">
+
+                {/* IKONY EDYCJI/USUWANIA (WARUNKOWE) */}
+                {isAuthor && !isEditing && (
+                    <div className="absolute top-4 right-4 flex space-x-2">
+                        <button
+                            onClick={() => setIsEditing(true)} // ⭐ PRZEŁĄCZANIE W TRYB EDYCJI ⭐
+                            className="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition duration-150"
+                            title="Edytuj post"
+                        >
+                            <FaEdit className="w-4 h-4"/>
+                        </button>
+                        <button
+                            onClick={handleDeletePost}
+                            className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition duration-150"
+                            title="Usuń post"
+                        >
+                            <FaTimes className="w-4 h-4"/>
+                        </button>
+                    </div>
+                )}
 
                 {/* ⭐ ZMODYFIKOWANA SEKCJA NAGŁÓWKA ⭐ */}
                 <div className="flex items-center mb-4">
-                    {/* Ramka Kategori (styl 'pigułki' z turkusowym tłem) */}
-                    <span className="inline-block bg-teal-500 text-white text-base font-bold px-3 py-1  mr-4 shadow-md">
+                    <span
+                        className="inline-block bg-teal-500 text-white text-base font-bold px-3 py-1 rounded-full mr-4 shadow-md">
                         {categoryName}
                     </span>
-
-                    {/* Tytuł Posta */}
                     <h1 className="text-4xl font-extrabold text-gray-900 leading-tight">{post.title}</h1>
                 </div>
 
                 <div className="flex items-center text-sm text-gray-500 mb-6 space-x-4">
-                    {/* Usunięto starą informację o kategorii */}
-
-                    <span>Autor: <strong className="text-gray-700">{post.user.username}</strong></span>
+                    <span className="flex items-center space-x-1">
+                        <span>Autor:</span>
+                        <span className="flex items-center space-x-1 text-gray-700 font-bold">
+                            <FaUserCircle className="w-4 h-4 text-gray-500"/>
+                            <span>{post.user.username}</span>
+                        </span>
+                    </span>
                     <span>|</span>
                     <span>Opublikowano: {formatDate(creationDate)}</span>
                 </div>
 
                 <hr className="my-8 border-gray-300"/>
-
 
                 <PostGallery postId={post.id}/>
 
@@ -329,14 +593,18 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
                 <hr className="my-4 border-black"/>
 
-
-                <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap my-8">
-                    <p>{post.content}</p>
-                </div>
+                {/* ⭐ WARUNKOWE RENDEROWANIE TREŚCI LUB FORMULARZA EDYCJI ⭐ */}
+                {isEditing ? (
+                    <EditForm/>
+                ) : (
+                    <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap my-8">
+                        <p>{currentContent}</p> {/* Wyświetla zaktualizowaną treść */}
+                    </div>
+                )}
 
                 <hr className="my-8 border-black"/>
 
-                {/* ⭐ ZMODYFIKOWANA SEKCJA KOMENTARZY - NAGŁÓWEK I SORTOWANIE ⭐ */}
+                {/* ⭐ SEKCJA KOMENTARZY I SORTOWANIA ⭐ */}
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-2xl font-bold text-gray-800">Komentarze ({comments.length})</h2>
 
@@ -351,7 +619,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                         </select>
                     )}
                 </div>
-                {/* KONIEC NAGŁÓWKA SORTOWANIA */}
 
                 {loadingComments && (<p className="text-gray-500">Ładowanie komentarzy...</p>)}
                 {commentsError && (<p className="text-red-600 font-semibold">{commentsError}</p>)}
@@ -363,21 +630,26 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                         ) : (
                             sortedComments.map(comment => {
                                 const commentDate = parseDateArray(comment.createdAt);
-                                return (
-                                    <div key={comment.id} className="bg-gray-50 p-4 rounded border border-gray-200">
-                                        <div className="flex justify-between items-start text-sm mb-1">
-                                            <span className="font-bold text-gray-800">{comment.username}</span>
+                                // const isCommentAuthor = user && user.nickname === comment.userId; // Sprawdzenie autora komentarza
 
-                                            {/* ⭐ ZAKTUALIZOWANA SEKCJA DATY ⭐ */}
+                                return (
+                                    <div key={comment.id}
+                                         className="bg-gray-50 p-4 rounded border border-gray-200 relative">
+
+                                        {/* Ikony edycji/usuwania komentarzy (jeśli są zaimplementowane) */}
+
+                                        <div className="flex justify-between items-start text-sm mb-1">
+                                            <div className="flex items-center space-x-2">
+                                                <FaUserCircle className="w-4 h-4 text-gray-500"/>
+                                                <span className="font-bold text-gray-800">{comment.username}</span>
+                                            </div>
+
                                             <div className="text-right text-gray-500 text-xs">
                                                 <span className="block">{formatDate(commentDate)}</span>
-                                                {/* Wyświetla, ile czasu temu został dodany */}
-                                                <span className="block font-medium text-gray-500">
+                                                <span className="block font-medium text-gray-600">
                                                     ({timeAgo(commentDate)})
                                                 </span>
                                             </div>
-
-
                                         </div>
                                         <p className="text-gray-700 whitespace-pre-wrap">{comment.content}</p>
                                     </div>
@@ -395,6 +667,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
             </div>
         </div>
     );
-};
+}
 
 export default PostDetails;
