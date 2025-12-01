@@ -292,7 +292,7 @@ return (
                     </div>
 
                     <div className="col-span-4 space-y-4">
-                        {recOffersGame && (recOffersGame.minRec.length >=1 || recOffersGame.maxRec >= 1) ? (
+                        {recOffersGame && (recOffersGame.minRec.length >=1 || recOffersGame.maxRec.length >= 1) ? (
                             <>
                                 {recOffersGame.minRec && recOffersGame.minRec.length > 0 && (
                                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
