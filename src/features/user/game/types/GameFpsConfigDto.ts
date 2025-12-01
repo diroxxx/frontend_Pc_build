@@ -5,8 +5,9 @@ export type GameFpsConfigDto = {
     technology: typeof technologyList[number];
     cpu: string;
     gpu: string;
+    budget: number;
 };
 
-export const resolutionList = ['720p', '1080p', '1440p', '4K'] as const;
-export const graphicsPresetList = ['Low', 'Medium', 'High', 'Ultra'] as const;
+export const resolutionList = ['1080p'] as const;
+export const graphicsPresetList = ['Low', 'Medium', 'High'] as const;
 export const technologyList = ['DLLS', 'DLAA', 'DLSS 2.0', 'DLSS 3.0', 'FSR 1.0', 'FSR 2.0', 'XeSS'] as const;
