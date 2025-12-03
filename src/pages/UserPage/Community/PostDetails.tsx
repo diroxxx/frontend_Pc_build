@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import customAxios from "../../../lib/customAxios.tsx";
 import AddCommentForm from "./AddComment.tsx";
-import {FaThumbsUp, FaThumbsDown, FaChevronLeft, FaChevronRight, FaUserCircle, FaTimes, FaEdit} from 'react-icons/fa';
+import {
+    FaThumbsUp,
+    FaThumbsDown,
+    FaChevronLeft,
+    FaChevronRight,
+    FaUserCircle,
+    FaTimes,
+    FaEdit,
+    FaBookmark, FaRegBookmark
+} from 'react-icons/fa';
 import {timeAgo} from "./PostTime.tsx";
 import {useAtom} from "jotai";
 import {userAtom} from "../../../atomContext/userAtom.tsx";
@@ -182,7 +191,35 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
     const [user] = useAtom(userAtom);
     const isAuthor = user && user.nickname === post.user.username;
+    const [isSaved, setIsSaved] = useState(false);
+    const [saveLoading, setSaveLoading] = useState(false);
 
+    // const handleToggleSave = async () => {
+    //     if (!user) {
+    //         alert("Musisz być zalogowany, aby zapisać post.");
+    //         return;
+    //     }
+    //
+    //     // Optymistyczna aktualizacja UI (zmienia ikonkę od razu)
+    //     const previousState = isSaved;
+    //     setIsSaved(!isSaved);
+    //
+    //     try {
+    //         if (!previousState) {
+    //             // Logika zapisywania (dostosuj endpoint do swojego backendu)
+    //             await customAxios.post(`community/posts/save/${post.id}`);
+    //             setToastMessage({ message: "Post został zapisany!", type: 'success' });
+    //         } else {
+    //             // Logika usuwania z zapisanych
+    //             await customAxios.delete(`community/posts/unsave/${post.id}`);
+    //             setToastMessage({ message: "Post usunięty z zapisanych.", type: 'success' });
+    //         }
+    //     } catch (error) {
+    //         console.error("Błąd zapisu:", error);
+    //         setIsSaved(previousState); // Cofnij zmianę w razie błędu
+    //         setToastMessage({ message: "Wystąpił błąd zapisu.", type: 'error' });
+    //     }
+    // };
     // FUNKCJA POBIERAJĄCA KOMENTARZE
     const fetchComments = async () => {
         setLoadingComments(true);
@@ -213,6 +250,72 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         };
     }, [showDeleteModal]);
 
+    // 1. Sprawdź przy załadowaniu, czy post jest już zapisany
+    useEffect(() => {
+        const checkSavedStatus = async () => {
+            // Sprawdzamy tylko jeśli użytkownik jest zalogowany
+            if (user) {
+                try {
+                    const response = await customAxios.get<boolean>(`/community/posts/${post.id}/isSaved`);
+                    setIsSaved(response.data);
+                } catch (error) {
+                    console.error("Błąd sprawdzania statusu zapisu:", error);
+                }
+            }
+        };
+        checkSavedStatus();
+    }, [post.id, user]);
+
+// 2. Funkcja obsługująca kliknięcie w zakładkę
+    const handleToggleSave = async () => {
+        if (!user) {
+            setToastMessage({ message: "Musisz być zalogowany, aby zapisać post.", type: 'error' });
+            return;
+        }
+
+        if (saveLoading) return; // Zapobiegaj podwójnym kliknięciom
+        setSaveLoading(true);
+
+        // Optymistyczna aktualizacja UI (zmieniamy ikonkę zanim dostaniemy odpowiedź z serwera)
+        const previousState = isSaved;
+        setIsSaved(!isSaved);
+
+        try {
+            if (!previousState) {
+                // Jeśli nie był zapisany -> ZAPISZ
+                await customAxios.post(`/community/posts/${post.id}/save`);
+                setToastMessage({ message: "Post został zapisany!", type: 'success' });
+            } else {
+                // Jeśli był zapisany -> USUŃ Z ZAPISANYCH
+                await customAxios.delete(`/community/posts/${post.id}/unsave`);
+                setToastMessage({ message: "Post usunięty z zapisanych.", type: 'success' });
+            }
+        } catch (error: any) {
+            console.error("Błąd zapisu:", error);
+            setIsSaved(previousState); // Cofnij zmianę ikonki w razie błędu
+
+            // --- NAPRAWA: Bezpieczne wyciąganie treści błędu ---
+            let errMsg = "Wystąpił błąd podczas zapisywania.";
+
+            // Sprawdzamy co dokładnie przyszło z backendu
+            if (error.response && error.response.data) {
+                const data = error.response.data;
+
+                // Jeśli backend zwrócił obiekt { message: "...", status: ... }
+                if (typeof data === 'object' && data.message) {
+                    errMsg = data.message;
+                }
+                // Jeśli backend zwrócił czysty tekst
+                else if (typeof data === 'string') {
+                    errMsg = data;
+                }
+            }
+
+            setToastMessage({ message: errMsg, type: 'error' });
+        } finally {
+            setSaveLoading(false);
+        }
+    };
 
     const fetchVoteStatus = async () => {
         try {
@@ -562,25 +665,83 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
             {/* ⭐ GŁÓWNY KONTENER POSTA - POZYCJONOWANIE IKON ⭐ */}
             <div className="relative max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-2xl border-t-4 border-blue-600">
+                {/* ⭐ IKONY W PRAWYM GÓRNYM ROGU (ZAPIS + EDYCJA/USUWANIE) ⭐ */}
+                {/*{!isEditing && (*/}
+                {/*    <div className="absolute top-4 right-4 flex space-x-2">*/}
 
-                {isAuthor && !isEditing && (
-                    <div className="absolute top-4 right-4 flex space-x-2">
-                        <button
-                            onClick={() => setIsEditing(true)}
-                            className="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition duration-150"
-                            title="Edytuj post"
-                        >
-                            <FaEdit className="w-4 h-4" />
-                        </button>
+                {/*        /!* Przycisk ZAPISZ (Widoczny dla każdego zalogowanego) *!/*/}
+                {/*        <button*/}
+                {/*            onClick={handleToggleSave}*/}
+                {/*            className="p-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-yellow-600 transition duration-150"*/}
+                {/*            title={isSaved ? "Usuń z zapisanych" : "Zapisz post"}*/}
+                {/*        >*/}
+                {/*            {isSaved ? <FaBookmark className="w-4 h-4 text-yellow-500" /> : <FaRegBookmark className="w-4 h-4" />}*/}
+                {/*        </button>*/}
 
-                        {/* ⭐ PRZYCISK USUWANIA POSTA - WYWOŁUJE MODAL ⭐ */}
-                        <button
-                            onClick={handleInitiateDelete} // Użycie funkcji otwierającej niestandardowy modal
-                            className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition duration-150"
-                            title="Usuń post"
-                        >
-                            <FaTimes className="w-4 h-4" />
-                        </button>
+                {/*        /!* Przyciski AUTORA (Edycja i Usuwanie) *!/*/}
+                {/*        {isAuthor && (*/}
+                {/*            <>*/}
+                {/*                <button*/}
+                {/*                    onClick={() => setIsEditing(true)}*/}
+                {/*                    className="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition duration-150"*/}
+                {/*                    title="Edytuj post"*/}
+                {/*                >*/}
+                {/*                    <FaEdit className="w-4 h-4" />*/}
+                {/*                </button>*/}
+
+                {/*                <button*/}
+                {/*                    onClick={handleInitiateDelete}*/}
+                {/*                    className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition duration-150"*/}
+                {/*                    title="Usuń post"*/}
+                {/*                >*/}
+                {/*                    <FaTimes className="w-4 h-4" />*/}
+                {/*                </button>*/}
+                {/*            </>*/}
+                {/*        )}*/}
+                {/*    </div>*/}
+                {/*)}*/}
+                {/* ⭐ IKONY W PRAWYM GÓRNYM ROGU (ZAPIS + EDYCJA/USUWANIE) ⭐ */}
+                {!isEditing && (
+                    <div className="absolute top-4 right-4 flex items-center space-x-2">
+
+                        {/* Przycisk ZAPISZ (Widoczny dla zalogowanych) */}
+                        {user && (
+                            <button
+                                onClick={handleToggleSave}
+                                disabled={saveLoading}
+                                className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition duration-150 group"
+                                title={isSaved ? "Usuń z zapisanych" : "Zapisz post"}
+                            >
+                                {isSaved ? (
+                                    <FaBookmark className="w-5 h-5 text-yellow-500 scale-110" />
+                                ) : (
+                                    <FaRegBookmark className="w-5 h-5 text-gray-500 group-hover:text-yellow-600" />
+                                )}
+                            </button>
+                        )}
+
+                        {/* Przyciski AUTORA (Edycja i Usuwanie) */}
+                        {isAuthor && (
+                            <>
+                                <div className="h-6 w-px bg-gray-300 mx-2"></div> {/* Separator */}
+
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition duration-150"
+                                    title="Edytuj post"
+                                >
+                                    <FaEdit className="w-4 h-4" />
+                                </button>
+
+                                <button
+                                    onClick={handleInitiateDelete}
+                                    className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition duration-150"
+                                    title="Usuń post"
+                                >
+                                    <FaTimes className="w-4 h-4" />
+                                </button>
+                            </>
+                        )}
                     </div>
                 )}
 
