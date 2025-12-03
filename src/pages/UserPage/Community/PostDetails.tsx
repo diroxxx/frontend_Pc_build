@@ -14,7 +14,7 @@ interface User {
 
 interface PostImageDTO {
     id: number;
-    imageUrl: string; // URL do pobrania obrazu
+    imageUrl: string;
     filename: string;
     mimeType: string;
 }
@@ -57,8 +57,6 @@ const formatDate = (date: Date) => {
         minute: "2-digit",
     });
 };
-// KONIEC: Przeniesione funkcje czasowe
-
 
 interface PostGalleryProps {
     postId: number;
@@ -174,12 +172,13 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     const [voteError, setVoteError] = useState<string | null>(null);
     const [commentSort, setCommentSort] = useState<'newest' | 'oldest'>('newest')
     const [isEditing, setIsEditing] = useState(false);
-    // Stan do przechowywania aktualnej treści posta (aby odświeżyć widok po edycji)
     const [currentContent, setCurrentContent] = useState(post.content);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [toastMessage, setToastMessage] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const closeToast = () => setToastMessage(null);
+    const [commentVotes, setCommentVotes] = useState<Record<number, number>>({});
+    const [commentUserVote, setCommentUserVote] = useState<Record<number, 'upvote' | 'downvote' | null>>({});
 
     const [user] = useAtom(userAtom);
     const isAuthor = user && user.nickname === post.user.username;
@@ -199,11 +198,9 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         }
     };
     useEffect(() => {
-        // Przewiń okno na samą górę, gdy komponent się montuje
         window.scrollTo(0, 0);
-    }, [post.id]); // Uruchamiamy za każdym razem, gdy zmienia się post (dla pewności)
+    }, [post.id]);
 
-    // ⭐ HAK ZARZĄDZAJĄCY SCROLLOWANIEM W MODALU ⭐
     useEffect(() => {
         if (showDeleteModal) {
             document.body.style.overflow = 'hidden';
@@ -234,7 +231,45 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
             console.error("Błąd pobierania statusu głosowania:", err);
         }
     };
+    // const fetchCommentVotes = async () => {
+    //     try {
+    //         const response = await customAxios.get(`/community/comments/votes/${post.id}`);
+    //
+    //         setCommentVotes(response.data.netScores);
+    //         setCommentUserVote(response.data.userVotes);
+    //     } catch (err) {
+    //         console.error("Błąd pobierania głosów komentarzy:", err);
+    //     }
+    // };
+    const fetchCommentVotes = async () => {
+        try {
+            const newNetScores: Record<number, number> = {};
+            const newUserVotes: Record<number, 'upvote' | 'downvote' | null> = {};
 
+            for (const comment of comments) {
+                // NET SCORE komentarza
+                const scoreRes = await customAxios.get<number>(
+                    `/community/comments/${comment.id}/vote`
+                );
+                newNetScores[comment.id] = scoreRes.data;
+
+                // STATUS użytkownika
+                const statusRes = await customAxios.get<string | null>(
+                    `/community/comments/${comment.id}/vote/status`
+                );
+
+                const status = statusRes.data;
+                newUserVotes[comment.id] =
+                    status === 'upvote' || status === 'downvote' ? status : null;
+            }
+
+            setCommentVotes(newNetScores);
+            setCommentUserVote(newUserVotes);
+
+        } catch (err) {
+            console.error("Błąd pobierania głosów komentarzy:", err);
+        }
+    };
 
     const VoteSection = () => (
         <div className="inline-flex items-center space-x-4 border p-3 rounded-lg bg-gray-50 mb-6">
@@ -273,16 +308,12 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     );
 
     const getSortedComments = () => {
-        // Tworzymy kopię, aby sortowanie nie modyfikowało stanu
         const sortedComments = [...comments];
 
         sortedComments.sort((a, b) => {
-            // Używamy zdefiniowanej wcześniej funkcji parseDateArray
             const dateA = parseDateArray(a.createdAt).getTime();
             const dateB = parseDateArray(b.createdAt).getTime();
 
-            // 'newest' (najnowsze) = dateB - dateA (malejąco)
-            // 'oldest' (najstarsze) = dateA - dateB (rosnąco)
             return commentSort === 'newest' ? dateB - dateA : dateA - dateB;
         });
 
@@ -295,9 +326,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         try {
             await customAxios.put(`community/posts/${post.id}`, updatedData);
 
-            // 1. Zaktualizuj lokalny stan treści, aby widok od razu się zmienił
             setCurrentContent(updatedContent);
-            // 2. Wyłącz tryb edycji
             setIsEditing(false);
 
             alert("Treść posta została zaktualizowana!");
@@ -492,10 +521,33 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         }
     };
 
+    const handleCommentVote = async (commentId: number, vote: 'upvote' | 'downvote') => {
+        try {
+            const response = await customAxios.post(
+                `/community/comments/${commentId}/vote?type=${vote}`
+            );
+
+            setCommentVotes(prev => ({
+                ...prev,
+                [commentId]: response.data
+            }));
+
+            setCommentUserVote(prev => ({
+                ...prev,
+                [commentId]: prev[commentId] === vote ? null : vote
+            }));
+
+        } catch (err) {
+            console.error("Błąd głosowania na komentarz:", err);
+        }
+    };
+
     useEffect(() => {
         fetchComments();
         fetchVoteStatus();
+        fetchCommentVotes()
     }, [post.id]);
+
 
     const sortedComments = getSortedComments();
 
@@ -511,7 +563,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
             {/* ⭐ GŁÓWNY KONTENER POSTA - POZYCJONOWANIE IKON ⭐ */}
             <div className="relative max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-2xl border-t-4 border-blue-600">
 
-                {isAuthor && !isEditing && ( // Wyświetlaj, tylko jeśli jest autorem i nie edytuje
+                {isAuthor && !isEditing && (
                     <div className="absolute top-4 right-4 flex space-x-2">
                         <button
                             onClick={() => setIsEditing(true)}
@@ -622,6 +674,35 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                                             </div>
                                         </div>
                                         <p className="text-gray-700 whitespace-pre-wrap">{comment.content}</p>
+                                        <div className="flex items-center space-x-4 mt-3">
+
+                                            <button
+                                                className={`p-1 rounded ${
+                                                    commentUserVote[comment.id] === 'upvote'
+                                                        ? 'text-white bg-blue-600'
+                                                        : 'text-gray-600 bg-gray-200'
+                                                }`}
+                                                onClick={() => handleCommentVote(comment.id, 'upvote')}
+                                            >
+                                                <FaThumbsUp/>
+                                            </button>
+
+                                            <span className="font-bold text-gray-800">
+        {commentVotes[comment.id] ?? 0}
+    </span>
+
+                                            <button
+                                                className={`p-1 rounded ${
+                                                    commentUserVote[comment.id] === 'downvote'
+                                                        ? 'text-white bg-red-600'
+                                                        : 'text-gray-600 bg-gray-200'
+                                                }`}
+                                                onClick={() => handleCommentVote(comment.id, 'downvote')}
+                                            >
+                                                <FaThumbsDown/>
+                                            </button>
+
+                                        </div>
                                     </div>
                                 );
                             })
@@ -636,8 +717,8 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                 </div>
             </div>
 
-            <DeleteConfirmationModal />
-            <ToastNotification />
+            <DeleteConfirmationModal/>
+            <ToastNotification/>
         </div>
     );
 };
