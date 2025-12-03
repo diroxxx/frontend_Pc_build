@@ -10,6 +10,7 @@ import GeneralPage from "./generalPage.tsx";
 import ComponentsPage from "./componentsPage.tsx";
 import OffersAdminPage from "./OffersAdminPage.tsx";
 import {useQueryClient} from "@tanstack/react-query";
+import AdminGamesPage from "../AdminGames/pages/AdminGamesPage.tsx";
 const AdminControlPanel = () => {
         const [activeTab, setActiveTab] = useState("general");
         const navigate = useNavigate();
@@ -120,6 +121,7 @@ const AdminControlPanel = () => {
                     {activeTab === "components" && <ComponentsPage />}
                     {activeTab === "offersUpdate" && <OffersComponent />}
                     {activeTab === "offers" && <OffersAdminPage />}
+                    {activeTab === "games" && <AdminGamesPage />}
                 </div>
             </div>
         </div>

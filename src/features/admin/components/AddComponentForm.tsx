@@ -1,6 +1,6 @@
 import {Check, PlusIcon, X} from "lucide-react";
 import {type ComponentItem, ComponentTypeEnum} from "../../../types/BaseItemDto.ts";
-import {useState} from "react";
+import React, {useState} from "react";
 
 interface AddComponentModalProps {
     isOpen: boolean;

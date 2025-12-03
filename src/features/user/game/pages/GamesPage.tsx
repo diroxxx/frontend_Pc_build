@@ -160,7 +160,7 @@ return (
                                         <p className="text-[9px] font-semibold text-gray-500 mb-1.5">WYBRANA GRA</p>
                                         <div className="flex items-center gap-1.5 p-1.5 bg-ocean-light-blue/10 rounded border border-ocean-light-blue">
                                             <img
-                                                src={`data:image/png;base64,${games?.find(g => g.title === gameFpsConfig?.gameTitle)?.imageBase64}`}
+                                                src={`data:image/png;base64,${games?.find(g => g.title === gameFpsConfig?.gameTitle)?.imageUrl}`}
                                                 alt={gameFpsConfig?.gameTitle}
                                                 className="w-8 h-8 rounded object-cover"
                                             />

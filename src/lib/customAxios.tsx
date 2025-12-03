@@ -18,8 +18,23 @@ interface ApiErrorResponse {
     status?: number;
 }
 
+customAxios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+    if (config.data instanceof FormData) {
+        if (config.headers) {
+            delete (config.headers as Record<string, any>)["Content-Type"];
+            if ((config.headers as any).common) delete (config.headers as any).common["Content-Type"];
+            if ((config.headers as any).post) delete (config.headers as any).post["Content-Type"];
+        }
+    }
+    const token = getAuthToken();
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
 
-// === REQUEST INTERCEPTOR ===
+
+
 customAxios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     const token = getAuthToken();
     if (token) {
@@ -28,7 +43,6 @@ customAxios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     return config;
 });
 
-// === REFRESH TOKEN HANDLING ===
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
 
@@ -42,13 +56,11 @@ const onRefreshed = (token: string) => {
     refreshSubscribers = [];
 };
 
-// === RESPONSE INTERCEPTOR ===
 customAxios.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
         const originalRequest = error.config as AxiosRequestWithRetry;
 
-        // === 401 UNAUTHORIZED ===
         if (error.response?.status === 401 && !originalRequest._retry) {
             if (isRefreshing) {
                 return new Promise(resolve => {

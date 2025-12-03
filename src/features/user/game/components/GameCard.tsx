@@ -1,11 +1,12 @@
 import type { GameDto } from "../types/GameDto";
+import {baseUrl} from "../../../../types/baseUrl.ts";
 
 const GameCard = ({ game }: { game: GameDto }) => {
     return (
         <div className="group bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
             <div className="relative w-full aspect-square overflow-hidden bg-gray-100">
                 <img 
-                    src={`data:image/png;base64,${game.imageBase64}`} 
+                    src={ baseUrl + game.imageUrl}
                     alt={game.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
