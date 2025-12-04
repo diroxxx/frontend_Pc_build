@@ -7,6 +7,7 @@ import PostImage from "./PostImage.tsx";
 import { FaArrowLeft } from 'react-icons/fa';
 import PaginatedList from "./PaginatedPosts.tsx";
 import { parseDateArray, formatDate, timeAgo } from "./PostTime.tsx";
+import { FaUserCircle } from "react-icons/fa";
 
 
 interface User {
@@ -386,6 +387,55 @@ const Community: React.FC = () => {
             </div>
 
             {/* Lista postów z paginacją */}
+            {/*{posts.length === 0 ? (*/}
+            {/*    <p className="text-center text-gray-500">Brak postów do wyświetlenia w tej kategorii.</p>*/}
+            {/*) : (*/}
+            {/*    <PaginatedList*/}
+            {/*        items={sortedPosts}*/}
+            {/*        itemsPerPage={12}*/}
+            {/*        renderItem={(post) => {*/}
+            {/*            // ⭐ Użycie zaimportowanych funkcji*/}
+            {/*            const date = parseDateArray(post.createdAt);*/}
+            {/*            const categoryName = post.category?.name || 'Brak kategorii';*/}
+
+            {/*            return (*/}
+            {/*                <li*/}
+            {/*                    key={post.id}*/}
+            {/*                    onClick={() => setSelectedPost(post)}*/}
+            {/*                    className="cursor-pointer bg-white p-4 rounded shadow-lg hover:shadow-xl transition duration-200 flex justify-between items-start border-l-4 border-blue-500"*/}
+            {/*                >*/}
+            {/*                    <div className="flex-1 min-w-0 pr-4">*/}
+            {/*                        /!* ⭐ ZMODYFIKOWANY NAGŁÓWEK POSTA ⭐ *!/*/}
+            {/*                        <div className="flex items-center mb-2">*/}
+            {/*                            /!* Ramka Kategori: Używam koloru teal-500, który jest zbliżony do turkusu z obrazka *!/*/}
+            {/*                            <span className="inline-block bg-teal-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md">*/}
+            {/*                                {categoryName}*/}
+            {/*                            </span>*/}
+
+            {/*                            /!* Tytuł Posta *!/*/}
+            {/*                            <h3 className="text-xl font-bold text-gray-800 truncate">*/}
+            {/*                                {post.title}*/}
+            {/*                            </h3>*/}
+            {/*                        </div>*/}
+            {/*                        /!* KONIEC ZMODYFIKOWANEGO NAGŁÓWKA *!/*/}
+
+            {/*                        <p className="text-gray-600 mt-1">*/}
+            {/*                            {post.content.substring(0, 100)}*/}
+            {/*                            {post.content.length > 100 ? '...' : ''}*/}
+            {/*                        </p>*/}
+            {/*                        <p className="text-gray-500 text-sm mt-2">*/}
+            {/*                            Autor: <strong className="text-gray-900">{post.user.username}</strong>*/}
+            {/*                        </p>*/}
+            {/*                    </div>*/}
+            {/*                    <div className="text-gray-400 text-sm text-right flex-shrink-0 pt-1">*/}
+            {/*                        <span className="block">{formatDate(date)}</span>*/}
+            {/*                        <span className="block text-xs">({timeAgo(date)})</span>*/}
+            {/*                    </div>*/}
+            {/*                </li>*/}
+            {/*            );*/}
+            {/*        }}*/}
+            {/*    />*/}
+            {/*)}*/}
             {posts.length === 0 ? (
                 <p className="text-center text-gray-500">Brak postów do wyświetlenia w tej kategorii.</p>
             ) : (
@@ -393,7 +443,6 @@ const Community: React.FC = () => {
                     items={sortedPosts}
                     itemsPerPage={12}
                     renderItem={(post) => {
-                        // ⭐ Użycie zaimportowanych funkcji
                         const date = parseDateArray(post.createdAt);
                         const categoryName = post.category?.name || 'Brak kategorii';
 
@@ -404,27 +453,30 @@ const Community: React.FC = () => {
                                 className="cursor-pointer bg-white p-4 rounded shadow-lg hover:shadow-xl transition duration-200 flex justify-between items-start border-l-4 border-blue-500"
                             >
                                 <div className="flex-1 min-w-0 pr-4">
-                                    {/* ⭐ ZMODYFIKOWANY NAGŁÓWEK POSTA ⭐ */}
                                     <div className="flex items-center mb-2">
-                                        {/* Ramka Kategori: Używam koloru teal-500, który jest zbliżony do turkusu z obrazka */}
-                                        <span className="inline-block bg-teal-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md">
-                                            {categoryName}
-                                        </span>
-
-                                        {/* Tytuł Posta */}
+                            <span className="inline-block bg-teal-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md">
+                                {categoryName}
+                            </span>
                                         <h3 className="text-xl font-bold text-gray-800 truncate">
                                             {post.title}
                                         </h3>
                                     </div>
-                                    {/* KONIEC ZMODYFIKOWANEGO NAGŁÓWKA */}
 
                                     <p className="text-gray-600 mt-1">
                                         {post.content.substring(0, 100)}
                                         {post.content.length > 100 ? '...' : ''}
                                     </p>
-                                    <p className="text-gray-500 text-sm mt-2">
-                                        Autor: <strong className="text-gray-900">{post.user.username}</strong>
-                                    </p>
+
+                                    {/* ⭐ ZMODYFIKOWANA SEKCJA AUTORA Z IKONKĄ ⭐ */}
+                                    <div className="text-gray-500 text-sm mt-2 flex items-center">
+                                        <span className="mr-1">Autor:</span>
+                                        <div className="flex items-center text-gray-900 font-bold">
+                                            {/* Ikonka użytkownika */}
+                                            <FaUserCircle className="w-4 h-4 mr-1 text-gray-400" />
+                                            {post.user.username}
+                                        </div>
+                                    </div>
+
                                 </div>
                                 <div className="text-gray-400 text-sm text-right flex-shrink-0 pt-1">
                                     <span className="block">{formatDate(date)}</span>

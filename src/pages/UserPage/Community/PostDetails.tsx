@@ -626,7 +626,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                 className="mb-6 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 font-medium transition"
                 onClick={onBack}
             >
-                ← Powrót do Forum
+                ← Powrót
             </button>
 
             {/* ⭐ GŁÓWNY KONTENER POSTA - POZYCJONOWANIE IKON ⭐ */}
@@ -636,7 +636,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                     <div className="absolute top-4 right-4 flex items-center space-x-2">
 
                         {/* Przycisk ZAPISZ (Widoczny dla zalogowanych) */}
-                        {user && (
+                        {user && !isAuthor && (
                             <button
                                 onClick={handleToggleSave}
                                 disabled={saveLoading}
