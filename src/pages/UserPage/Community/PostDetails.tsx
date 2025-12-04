@@ -190,36 +190,11 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     const [commentUserVote, setCommentUserVote] = useState<Record<number, 'upvote' | 'downvote' | null>>({});
 
     const [user] = useAtom(userAtom);
-    const isAuthor = user && user.nickname === post.user.username;
+    // const isAuthor = user && user.nickname === post.user.username;
+    const isAuthor = user && post.user && user.nickname === post.user.username;
     const [isSaved, setIsSaved] = useState(false);
     const [saveLoading, setSaveLoading] = useState(false);
 
-    // const handleToggleSave = async () => {
-    //     if (!user) {
-    //         alert("Musisz być zalogowany, aby zapisać post.");
-    //         return;
-    //     }
-    //
-    //     // Optymistyczna aktualizacja UI (zmienia ikonkę od razu)
-    //     const previousState = isSaved;
-    //     setIsSaved(!isSaved);
-    //
-    //     try {
-    //         if (!previousState) {
-    //             // Logika zapisywania (dostosuj endpoint do swojego backendu)
-    //             await customAxios.post(`community/posts/save/${post.id}`);
-    //             setToastMessage({ message: "Post został zapisany!", type: 'success' });
-    //         } else {
-    //             // Logika usuwania z zapisanych
-    //             await customAxios.delete(`community/posts/unsave/${post.id}`);
-    //             setToastMessage({ message: "Post usunięty z zapisanych.", type: 'success' });
-    //         }
-    //     } catch (error) {
-    //         console.error("Błąd zapisu:", error);
-    //         setIsSaved(previousState); // Cofnij zmianę w razie błędu
-    //         setToastMessage({ message: "Wystąpił błąd zapisu.", type: 'error' });
-    //     }
-    // };
     // FUNKCJA POBIERAJĄCA KOMENTARZE
     const fetchComments = async () => {
         setLoadingComments(true);
@@ -334,16 +309,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
             console.error("Błąd pobierania statusu głosowania:", err);
         }
     };
-    // const fetchCommentVotes = async () => {
-    //     try {
-    //         const response = await customAxios.get(`/community/comments/votes/${post.id}`);
-    //
-    //         setCommentVotes(response.data.netScores);
-    //         setCommentUserVote(response.data.userVotes);
-    //     } catch (err) {
-    //         console.error("Błąd pobierania głosów komentarzy:", err);
-    //     }
-    // };
+
     const fetchCommentVotes = async () => {
         try {
             const newNetScores: Record<number, number> = {};
@@ -666,41 +632,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
             {/* ⭐ GŁÓWNY KONTENER POSTA - POZYCJONOWANIE IKON ⭐ */}
             <div className="relative max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-2xl border-t-4 border-blue-600">
                 {/* ⭐ IKONY W PRAWYM GÓRNYM ROGU (ZAPIS + EDYCJA/USUWANIE) ⭐ */}
-                {/*{!isEditing && (*/}
-                {/*    <div className="absolute top-4 right-4 flex space-x-2">*/}
-
-                {/*        /!* Przycisk ZAPISZ (Widoczny dla każdego zalogowanego) *!/*/}
-                {/*        <button*/}
-                {/*            onClick={handleToggleSave}*/}
-                {/*            className="p-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-yellow-600 transition duration-150"*/}
-                {/*            title={isSaved ? "Usuń z zapisanych" : "Zapisz post"}*/}
-                {/*        >*/}
-                {/*            {isSaved ? <FaBookmark className="w-4 h-4 text-yellow-500" /> : <FaRegBookmark className="w-4 h-4" />}*/}
-                {/*        </button>*/}
-
-                {/*        /!* Przyciski AUTORA (Edycja i Usuwanie) *!/*/}
-                {/*        {isAuthor && (*/}
-                {/*            <>*/}
-                {/*                <button*/}
-                {/*                    onClick={() => setIsEditing(true)}*/}
-                {/*                    className="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition duration-150"*/}
-                {/*                    title="Edytuj post"*/}
-                {/*                >*/}
-                {/*                    <FaEdit className="w-4 h-4" />*/}
-                {/*                </button>*/}
-
-                {/*                <button*/}
-                {/*                    onClick={handleInitiateDelete}*/}
-                {/*                    className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition duration-150"*/}
-                {/*                    title="Usuń post"*/}
-                {/*                >*/}
-                {/*                    <FaTimes className="w-4 h-4" />*/}
-                {/*                </button>*/}
-                {/*            </>*/}
-                {/*        )}*/}
-                {/*    </div>*/}
-                {/*)}*/}
-                {/* ⭐ IKONY W PRAWYM GÓRNYM ROGU (ZAPIS + EDYCJA/USUWANIE) ⭐ */}
                 {!isEditing && (
                     <div className="absolute top-4 right-4 flex items-center space-x-2">
 
@@ -759,7 +690,8 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                         <span>Autor:</span>
                         <span className="flex items-center space-x-1 text-gray-700 font-bold">
                             <FaUserCircle className="w-4 h-4 text-gray-500"/>
-                            <span>{post.user.username}</span>
+                            {/*<span>{post.user.username}</span>*/}
+                            <span>{post.user?.username || "Nieznany"}</span>
                         </span>
                     </span>
                     <span>|</span>
