@@ -4,6 +4,7 @@ import {EditIcon} from "lucide-react";
 import {showToast} from "../../../../lib/ToastContainer.tsx";
 import {deleteGameByIdApi} from "../api/deleteGameByIdApi.ts";
 import {baseUrl} from "../../../../types/baseUrl.ts";
+import {useEffect, useMemo, useState} from "react";
 
 interface GameInfoDtoProps {
     gameReqCompDto: GameReqCompDto;
@@ -15,8 +16,20 @@ interface GameInfoDtoProps {
 
 export function GameInfoDto({ gameReqCompDto,refetchGames, handleOpenEditGameModal, setGameToEdit }: GameInfoDtoProps) {
     const { title, imageUrl, cpuSpecs = [], gpuSpecs = [] } = gameReqCompDto;
+    const [cacheBuster, setCacheBuster] = useState<number>(() => Date.now());
 
-    // const imageToShow = useFetchImageBlobUrl(imageUrl);
+
+    useEffect(() => {
+        setCacheBuster(Date.now());
+    }, [gameReqCompDto]);
+
+    const imageSrc = useMemo(() => {
+        if (!imageUrl) return "";
+        const url = `${baseUrl.replace(/\/$/, "")}/${String(imageUrl).replace(/^\//, "")}`;
+        return `${url}${url.includes("?") ? "&" : "?"}v=${cacheBuster}`;
+    }, [baseUrl, imageUrl, cacheBuster]);
+
+
     const handleDeleteGame = async (gameId?: number) => {
         if (gameId === undefined || gameId === null) {
             showToast.error("Nie można usunąć gry, brak identyfikatora");
@@ -53,13 +66,12 @@ export function GameInfoDto({ gameReqCompDto,refetchGames, handleOpenEditGameMod
                             </button>
                         </div>
 
-
                     </div>
                     <div className="flex items-center gap-3">
-                        {gameReqCompDto.imageUrl  ? (
+                        {imageUrl  ? (
                             <div className="w-12 h-12 flex-shrink-0 overflow-hidden rounded-md">
                                 <img
-                                    src={ baseUrl + imageUrl}
+                                    src={imageSrc}
                                     alt={title}
                                     className="w-full h-full object-cover"
                                 />

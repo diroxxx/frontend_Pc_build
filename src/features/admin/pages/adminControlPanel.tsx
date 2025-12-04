@@ -1,5 +1,5 @@
 import {useState } from "react";
-import UsersPage from "./usersPage.tsx";
+import UsersPage from "../UsersManage/usersPage.tsx";
 import { useNavigate } from "react-router-dom";
 import { setAuthToken } from "../../../lib/Auth.tsx";
 import { userAtom } from "../../../atomContext/userAtom.tsx";

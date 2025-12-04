@@ -19,21 +19,7 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import {updateGameReqCompApi} from "../api/updateGameReqCompApi.ts";
-
-const modalSx = {
-    position: "absolute" as const,
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: { xs: "92%", sm: 700 },
-    bgcolor: "var(--color-ocean-dark-blue)",
-    color: "var(--color-ocean-white)",
-    border: "1px solid var(--color-ocean-blue)",
-    boxShadow: "0 12px 40px rgba(16,55,131,0.25)",
-    borderRadius: 2,
-    p: 3,
-    outline: "none",
-};
+import {modalSx} from "../../../../types/modalStyle.ts";
 
 interface GameModalProps {
     open: boolean;
@@ -173,12 +159,8 @@ export const EditGameModal = ({
         if (!validateTitle(gameInfoToChange.title)) return;
         if (gameInfoToChange.imageUrl == null || gameInfoToChange.imageUrl === ''|| gameInfoToChange.imageUrl === '' || gameInfoToChange.cpuSpecs.length == 0 || gameInfoToChange.cpuSpecs.length == 0) {
             showToast.error("Wprowadź dane")
+            return;
         }
-        // if (selectedFile == null ) {
-        //     showToast.error("Podaj grafike gry");
-        //     return;
-        //
-        // }
         try {
             const dtoToSend: GameReqCompDto = {
                 ...gameInfoToChange,
@@ -187,10 +169,9 @@ export const EditGameModal = ({
             };
 
             console.log(dtoToSend);
-            await updateGameReqCompApi(dtoToSend, selectedFile);
+            await updateGameReqCompApi(dtoToSend, selectedFile).then( () => refetchGames());
             console.log("dtoToSend", dtoToSend);
             showToast.success("Zapisano zmiany");
-            refetchGames();
             handleClose();
         } catch (err) {
             console.error("save failed", err);

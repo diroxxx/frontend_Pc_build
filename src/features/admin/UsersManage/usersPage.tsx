@@ -1,16 +1,24 @@
-import { useEffect, useState } from "react";
-import customAxios from "../../../lib/customAxios.tsx";
-import { usersListAtom } from "../atoms/adminAtom.tsx";
-import { useAtom } from "jotai";
+import {useState} from "react";
 import {RemoveIcon} from "../../../assets/icons/removeIcon.tsx"
+import {EditIcon} from "lucide-react";
+import {EditUserModal} from "./EditUserModal.tsx";
+import {UserRole, type UserUpdateDto} from "./UserUpdateDto.ts";
+import {deleteUserByIdApi} from "./deleteUserByIdApi.ts";
+import {showToast} from "../../../lib/ToastContainer.tsx";
+import {useAllUsers} from "./useAllUsers.ts";
+import type {UserToShowDto} from "./UserToShowDto.ts";
+
 const UsersPage = () => {
-    const [getUsers, setUsers] = useAtom(usersListAtom);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterRole, setFilterRole] = useState<string>('all');
+    const[openUserModal, setOpenUserModal] = useState<boolean>(false);
+    const {data:users, isError,isLoading,isFetching, refetch} = useAllUsers();
 
-    const filteredUsers = getUsers.filter(user => {
+    const usersList = users != null ? users : [];
+
+    const filteredUsers = usersList.filter(user => {
         const matchesSearch =
-            user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.nickname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.email?.toLowerCase().includes(searchTerm.toLowerCase())
 
         const matchesRole = filterRole === 'all' || user.role === filterRole;
@@ -18,9 +26,23 @@ const UsersPage = () => {
         return matchesSearch && matchesRole;
     });
 
+    const handleOpenUSerModal = () => setOpenUserModal(true);
+    const handleCloseUserModal = () => setOpenUserModal(false);
+
+
+    const [userToUpdate, setUserToUpdate] = useState<UserToShowDto>({
+        email: "",
+        nickname: "",
+        role: UserRole.USER
+    });
+
+    function handleDeleteUSerByEmail(email:string) {
+        deleteUserByIdApi(email).then(r => showToast.success(r.message));
+    }
+
     return (
         <div className="space-y-4">
-            {/* Header */}
+            <EditUserModal open={openUserModal} handleClose={handleCloseUserModal} userUpdateDto={userToUpdate} userRefetch={refetch} />
             <div className=" rounded-lg shadow-sm border border-gray-200 p-4">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold text-midnight-dark">Lista użytkowników</h2>
@@ -60,16 +82,15 @@ const UsersPage = () => {
                 <div className="flex items-center gap-3 text-xs text-midnight-dark">
                     <span>Wyświetlono: <strong>{filteredUsers.length}</strong></span>
                     <span>•</span>
-                    <span>Łącznie: <strong>{getUsers.length}</strong></span>
+                    <span>Łącznie: <strong>{usersList.length}</strong></span>
                 </div>
             </div>
 
-            {/* Table */}
             <div className=" rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                 <table className="w-full text-sm">
                     <thead className="bg-ocean-dark-blue text-ocean-white">
                     <tr>
-                        <th className="px-3 py-2 text-left font-medium">Imię</th>
+                        <th className="px-3 py-2 text-left font-medium">Pseudonim</th>
                         <th className="px-3 py-2 text-left font-medium">Email</th>
                         <th className="px-3 py-2 text-left font-medium">Rola</th>
                         <th className="px-3 py-2 text-right font-medium">Akcje</th>
@@ -88,9 +109,9 @@ const UsersPage = () => {
                             </td>
                         </tr>
                     ) : (
-                        filteredUsers.map(({ role, username, email }) => (
+                        filteredUsers.map(({ role, nickname, email}) => (
                             <tr key={email} className="hover:bg-ocean-light-blue/20">
-                                <td className="px-3 py-2 font-medium text-midnight-dark">{username}</td>
+                                <td className="px-3 py-2 font-medium text-midnight-dark">{nickname}</td>
                                 <td className="px-3 py-2 text-midnight-dark">{email}</td>
                                 <td className="px-3 py-2">
                                         <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
@@ -103,14 +124,27 @@ const UsersPage = () => {
                                 </td>
                                 <td className="px-3 py-2">
                                     <div className="flex items-center justify-end gap-1">
-                                        {/*<button className="p-1.5 text-ocean-blue hover:bg-ocean-light-blue rounded transition-colors" title="Edytuj">*/}
-                                        {/*    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">*/}
-                                        {/*        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />*/}
-                                        {/*    </svg>*/}
-                                        {/*</button>*/}
-                                        <button className="p-1.5 text-ocean-red hover:bg-ocean-red/10 rounded transition-colors" title="Usuń">
+                                        {role != "ADMIN" &&  <button className={"hover:bg-ocean-dark-blue/10 transition-colors p-1.5"}>
+
+                                            <EditIcon
+                                                className={"w-5 h-5 text-ocean-dark-blue  cursor-pointer"}
+                                                onClick={() => {
+                                                    setUserToUpdate({
+                                                        email: email,
+                                                        nickname: nickname,
+                                                        role: UserRole.USER
+                                                    })
+                                                    handleOpenUSerModal()
+                                                }}
+                                            />
+                                        </button>}
+
+
+                                        {role != "ADMIN" && <button
+                                            onClick={() => handleDeleteUSerByEmail(email)}
+                                            className="p-1.5 text-ocean-red hover:bg-ocean-red/10 rounded transition-colors" title="Usuń">
                                             <RemoveIcon/>
-                                        </button>
+                                        </button>}
                                     </div>
                                 </td>
                             </tr>

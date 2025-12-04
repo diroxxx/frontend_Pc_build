@@ -20,22 +20,8 @@ import {
 } from "../../types/GameReqCompDto.ts";
 import {createNewGameReqCompApi} from "../api/createNewGameReqCompApi.ts";
 import {showToast} from "../../../../lib/ToastContainer.tsx";
+import {modalSx} from "../../../../types/modalStyle.ts";
 
-
-const modalSx = {
-    position: "absolute" as const,
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: { xs: "92%", sm: 700 },
-    bgcolor: "var(--color-ocean-dark-blue)",
-    color: "var(--color-ocean-white)",
-    border: "1px solid var(--color-ocean-blue)",
-    boxShadow: "0 12px 40px rgba(16,55,131,0.25)",
-    borderRadius: 2,
-    p: 3,
-    outline: "none",
-};
 
 interface GameModalProps {
     open: boolean;
@@ -252,7 +238,7 @@ export function AddNewGameModal({ open, handleClose, gamesTitles, gpus, cpus, re
                             </Select>
                         </FormControl>
 
-=                        <FormControl size="small" fullWidth>
+                        <FormControl size="small" fullWidth>
                             <InputLabel id="cpu-level-label" sx={{ color: "rgba(241,250,238,0.8)" }}>
                                 Wymagania (CPU)
                             </InputLabel>

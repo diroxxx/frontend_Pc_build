@@ -102,14 +102,6 @@ return (
                         </button>
                     </div>
 
-                    {/* <div className="text-center">
-                        <a
-                            href="#"
-                            className="text-sm text-ocean-blue hover:text-ocean-dark-blue transition-colors duration-200"
-                        >
-                            Zapomniałeś swojego hasła?
-                        </a>
-                    </div> */}
                 </form>
                 
                 <div className="mt-3 min-h-[60px]">
@@ -129,7 +121,7 @@ return (
                         <span className="text-sm text-gray-600">
                             Nie masz jeszcze konta?{' '}
                             <a
-                                href="/src/features/user/userProfile/pages/Register"
+                                href="/Register"
                                 className="font-medium text-ocean-blue hover:text-ocean-dark-blue transition-colors duration-200"
                             >
                                 Zarejestruj się
