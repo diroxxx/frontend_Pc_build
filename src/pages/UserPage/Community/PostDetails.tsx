@@ -15,6 +15,7 @@ import {timeAgo} from "./PostTime.tsx";
 import {useAtom} from "jotai";
 import {userAtom} from "../../../atomContext/userAtom.tsx";
 import { Dialog } from "@mui/material";
+import {getCategoryColor} from "./categoryUtils.tsx";
 
 
 interface User {
@@ -402,10 +403,9 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
             return;
         }
 
-        if (saveLoading) return; // Zapobiegaj podwójnym kliknięciom
+        if (saveLoading) return;
         setSaveLoading(true);
 
-        // Optymistyczna aktualizacja UI (zmieniamy ikonkę zanim dostaniemy odpowiedź z serwera)
         const previousState = isSaved;
         setIsSaved(!isSaved);
 
@@ -494,41 +494,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         }
     };
 
-    // const VoteSection = () => (
-    //     <div className="inline-flex items-center space-x-4 border p-3 rounded-lg bg-gray-50 mb-6">
-    //         <button
-    //             className={`flex items-center p-2 rounded-full transition ${
-    //                 userVoteStatus === 'upvote' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-    //             }`}
-    //             onClick={() => handleVote('upvote')}
-    //             title="Upvote (Like)"
-    //         >
-    //             <FaThumbsUp className="w-5 h-5"/>
-    //         </button>
-    //
-    //         <span
-    //             className={`text-xl font-bold ${
-    //                 netScore > 0 ? 'text-gray-700' : netScore < 0 ? 'text-red-700' : 'text-gray-700'
-    //             }`}
-    //         >
-    //         {netScore}
-    //     </span>
-    //
-    //         <button
-    //             className={`flex items-center p-2 rounded-full transition ${
-    //                 userVoteStatus === 'downvote' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-    //             }`}
-    //             onClick={() => handleVote('downvote')}
-    //             title="Downvote (Dislike)"
-    //         >
-    //             <FaThumbsDown className="w-5 h-5"/>
-    //         </button>
-    //
-    //         {voteError && (
-    //             <span className="text-sm text-red-500 ml-4 font-medium">{voteError}</span>
-    //         )}
-    //     </div>
-    // );
+
     const VoteSection = () => (
         <div className="inline-flex items-center space-x-4 border p-3 rounded-lg bg-gray-50 mb-6">
             {/* PRZYCISK LIKE */}
@@ -798,35 +764,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         }
     };
 
-    // const handleCommentVote = async (commentId: number, vote: 'upvote' | 'downvote') => {
-    //     // if (!user) {
-    //     //     setToastMessage({
-    //     //         message: "Musisz być zalogowany, aby oceniać komentarze.",
-    //     //         type: 'error'
-    //     //     });
-    //     //     return;
-    //     // }
-    //
-    //     try {
-    //         const response = await customAxios.post(
-    //             `/community/comments/${commentId}/vote?type=${vote}`
-    //         );
-    //
-    //         setCommentVotes(prev => ({
-    //             ...prev,
-    //             [commentId]: response.data
-    //         }));
-    //
-    //         setCommentUserVote(prev => ({
-    //             ...prev,
-    //             [commentId]: prev[commentId] === vote ? null : vote
-    //         }));
-    //
-    //     } catch (err) {
-    //         console.error("Błąd głosowania na komentarz:", err);
-    //     }
-    // };
-
     const handleCommentVote = async (commentId: number, vote: 'upvote' | 'downvote') => {
         // --- ZMIANA: Blokada dla niezalogowanych ---
         if (!user) {
@@ -869,6 +806,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
     const sortedComments = getSortedComments();
 
+
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
             <button
@@ -893,9 +831,9 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                                 title={isSaved ? "Usuń z zapisanych" : "Zapisz post"}
                             >
                                 {isSaved ? (
-                                    <FaBookmark className="w-5 h-5 text-yellow-500 scale-110" />
+                                    <FaBookmark className="w-5 h-5 text-yellow-500 scale-110"/>
                                 ) : (
-                                    <FaRegBookmark className="w-5 h-5 text-gray-500 group-hover:text-yellow-600" />
+                                    <FaRegBookmark className="w-5 h-5 text-gray-500 group-hover:text-yellow-600"/>
                                 )}
                             </button>
                         )}
@@ -903,14 +841,15 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                         {/* Przyciski AUTORA (Edycja i Usuwanie) */}
                         {isAuthor && (
                             <>
-                                <div className="h-6 w-px bg-gray-300 mx-2"></div> {/* Separator */}
+                                <div className="h-6 w-px bg-gray-300 mx-2"></div>
+                                {/* Separator */}
 
                                 <button
                                     onClick={() => setIsEditing(true)}
                                     className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition duration-150"
                                     title="Edytuj post"
                                 >
-                                    <FaEdit className="w-4 h-4" />
+                                    <FaEdit className="w-4 h-4"/>
                                 </button>
 
                                 <button
@@ -918,20 +857,20 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                                     className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition duration-150"
                                     title="Usuń post"
                                 >
-                                    <FaTimes className="w-4 h-4" />
+                                    <FaTimes className="w-4 h-4"/>
                                 </button>
                             </>
                         )}
                     </div>
                 )}
 
-                {/* ⭐ ZMODYFIKOWANA SEKCJA NAGŁÓWKA ⭐ */}
-                <div className="flex items-center mb-4">
-                    <span
-                        className="inline-block bg-teal-500 text-white text-base font-bold px-3 py-1 rounded-full mr-4 shadow-md">
-                        {categoryName}
-                    </span>
-                    <h1 className="text-4xl font-extrabold text-gray-900 leading-tight">{post.title}</h1>
+                <div className="flex items-center mb-2">
+                    <span className={`inline-block text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md ${getCategoryColor(post.category?.name)}`}>
+                                        {categoryName}
+                                    </span>
+                    <h1 className="text-4xl font-extrabold text-gray-900 leading-tight">
+                        {post.title}
+                    </h1>
                 </div>
 
                 <div className="flex items-center text-sm text-gray-500 mb-6 space-x-4">

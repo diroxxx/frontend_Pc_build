@@ -6,13 +6,18 @@ import UserComputers from "../components/UserComputers.tsx";
 import customAxios from "../../../../lib/customAxios.tsx";
 import PostDetails from "../../../../pages/UserPage/Community/PostDetails.tsx";
 import PaginatedList from "../../../../pages/UserPage/Community/PaginatedPosts.tsx";
-import { FaUserCircle } from "react-icons/fa";
+import {FaDesktop, FaMicrochip, FaMoneyBillWave, FaUserCircle} from "react-icons/fa";
+import {useNavigate} from "react-router-dom";
+// 👇 DODAJ TEN IMPORT (dopasuj ścieżkę do swojego pliku categoryUtils)
+import { getCategoryColor } from "../../../../pages/UserPage/Community/categoryUtils";
 
 // --- INTERFEJSY ---
 
 interface User {
     id: number;
     username: string;
+    nickname: string;
+    email: string;
 }
 
 interface Category {
@@ -29,10 +34,16 @@ interface Post {
     createdAt: number[];
     category?: Category;
 }
+interface Computer {
+    id: number;
+    name: string;
+    totalPrice: number;
+    offers: any[];
+}
 
 function UserPage() {
     const [activeTab, setActiveTab] = useState("profile");
-
+    const navigate = useNavigate(); // <--- DODAJ TO
     // --- STATE DLA POSTÓW ---
     const [posts, setPosts] = useState<Post[]>([]);
     const [loadingPosts, setLoadingPosts] = useState(false);
@@ -45,6 +56,9 @@ function UserPage() {
 
     // --- STATE DLA SZCZEGÓŁÓW POSTA ---
     const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+    const [computers, setComputers] = useState<Computer[]>([]);
+    const [loadingComputers, setLoadingComputers] = useState(false);
+    const [errorComputers, setErrorComputers] = useState<string | null>(null);
 
     const [user] = useAtom(userAtom);
 
@@ -77,6 +91,30 @@ function UserPage() {
             fetchPosts();
         }
     }, [activeTab, user?.nickname]);
+
+    // NOWE: POBIERANIE ZESTAWÓW KOMPUTEROWYCH
+    useEffect(() => {
+        // Sprawdzamy czy zakładka to "builds" i czy mamy email usera
+        if (activeTab === "builds" && user?.email) {
+            const fetchComputers = async () => {
+                try {
+                    setLoadingComputers(true);
+                    setErrorComputers(null);
+
+                    // Endpoint z Javy: /users/{email}/computers
+                    const response = await customAxios.get(`api/users/${user.email}/computers`);
+
+                    setComputers(response.data);
+                } catch (err: any) {
+                    console.error("Błąd pobierania zestawów:", err);
+                    setErrorComputers("Nie udało się pobrać konfiguracji PC.");
+                } finally {
+                    setLoadingComputers(false);
+                }
+            };
+            fetchComputers();
+        }
+    }, [activeTab, user?.email]);
 
     useEffect(() => {
         if (activeTab === "saved" && user?.nickname) {
@@ -175,6 +213,35 @@ function UserPage() {
                         )}
 
                         {/* UŻYCIE PAGINATED LIST DLA MY POSTS */}
+                        {/*{!loadingPosts && !errorPosts && (*/}
+                        {/*    <PaginatedList*/}
+                        {/*        items={posts}*/}
+                        {/*        itemsPerPage={5}*/}
+                        {/*        renderItem={(post) => (*/}
+                        {/*            <div*/}
+                        {/*                key={post.id}*/}
+                        {/*                onClick={() => handlePostClick(post)}*/}
+                        {/*                className="p-5 bg-white rounded-lg shadow-sm hover:shadow-md transition border border-gray-100 cursor-pointer group"*/}
+                        {/*            >*/}
+                        {/*                <div className="flex justify-between items-start">*/}
+                        {/*                    <h4 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors">*/}
+                        {/*                        {post.title}*/}
+                        {/*                    </h4>*/}
+                        {/*                    {post.category?.name && (*/}
+                        {/*                        <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">*/}
+                        {/*                            {post.category.name}*/}
+                        {/*                        </span>*/}
+                        {/*                    )}*/}
+                        {/*                </div>*/}
+                        {/*                <p className="text-gray-600 mt-2 line-clamp-3">{post.content}</p>*/}
+                        {/*                <div className="mt-2 text-xs text-gray-400">*/}
+                        {/*                    Kliknij, aby zobaczyć szczegóły*/}
+                        {/*                </div>*/}
+                        {/*            </div>*/}
+                        {/*        )}*/}
+                        {/*    />*/}
+                        {/*)}*/}
+
                         {!loadingPosts && !errorPosts && (
                             <PaginatedList
                                 items={posts}
@@ -185,16 +252,17 @@ function UserPage() {
                                         onClick={() => handlePostClick(post)}
                                         className="p-5 bg-white rounded-lg shadow-sm hover:shadow-md transition border border-gray-100 cursor-pointer group"
                                     >
-                                        <div className="flex justify-between items-start">
+                                        {/* 👇 ZMIANA: Kategoria przed tytułem, dynamiczny kolor 👇 */}
+                                        <div className="flex items-center mb-2">
+                                            <span className={`inline-block text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md ${getCategoryColor(post.category?.name)}`}>
+                                                {post.category?.name || 'Inne'}
+                                            </span>
                                             <h4 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
                                                 {post.title}
                                             </h4>
-                                            {post.category?.name && (
-                                                <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
-                                                    {post.category.name}
-                                                </span>
-                                            )}
                                         </div>
+                                        {/* 👆 KONIEC ZMIANY 👆 */}
+
                                         <p className="text-gray-600 mt-2 line-clamp-3">{post.content}</p>
                                         <div className="mt-2 text-xs text-gray-400">
                                             Kliknij, aby zobaczyć szczegóły
@@ -208,58 +276,63 @@ function UserPage() {
 
                 {/* --- MY BUILDS CONTENT --- */}
                 {activeTab === "builds" && <UserComputers />}
+                {activeTab === "builds" && (
+                    <div className="py-8">
+                        <h3 className="text-xl font-semibold text-center mb-4">Moje Konfiguracje PC</h3>
 
-                {/*/!* --- SAVED CONTENT --- *!/*/}
-                {/*{activeTab === "saved" && (*/}
-                {/*    <div className="py-8">*/}
-                {/*        <h3 className="text-xl font-semibold text-center mb-4">Zapisane Posty</h3>*/}
+                        {loadingComputers && <p className="text-gray-600 text-center animate-pulse">Ładowanie zestawów...</p>}
+                        {errorComputers && <p className="text-red-500 text-center">{errorComputers}</p>}
 
-                {/*        {loadingSaved && <p className="text-gray-600 text-center animate-pulse">Loading saved items...</p>}*/}
-                {/*        {errorSaved && <p className="text-red-500 text-center">{errorSaved}</p>}*/}
+                        {!loadingComputers && !errorComputers && computers.length === 0 && (
+                            <div className="text-center py-10 bg-white rounded-lg shadow-sm">
+                                <FaDesktop className="mx-auto text-gray-300 w-12 h-12 mb-3" />
+                                <p className="text-gray-500">Nie stworzyłeś jeszcze żadnych zestawów.</p>
+                            </div>
+                        )}
 
-                {/*        {!loadingSaved && !errorSaved && savedPosts.length === 0 && (*/}
-                {/*            <div className="text-center py-10 bg-white rounded-lg shadow-sm">*/}
-                {/*                <p className="text-gray-500">Nie zapisałeś jeszcze żadnego posta.</p>*/}
-                {/*            </div>*/}
-                {/*        )}*/}
+                        {/* LISTA ZESTAWÓW */}
+                        {!loadingComputers && !errorComputers && computers.length > 0 && (
+                            <div className="grid gap-4">
+                                {computers.map((comp) => (
+                                    <div
+                                        key={comp.id}
+                                        className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition border-l-4 border-green-500 flex flex-col sm:flex-row justify-between items-start sm:items-center"
+                                    >
+                                        <div className="mb-4 sm:mb-0">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <FaDesktop className="text-gray-600 text-xl" />
+                                                <h4 className="text-xl font-bold text-gray-800">{comp.name}</h4>
+                                            </div>
 
-                {/*        /!* UŻYCIE PAGINATED LIST DLA SAVED POSTS *!/*/}
-                {/*        {!loadingSaved && !errorSaved && (*/}
-                {/*            <PaginatedList*/}
-                {/*                items={savedPosts}*/}
-                {/*                itemsPerPage={5}*/}
-                {/*                renderItem={(savedItem) => (*/}
-                {/*                    <div*/}
-                {/*                        key={savedItem.id}*/}
-                {/*                        onClick={() => {*/}
-                {/*                            // Poprawka ID dla zapisanych postów*/}
-                {/*                            const correctPostObject = {*/}
-                {/*                                ...savedItem,*/}
-                {/*                                id: savedItem.postId*/}
-                {/*                            };*/}
-                {/*                            handlePostClick(correctPostObject);*/}
-                {/*                        }}*/}
-                {/*                        className="p-5 bg-white rounded-lg shadow-sm hover:shadow-md transition border border-gray-100 cursor-pointer group"*/}
-                {/*                    >*/}
-                {/*                        <div className="flex justify-between items-start">*/}
-                {/*                            <h4 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors">*/}
-                {/*                                {savedItem.title}*/}
-                {/*                            </h4>*/}
-                {/*                            {savedItem.category?.name && (*/}
-                {/*                                <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">*/}
-                {/*                                    {savedItem.category.name}*/}
-                {/*                                </span>*/}
-                {/*                            )}*/}
-                {/*                        </div>*/}
-                {/*                        <p className="text-gray-600 mt-2 line-clamp-3">{savedItem.content}</p>*/}
-                {/*                        <div className="mt-3 flex justify-between items-center text-xs text-gray-500">*/}
-                {/*                        </div>*/}
-                {/*                    </div>*/}
-                {/*                )}*/}
-                {/*            />*/}
-                {/*        )}*/}
-                {/*    </div>*/}
-                {/*)}*/}
+                                            <div
+                                                className="flex flex-col sm:flex-row gap-2 sm:gap-6 text-sm text-gray-500">
+                                                <span className="flex items-center gap-1">
+                                                    <FaMicrochip/> Części: {comp.offers ? comp.offers.length : 0}
+                                                </span>
+                                                <span
+                                                    className="flex items-center gap-1 text-green-700 font-bold text-base">
+                                                         <FaMoneyBillWave/>
+                                                        Cena: {comp.offers
+                                                    ? comp.offers.reduce((sum: number, part: any) => sum + (part.price || 0), 0).toFixed(2)
+                                                    : "0.00"} PLN
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            className="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm font-medium shadow"
+                                            // onClick={() => console.log("Otwórz szczegóły zestawu ID:", comp.id)}
+                                            onClick={() => navigate('/builds')} // <--- ZMIANA TUTAJ
+                                        >
+                                            Zobacz szczegóły
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 {/* --- SAVED CONTENT --- */}
                 {activeTab === "saved" && (
                     <div className="py-8">
@@ -267,6 +340,54 @@ function UserPage() {
 
                         {/* ... loading i error bez zmian ... */}
 
+                        {/*{!loadingSaved && !errorSaved && (*/}
+                        {/*    <PaginatedList*/}
+                        {/*        items={savedPosts}*/}
+                        {/*        itemsPerPage={5}*/}
+                        {/*        renderItem={(savedItem) => (*/}
+                        {/*            <div*/}
+                        {/*                key={savedItem.id}*/}
+                        {/*                onClick={() => {*/}
+                        {/*                    // Zabezpieczenie na wypadek gdyby postId było nullem*/}
+                        {/*                    const correctPostObject = {*/}
+                        {/*                        ...savedItem,*/}
+                        {/*                        id: savedItem.postId ?? 0*/}
+                        {/*                    };*/}
+
+                        {/*                    // Klikamy tylko jeśli ID jest poprawne*/}
+                        {/*                    if (correctPostObject.id !== 0) {*/}
+                        {/*                        handlePostClick(correctPostObject);*/}
+                        {/*                    }*/}
+                        {/*                }}*/}
+                        {/*                className="p-5 bg-white rounded-lg shadow-sm hover:shadow-md transition border border-gray-100 cursor-pointer group"*/}
+                        {/*            >*/}
+                        {/*                <div className="flex justify-between items-start">*/}
+                        {/*                    <h4 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors">*/}
+                        {/*                        {savedItem.title}*/}
+                        {/*                    </h4>*/}
+                        {/*                    {savedItem.category?.name && (*/}
+                        {/*                        <span*/}
+                        {/*                            className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">*/}
+                        {/*            {savedItem.category.name}*/}
+                        {/*        </span>*/}
+                        {/*                    )}*/}
+                        {/*                </div>*/}
+                        {/*                <p className="text-gray-600 mt-2 line-clamp-3">{savedItem.content}</p>*/}
+
+                        {/*                <div className="mt-3 flex justify-between items-center text-xs text-gray-500">*/}
+                        {/*                    <div className="flex items-center">*/}
+                        {/*                        <span className="mr-1">Autor:</span>*/}
+                        {/*                        <div className="flex items-center font-bold text-gray-700">*/}
+                        {/*                            <FaUserCircle className="w-4 h-4 mr-1 text-gray-400"/>*/}
+                        {/*                            {savedItem.user?.username || "Nieznany"}*/}
+                        {/*                        </div>*/}
+                        {/*                    </div>*/}
+                        {/*                </div>*/}
+                        {/*                /!* --------------------------------------- *!/*/}
+                        {/*            </div>*/}
+                        {/*        )}*/}
+                        {/*    />*/}
+                        {/*)}*/}
                         {!loadingSaved && !errorSaved && (
                             <PaginatedList
                                 items={savedPosts}
@@ -275,43 +396,28 @@ function UserPage() {
                                     <div
                                         key={savedItem.id}
                                         onClick={() => {
-                                            // Zabezpieczenie na wypadek gdyby postId było nullem
                                             const correctPostObject = {
                                                 ...savedItem,
                                                 id: savedItem.postId ?? 0
                                             };
-
-                                            // Klikamy tylko jeśli ID jest poprawne
                                             if (correctPostObject.id !== 0) {
                                                 handlePostClick(correctPostObject);
                                             }
                                         }}
                                         className="p-5 bg-white rounded-lg shadow-sm hover:shadow-md transition border border-gray-100 cursor-pointer group"
                                     >
-                                        <div className="flex justify-between items-start">
+                                        {/* 👇 ZMIANA: Kategoria przed tytułem, dynamiczny kolor 👇 */}
+                                        <div className="flex items-center mb-2">
+                                            <span className={`inline-block text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md ${getCategoryColor(savedItem.category?.name)}`}>
+                                                {savedItem.category?.name || 'Inne'}
+                                            </span>
                                             <h4 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
                                                 {savedItem.title}
                                             </h4>
-                                            {savedItem.category?.name && (
-                                                <span
-                                                    className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
-                                    {savedItem.category.name}
-                                </span>
-                                            )}
                                         </div>
-                                        <p className="text-gray-600 mt-2 line-clamp-3">{savedItem.content}</p>
+                                        {/* 👆 KONIEC ZMIANY 👆 */}
 
-                                        {/* --- TU BYŁO PUSTO, TERAZ JEST AUTOR --- */}
-                                        {/*<div className="mt-3 flex justify-between items-center text-xs text-gray-500">*/}
-                                        {/*    <div className="flex items-center">*/}
-                                        {/*        <span className="mr-1">Autor:</span>*/}
-                                        {/*        <div className="flex items-center font-bold text-gray-700">*/}
-                                        {/*            <FaUserCircle className="w-4 h-4 mr-1 text-gray-400" />*/}
-                                        {/*            /!* Używamy optional chaining (?.) dla bezpieczeństwa *!/*/}
-                                        {/*            {savedItem.user?.username || "Nieznany"}*/}
-                                        {/*        </div>*/}
-                                        {/*    </div>*/}
-                                        {/*</div>*/}
+                                        <p className="text-gray-600 mt-2 line-clamp-3">{savedItem.content}</p>
 
                                         <div className="mt-3 flex justify-between items-center text-xs text-gray-500">
                                             <div className="flex items-center">
@@ -322,7 +428,6 @@ function UserPage() {
                                                 </div>
                                             </div>
                                         </div>
-                                        {/* --------------------------------------- */}
                                     </div>
                                 )}
                             />

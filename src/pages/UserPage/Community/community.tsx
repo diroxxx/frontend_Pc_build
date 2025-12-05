@@ -8,6 +8,7 @@ import { FaArrowLeft } from 'react-icons/fa';
 import PaginatedList from "./PaginatedPosts.tsx";
 import { parseDateArray, formatDate, timeAgo } from "./PostTime.tsx";
 import { FaUserCircle } from "react-icons/fa";
+import {getCategoryColor} from "./categoryUtils.tsx";
 // import PostMainImage from "./PostMainImage";
 
 
@@ -39,8 +40,6 @@ interface Category {
     name: string;
 }
 
-
-
 const Community: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]);
     const [selectedPost, setSelectedPost] = useState<Post | null>(null);
@@ -60,73 +59,11 @@ const Community: React.FC = () => {
     const [formError, setFormError] = useState<string | null>(null);
     const [postStatus, setPostStatus] = useState<string | null>(null);
 
-    //
-    // const fetchPosts = async () => {
-    //     try {
-    //         // ZMIANA: Dopasowanie ścieżki do nowego endpointu Java pobierającego po ID
-    //         // Jeśli w PostController dałeś @RequestMapping("/api/posts"), to ścieżka wygląda tak:
-    //         const endpoint = selectedFilterCategoryId && selectedFilterCategoryId !== 'all'
-    //             ? `api/posts/category/id/${selectedFilterCategoryId}`
-    //             : `community/`; // Dla wszystkich postów (zostaw stary endpoint lub zmień na 'api/posts' jeśli tam też zmieniłeś)
-    //
-    //         const response = await customAxios.get(endpoint);
-    //         setPosts(response.data);
-    //     } catch (error) {
-    //         console.error("Fetch posts error:", error);
-    //         setPosts([]);
-    //     }
-    // };
-    //
-    // const fetchCategories = async () => {
-    //     try {
-    //         const response = await customAxios.get(`community/categories`);
-    //         const data: Category[] = response.data;
-    //
-    //         setCategories(data);
-    //
-    //
-    //     } catch (err) {
-    //         setFormError('Nie udało się załadować kategorii. Sprawdź połączenie z backendem.');
-    //         console.error("Błąd pobierania kategorii:", err);
-    //     } finally {
-    //         setFormLoading(false);
-    //     }
-    // };
-    //
-    // useEffect(() => {
-    //     fetchPosts();
-    //     fetchCategories();
-    // }, [selectedFilterCategoryId]);
-    // const fetchPosts = async () => {
-    //     try {
-    //         // Domyślny endpoint: pobierz wszystkie posty
-    //         // Odpowiada metodzie @GetMapping w PostController (bez dodatkowego URL)
-    //         let endpoint = 'community/categories';
-    //
-    //         // Jeśli wybrano konkretną kategorię (i nie jest to 'all'), zmień endpoint
-    //         // Odpowiada metodzie @GetMapping("/category/id/{id}")
-    //         if (selectedFilterCategoryId && selectedFilterCategoryId !== 'all') {
-    //             endpoint = `/category/id/${selectedFilterCategoryId}`;
-    //         }
-    //
-    //         console.log("Wysyłanie zapytania do:", endpoint); // Debug: sprawdź w konsoli przeglądarki co się wysyła
-    //
-    //         const response = await customAxios.get(endpoint);
-    //         setPosts(response.data);
-    //     } catch (error) {
-    //         console.error("Fetch posts error:", error);
-    //         setPosts([]);
-    //     }
-    // };
+
     const fetchPosts = async () => {
         try {
-            // 1. Domyślny endpoint (Wszystkie posty)
-            // Zakładam, że w CommunityController masz metodę @GetMapping bez argumentów, która zwraca wszystkie posty.
-            // Jeśli nie, musisz ją dodać (kod poniżej).
             let endpoint = 'community/';
 
-            // 2. Endpoint filtrowania (Posty po kategorii)
-            // Musi pasować do: @RequestMapping("/community") + @GetMapping("/categories/id/{categoryId}")
             if (selectedFilterCategoryId && selectedFilterCategoryId !== 'all') {
                 endpoint = `community/categories/id/${selectedFilterCategoryId}`;
             }
@@ -197,7 +134,6 @@ const Community: React.FC = () => {
         };
 
         try {
-            // Oczekuj na odpowiedź z obiektem nowo utworzonego posta, zawierającego ID
             const response = await customAxios.post<Post>(`community/posts`, newPostData);
             const createdPost = response.data;
 
@@ -216,8 +152,6 @@ const Community: React.FC = () => {
         }
     };
 
-
-    // 1. Widok Szczegółów Posta
     if (selectedPost) {
         return (
             <PostDetails
@@ -227,7 +161,6 @@ const Community: React.FC = () => {
         );
     }
 
-    // 2. Widok Formularza Tworzenia Posta / Ładowania Zdjęć (Nowa implementacja)
     if (isCreatingPost) {
         if (!isAuthenticated) return <div className="p-6 text-center text-red-600">Musisz być zalogowany, aby tworzyć
             posty!</div>;
@@ -341,24 +274,7 @@ const Community: React.FC = () => {
                             />
                         </div>
 
-                        {/*/!* Pole Kategori *!/*/}
-                        {/*<div>*/}
-                        {/*    <label htmlFor="category" className="block mt-4 mb-1 font-medium">Kategoria:</label>*/}
-                        {/*    <select*/}
-                        {/*        id="category"*/}
-                        {/*        value={categoryId}*/}
-                        {/*        onChange={(e) => setCategoryId(e.target.value)}*/}
-                        {/*        required*/}
-                        {/*        className="w-full p-2 border border-gray-300 rounded"*/}
-                        {/*    >*/}
-                        {/*        {categories.map((cat) => (*/}
-                        {/*            <option key={cat.id} value={cat.id}>*/}
-                        {/*                {cat.name}*/}
-                        {/*            </option>*/}
-                        {/*        ))}*/}
-                        {/*    </select>*/}
-                        {/*</div>*/}
-                        {/* Pole Kategorii */}
+
                         <div>
                             <label htmlFor="category" className="block mt-4 mb-1 font-medium">Kategoria:</label>
                             <select
@@ -420,8 +336,6 @@ const Community: React.FC = () => {
             </div>
         );
     }
-
-
 
     const sortedPosts = getSortedPosts();
 
@@ -495,25 +409,26 @@ const Community: React.FC = () => {
                                                 alt="Miniatura"
                                                 className="w-24 h-24 object-cover rounded-md border border-gray-200"
                                                 onError={(e) => {
-                                                    // Zabezpieczenie na wypadek błędu ładowania obrazka
                                                     e.currentTarget.style.display = 'none';
                                                 }}
                                             />
                                         </div>
                                     ) : (
-                                        // Opcjonalnie: Pusty placeholder lub ikona, jeśli nie ma zdjęcia (jak na reddicie)
-                                        // Możesz usunąć ten blok else, jeśli chcesz sam tekst dla postów bez zdjęć
-                                        <div className="mr-4 flex-shrink-0 w-24 h-24 bg-gray-100 rounded-md flex items-center justify-center border border-gray-200 text-gray-400 text-xs text-center p-1">
+                                        <div
+                                            className="mr-4 flex-shrink-0 w-24 h-24 bg-gray-100 rounded-md flex items-center justify-center border border-gray-200 text-gray-400 text-xs text-center p-1">
                                             Brak zdjęcia
                                         </div>
                                     )}
 
-                                    {/* SEKCJA TEKSTOWA */}
                                     <div className="flex-1 min-w-0">
+
                                         <div className="flex items-center mb-2">
-                            <span className="inline-block bg-teal-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md">
-                                {categoryName}
-                            </span>
+                                            <span
+                                                className={`inline-block text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md ${getCategoryColor(post.category?.name)}`}>
+                                        {categoryName}
+                                    </span>
+                                            {/* 👆 KONIEC ZMIANY 👆 */}
+
                                             <h3 className="text-xl font-bold text-gray-800 truncate">
                                                 {post.title}
                                             </h3>
@@ -526,7 +441,7 @@ const Community: React.FC = () => {
                                         <div className="text-gray-500 text-sm mt-2 flex items-center">
                                             <span className="mr-1">Autor:</span>
                                             <div className="flex items-center text-gray-900 font-bold">
-                                                <FaUserCircle className="w-4 h-4 mr-1 text-gray-400" />
+                                                <FaUserCircle className="w-4 h-4 mr-1 text-gray-400"/>
                                                 {post.user.username}
                                             </div>
                                         </div>
@@ -545,111 +460,6 @@ const Community: React.FC = () => {
             )}
         </div>
     );
-    // return (
-    //     <div className="p-6 bg-gray-100 min-h-screen">
-    //         <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Forum Społeczności</h1>
-    //
-    //         {/* Filtry i przycisk dodawania posta */}
-    //         <div className="flex justify-center items-center mb-6 space-x-4">
-    //             <select
-    //                 className="border border-gray-300 rounded px-4 py-2 shadow-sm"
-    //                 value={selectedFilterCategoryId || 'all'}
-    //                 onChange={(e) => setSelectedFilterCategoryId(e.target.value)}
-    //             >
-    //                 <option value="all">Wszystkie kategorie</option>
-    //                 {categories.map((cat) => (
-    //                     <option key={cat.id} value={cat.id.toString()}>
-    //                         {cat.name}
-    //                     </option>
-    //                 ))}
-    //             </select>
-    //
-    //             <button
-    //                 className={`px-4 py-2 rounded shadow-md transition duration-150 ${isAuthenticated ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}
-    //                 onClick={() => isAuthenticated && setIsCreatingPost(true)}
-    //                 disabled={!isAuthenticated}
-    //                 title={isAuthenticated ? "Utwórz nowy post" : "Zaloguj się, aby tworzyć posty"}
-    //             >
-    //                 + Utwórz Post
-    //             </button>
-    //
-    //             <select
-    //                 className="border border-gray-300 rounded px-4 py-2 shadow-sm"
-    //                 value={filter}
-    //                 onChange={(e) => setFilter(e.target.value as "oldest" | "newest")}
-    //             >
-    //                 <option value="newest">Najnowsze</option>
-    //                 <option value="oldest">Najstarsze</option>
-    //             </select>
-    //         </div>
-    //
-    //         {/* Lista postów z paginacją */}
-    //         {posts.length === 0 ? (
-    //             <p className="text-center text-gray-500">Brak postów do wyświetlenia w tej kategorii.</p>
-    //         ) : (
-    //             <PaginatedList
-    //                 items={sortedPosts}
-    //                 itemsPerPage={12}
-    //                 renderItem={(post) => {
-    //                     const date = parseDateArray(post.createdAt);
-    //                     const categoryName = post.category?.name || 'Brak kategorii';
-    //
-    //                     return (
-    //                         <li
-    //                             key={post.id}
-    //                             onClick={() => setSelectedPost(post)}
-    //                             className="cursor-pointer bg-white p-4 rounded shadow-lg hover:shadow-xl transition duration-200 flex justify-between items-start border-l-4 border-blue-500"
-    //                         >
-    //                             {/* GŁÓWNY KONTENER TREŚCI (Zdjęcie + Tekst) */}
-    //                             <div className="flex flex-1 min-w-0 pr-4">
-    //
-    //                                 {/* --- 2. SEKCJA MINIATURKI (ZMIANA TUTAJ) --- */}
-    //                                 {/* Używamy PostMainImage - on sam sprawdzi czy są zdjęcia i pobierze pierwsze bezpiecznie */}
-    //                                 <div className="mr-4 flex-shrink-0">
-    //                                     <PostMainImage
-    //                                         images={post.images}
-    //                                         className="w-24 h-24 object-cover rounded-md border border-gray-200"
-    //                                     />
-    //                                 </div>
-    //                                 {/* ------------------------------------------- */}
-    //
-    //                                 {/* SEKCJA TEKSTOWA */}
-    //                                 <div className="flex-1 min-w-0">
-    //                                     <div className="flex items-center mb-2">
-    //                                         <span className="inline-block bg-teal-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md">
-    //                                             {categoryName}
-    //                                         </span>
-    //                                         <h3 className="text-xl font-bold text-gray-800 truncate">
-    //                                             {post.title}
-    //                                         </h3>
-    //                                     </div>
-    //
-    //                                     <p className="text-gray-600 mt-1 line-clamp-2">
-    //                                         {post.content}
-    //                                     </p>
-    //
-    //                                     <div className="text-gray-500 text-sm mt-2 flex items-center">
-    //                                         <span className="mr-1">Autor:</span>
-    //                                         <div className="flex items-center text-gray-900 font-bold">
-    //                                             <FaUserCircle className="w-4 h-4 mr-1 text-gray-400" />
-    //                                             {post.user.username}
-    //                                         </div>
-    //                                     </div>
-    //                                 </div>
-    //                             </div>
-    //
-    //                             {/* DATA (Po prawej stronie) */}
-    //                             <div className="text-gray-400 text-sm text-right flex-shrink-0 pt-1 pl-2">
-    //                                 <span className="block">{formatDate(date)}</span>
-    //                                 <span className="block text-xs">({timeAgo(date)})</span>
-    //                             </div>
-    //                         </li>
-    //                     );
-    //                 }}
-    //             />
-    //         )}
-    //     </div>
-    // );
 }
 
 export default Community;
