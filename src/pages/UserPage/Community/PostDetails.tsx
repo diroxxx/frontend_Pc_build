@@ -14,6 +14,7 @@ import {
 import {timeAgo} from "./PostTime.tsx";
 import {useAtom} from "jotai";
 import {userAtom} from "../../../atomContext/userAtom.tsx";
+import { Dialog } from "@mui/material";
 
 
 interface User {
@@ -77,6 +78,102 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
     const [error, setError] = useState<string | null>(null);
     const [currentIndex, setCurrentIndex] = useState(0);
 
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+
+
+//     useEffect(() => {
+//         if (!postId) {
+//             setLoading(false);
+//             return;
+//         }
+//
+//         const fetchImages = async () => {
+//             setLoading(true);
+//             try {
+//                 const response = await customAxios.get<PostImageDTO[]>(
+//                     `/community/posts/${postId}/images`
+//                 );
+//                 setImages(response.data);
+//             } catch (err) {
+//                 console.error("Błąd pobierania zdjęć:", err);
+//                 setError("Nie udało się załadować listy zdjęć.");
+//             } finally {
+//                 setLoading(false);
+//             }
+//         };
+//
+//         fetchImages();
+//     }, [postId]);
+//
+//     const prevImage = () => {
+//         setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+//     };
+//
+//     const nextImage = () => {
+//         setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+//     };
+//
+//     if (loading) return <p className="text-blue-500 mt-4">Ładowanie zdjęć...</p>;
+//     if (error) return <p className="text-red-500 mt-4">{error}</p>;
+//     if (images.length === 0) return <p className="text-gray-500 mt-4 italic">Brak zdjęć do wyświetlenia.</p>;
+//
+//     return (
+//         <div className="mt-6">
+//             {/*<h3 className="text-xl font-bold text-gray-800 mb-4">Galeria zdjęć:</h3>*/}
+//
+//             <div className="relative w-full max-w-3xl mx-auto">
+//                 {/* Duże zdjęcie */}
+//                 <img
+//                     src={images[currentIndex].imageUrl}
+//                     alt={images[currentIndex].filename}
+//                     className="w-full aspect-square object-cover rounded-lg shadow-md"
+//                     onError={(e) => {
+//                         e.currentTarget.src = "https://placehold.co/600x338?text=Błąd+ładowania";
+//                     }}
+//                 />
+//
+//                 {/* Strzałki do przewijania */}
+//                 {images.length > 1 && (
+//                     <>
+//                         <button
+//                             onClick={prevImage}
+//                             className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-black bg-opacity-40 text-white p-2 rounded-full hover:bg-opacity-60 transition"
+//                         >
+//                             <FaChevronLeft />
+//                         </button>
+//                         <button
+//                             onClick={nextImage}
+//                             className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-black bg-opacity-40 text-white p-2 rounded-full hover:bg-opacity-60 transition"
+//                         >
+//                             <FaChevronRight />
+//                         </button>
+//                     </>
+//                 )}
+//
+//                 {images.length > 1 && (
+//                     <div className="flex justify-center mt-4 space-x-2 overflow-x-auto">
+//                         {images.map((img, index) => (
+//                             <img
+//                                 key={img.id}
+//                                 src={img.imageUrl}
+//                                 alt={img.filename}
+//                                 className={`w-20 aspect-square object-cover rounded cursor-pointer border-2 ${
+//                                     index === currentIndex ? "border-blue-500" : "border-transparent"
+//                                 }`}
+//                                 onClick={() => setCurrentIndex(index)}
+//                                 onError={(e) => {
+//                                     e.currentTarget.src = "https://placehold.co/100x100?text=Błąd+ładowania";
+//                                 }}
+//                             />
+//                         ))}
+//                     </div>
+//                 )}
+//             </div>
+//         </div>
+//     );
+// };
     useEffect(() => {
         if (!postId) {
             setLoading(false);
@@ -101,11 +198,13 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
         fetchImages();
     }, [postId]);
 
-    const prevImage = () => {
+    const prevImage = (e?: React.MouseEvent) => {
+        e?.stopPropagation(); // Zapobiega zamykaniu modala przy kliknięciu strzałki
         setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
     };
 
-    const nextImage = () => {
+    const nextImage = (e?: React.MouseEvent) => {
+        e?.stopPropagation(); // Zapobiega zamykaniu modala przy kliknięciu strzałki
         setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
     };
 
@@ -115,30 +214,29 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
 
     return (
         <div className="mt-6">
-            {/*<h3 className="text-xl font-bold text-gray-800 mb-4">Galeria zdjęć:</h3>*/}
-
             <div className="relative w-full max-w-3xl mx-auto">
-                {/* Duże zdjęcie */}
+                {/* Duże zdjęcie - dodano onClick i cursor-pointer */}
                 <img
                     src={images[currentIndex].imageUrl}
                     alt={images[currentIndex].filename}
-                    className="w-full aspect-square object-cover rounded-lg shadow-md"
+                    onClick={handleOpen} // <-- KLIKNIĘCIE OTWIERA MODAL
+                    className="w-full aspect-square object-cover rounded-lg shadow-md cursor-pointer hover:opacity-95 transition" // <-- DODANO cursor-pointer
                     onError={(e) => {
                         e.currentTarget.src = "https://placehold.co/600x338?text=Błąd+ładowania";
                     }}
                 />
 
-                {/* Strzałki do przewijania */}
+                {/* Strzałki do przewijania (widok standardowy) */}
                 {images.length > 1 && (
                     <>
                         <button
-                            onClick={prevImage}
+                            onClick={(e) => prevImage(e)}
                             className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-black bg-opacity-40 text-white p-2 rounded-full hover:bg-opacity-60 transition"
                         >
                             <FaChevronLeft />
                         </button>
                         <button
-                            onClick={nextImage}
+                            onClick={(e) => nextImage(e)}
                             className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-black bg-opacity-40 text-white p-2 rounded-full hover:bg-opacity-60 transition"
                         >
                             <FaChevronRight />
@@ -146,6 +244,7 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
                     </>
                 )}
 
+                {/* Miniatury */}
                 {images.length > 1 && (
                     <div className="flex justify-center mt-4 space-x-2 overflow-x-auto">
                         {images.map((img, index) => (
@@ -165,10 +264,65 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
                     </div>
                 )}
             </div>
+
+            {/* --- MODAL MUI (LIGHTBOX) --- */}
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                maxWidth="xl" // Pozwala na bardzo szeroki modal
+                PaperProps={{
+                    style: {
+                        backgroundColor: 'transparent', // Przezroczyste tło "kartki" dialogu
+                        boxShadow: 'none', // Usunięcie cienia
+                        overflow: 'hidden'
+                    }
+                }}
+                slotProps={{
+                    backdrop: {
+                        style: { backgroundColor: 'rgba(0, 0, 0, 0.9)' } // Ciemniejsze tło za zdjęciem
+                    }
+                }}
+            >
+                <div className="relative flex items-center justify-center outline-none">
+                    {/* Przycisk zamknięcia */}
+                    <button
+                        onClick={handleClose}
+                        className="absolute -top-10 right-0 text-white hover:text-gray-300 z-50 text-3xl"
+                    >
+                        <FaTimes />
+                    </button>
+
+                    {/* Strzałka Lewa w Modalu */}
+                    {images.length > 1 && (
+                        <button
+                            onClick={prevImage}
+                            className="absolute left-0 md:-left-12 text-white p-2 hover:bg-white/10 rounded-full transition z-50"
+                        >
+                            <FaChevronLeft size={40} />
+                        </button>
+                    )}
+
+                    {/* Zdjęcie w pełnym rozmiarze */}
+                    <img
+                        src={images[currentIndex].imageUrl}
+                        alt={images[currentIndex].filename}
+                        className="max-h-[90vh] max-w-[90vw] object-contain rounded"
+                    />
+
+                    {/* Strzałka Prawa w Modalu */}
+                    {images.length > 1 && (
+                        <button
+                            onClick={nextImage}
+                            className="absolute right-0 md:-right-12 text-white p-2 hover:bg-white/10 rounded-full transition z-50"
+                        >
+                            <FaChevronRight size={40} />
+                        </button>
+                    )}
+                </div>
+            </Dialog>
         </div>
     );
 };
-
 
 const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     const [comments, setComments] = useState<PostCommentDTO[]>([]);
@@ -340,11 +494,51 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         }
     };
 
+    // const VoteSection = () => (
+    //     <div className="inline-flex items-center space-x-4 border p-3 rounded-lg bg-gray-50 mb-6">
+    //         <button
+    //             className={`flex items-center p-2 rounded-full transition ${
+    //                 userVoteStatus === 'upvote' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+    //             }`}
+    //             onClick={() => handleVote('upvote')}
+    //             title="Upvote (Like)"
+    //         >
+    //             <FaThumbsUp className="w-5 h-5"/>
+    //         </button>
+    //
+    //         <span
+    //             className={`text-xl font-bold ${
+    //                 netScore > 0 ? 'text-gray-700' : netScore < 0 ? 'text-red-700' : 'text-gray-700'
+    //             }`}
+    //         >
+    //         {netScore}
+    //     </span>
+    //
+    //         <button
+    //             className={`flex items-center p-2 rounded-full transition ${
+    //                 userVoteStatus === 'downvote' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+    //             }`}
+    //             onClick={() => handleVote('downvote')}
+    //             title="Downvote (Dislike)"
+    //         >
+    //             <FaThumbsDown className="w-5 h-5"/>
+    //         </button>
+    //
+    //         {voteError && (
+    //             <span className="text-sm text-red-500 ml-4 font-medium">{voteError}</span>
+    //         )}
+    //     </div>
+    // );
     const VoteSection = () => (
         <div className="inline-flex items-center space-x-4 border p-3 rounded-lg bg-gray-50 mb-6">
+            {/* PRZYCISK LIKE */}
             <button
                 className={`flex items-center p-2 rounded-full transition ${
-                    userVoteStatus === 'upvote' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    !user ? 'opacity-50 cursor-not-allowed' : ''
+                } ${
+                    userVoteStatus === 'upvote'
+                        ? 'bg-blue-600 text-white'
+                        : `bg-gray-200 text-gray-700 ${user ? 'hover:bg-gray-300' : ''}`
                 }`}
                 onClick={() => handleVote('upvote')}
                 title="Upvote (Like)"
@@ -352,17 +546,23 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                 <FaThumbsUp className="w-5 h-5"/>
             </button>
 
+            {/* WYNIK PUNKTOWY */}
             <span
                 className={`text-xl font-bold ${
                     netScore > 0 ? 'text-gray-700' : netScore < 0 ? 'text-red-700' : 'text-gray-700'
                 }`}
             >
-            {netScore}
-        </span>
+                {netScore}
+            </span>
 
+            {/* PRZYCISK DISLIKE */}
             <button
                 className={`flex items-center p-2 rounded-full transition ${
-                    userVoteStatus === 'downvote' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    !user ? 'opacity-50 cursor-not-allowed' : ''
+                } ${
+                    userVoteStatus === 'downvote'
+                        ? 'bg-red-600 text-white'
+                        : `bg-gray-200 text-gray-700 ${user ? 'hover:bg-gray-300' : ''}`
                 }`}
                 onClick={() => handleVote('downvote')}
                 title="Downvote (Dislike)"
@@ -568,6 +768,13 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     };
 
     const handleVote = async (voteType: 'upvote' | 'downvote') => {
+        if (!user) {
+            setToastMessage({
+                message: "Musisz być zalogowany, aby oceniać posty.",
+                type: 'error'
+            });
+            return;
+        }
         setVoteError(null);
         try {
             const response = await customAxios.post<number>(`community/posts/${post.id}/vote?type=${voteType}`);
@@ -582,15 +789,55 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
         } catch (err: any) {
             console.error("Błąd głosowania:", err);
+            // Tutaj też możemy użyć Toast zamiast małego tekstu erroru, jeśli wolisz
             if (err.response?.status === 401) {
-                setVoteError("Musisz być zalogowany, aby głosować!");
+                setToastMessage({ message: "Sesja wygasła. Zaloguj się ponownie.", type: 'error' });
             } else {
-                setVoteError("Wystąpił błąd podczas oddawania głosu.");
+                setToastMessage({ message: "Wystąpił błąd podczas oddawania głosu.", type: 'error' });
             }
         }
     };
 
+    // const handleCommentVote = async (commentId: number, vote: 'upvote' | 'downvote') => {
+    //     // if (!user) {
+    //     //     setToastMessage({
+    //     //         message: "Musisz być zalogowany, aby oceniać komentarze.",
+    //     //         type: 'error'
+    //     //     });
+    //     //     return;
+    //     // }
+    //
+    //     try {
+    //         const response = await customAxios.post(
+    //             `/community/comments/${commentId}/vote?type=${vote}`
+    //         );
+    //
+    //         setCommentVotes(prev => ({
+    //             ...prev,
+    //             [commentId]: response.data
+    //         }));
+    //
+    //         setCommentUserVote(prev => ({
+    //             ...prev,
+    //             [commentId]: prev[commentId] === vote ? null : vote
+    //         }));
+    //
+    //     } catch (err) {
+    //         console.error("Błąd głosowania na komentarz:", err);
+    //     }
+    // };
+
     const handleCommentVote = async (commentId: number, vote: 'upvote' | 'downvote') => {
+        // --- ZMIANA: Blokada dla niezalogowanych ---
+        if (!user) {
+            setToastMessage({
+                message: "Musisz być zalogowany, aby oceniać komentarze.",
+                type: 'error'
+            });
+            return;
+        }
+        // -------------------------------------------
+
         try {
             const response = await customAxios.post(
                 `/community/comments/${commentId}/vote?type=${vote}`
@@ -608,6 +855,8 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
         } catch (err) {
             console.error("Błąd głosowania na komentarz:", err);
+            // Opcjonalnie: obsługa błędu z backendu
+            setToastMessage({ message: "Wystąpił błąd podczas głosowania.", type: 'error' });
         }
     };
 
@@ -767,15 +1016,50 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                                             </div>
                                         </div>
                                         <p className="text-gray-700 whitespace-pre-wrap">{comment.content}</p>
+                                        {/*<div className="flex items-center space-x-4 mt-3">*/}
+
+                                        {/*    <button*/}
+                                        {/*        className={`p-1 rounded ${*/}
+                                        {/*            commentUserVote[comment.id] === 'upvote'*/}
+                                        {/*                ? 'text-white bg-blue-600'*/}
+                                        {/*                : 'text-gray-600 bg-gray-200'*/}
+                                        {/*        }`}*/}
+                                        {/*        onClick={() => handleCommentVote(comment.id, 'upvote')}*/}
+                                        {/*    >*/}
+                                        {/*        <FaThumbsUp/>*/}
+                                        {/*    </button>*/}
+
+                                        {/*    <span className="font-bold text-gray-800">*/}
+                                        {/*            {commentVotes[comment.id] ?? 0}*/}
+                                        {/*     </span>*/}
+
+                                        {/*    <button*/}
+                                        {/*        className={`p-1 rounded ${*/}
+                                        {/*            commentUserVote[comment.id] === 'downvote'*/}
+                                        {/*                ? 'text-white bg-red-600'*/}
+                                        {/*                : 'text-gray-600 bg-gray-200'*/}
+                                        {/*        }`}*/}
+                                        {/*        onClick={() => handleCommentVote(comment.id, 'downvote')}*/}
+                                        {/*    >*/}
+                                        {/*        <FaThumbsDown/>*/}
+                                        {/*    </button>*/}
+
+                                        {/*</div>*/}
                                         <div className="flex items-center space-x-4 mt-3">
 
                                             <button
-                                                className={`p-1 rounded ${
+                                                // Dodano warunek !user do stylów (opacity-50 i cursor-not-allowed)
+                                                className={`p-1 rounded transition-colors ${
+                                                    !user ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'
+                                                } ${
                                                     commentUserVote[comment.id] === 'upvote'
-                                                        ? 'text-white bg-blue-600'
+                                                        ? 'text-white bg-blue-600 hover:bg-blue-700'
                                                         : 'text-gray-600 bg-gray-200'
                                                 }`}
                                                 onClick={() => handleCommentVote(comment.id, 'upvote')}
+                                                // Opcjonalnie: możesz dodać disabled={!user} jeśli wolisz,
+                                                // ale wtedy Toast z komunikatem się nie pokaże.
+                                                // Zostawiam bez disabled, aby funkcja handleCommentVote wyświetliła błąd.
                                             >
                                                 <FaThumbsUp/>
                                             </button>
@@ -785,9 +1069,11 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     </span>
 
                                             <button
-                                                className={`p-1 rounded ${
+                                                className={`p-1 rounded transition-colors ${
+                                                    !user ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'
+                                                } ${
                                                     commentUserVote[comment.id] === 'downvote'
-                                                        ? 'text-white bg-red-600'
+                                                        ? 'text-white bg-red-600 hover:bg-red-700'
                                                         : 'text-gray-600 bg-gray-200'
                                                 }`}
                                                 onClick={() => handleCommentVote(comment.id, 'downvote')}

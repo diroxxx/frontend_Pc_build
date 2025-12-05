@@ -78,25 +78,6 @@ function UserPage() {
         }
     }, [activeTab, user?.nickname]);
 
-    // --- POBIERANIE ZAPISANYCH POSTÓW ---
-    // useEffect(() => {
-    //     if (activeTab === "saved" && user?.nickname) {
-    //         const fetchSaved = async () => {
-    //             try {
-    //                 setLoadingSaved(true);
-    //                 setErrorSaved(null);
-    //                 const response = await customAxios.get(`community/posts/saved/${user.nickname}`);
-    //                 setSavedPosts(Array.isArray(response.data) ? response.data : []);
-    //             } catch (err: any) {
-    //                 console.error(err);
-    //                 setErrorSaved(err.message || "Failed to load saved items");
-    //             } finally {
-    //                 setLoadingSaved(false);
-    //             }
-    //         };
-    //         fetchSaved();
-    //     }
-    // }, [activeTab, user?.nickname]);
     useEffect(() => {
         if (activeTab === "saved" && user?.nickname) {
             const fetchSaved = async () => {
@@ -113,7 +94,7 @@ function UserPage() {
                             ...item,
                             // Tworzymy sztuczny obiekt user dla autora posta na podstawie nowego pola z backendu
                             user: {
-                                id: 0, // ID autora nie jest konieczne do wyświetlenia nazwy, ale TS może go wymagać
+                                id: 0, // ID autora ngit ie jest konieczne do wyświetlenia nazwy, ale TS może go wymagać
                                 username: item.authorName || "Nieznany autor"
                             }
                         }));
