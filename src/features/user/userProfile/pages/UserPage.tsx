@@ -130,9 +130,8 @@ function UserPage() {
                         // MAPOWANIE: Tworzymy strukturę pasującą do interfejsu Post
                         const formattedSavedPosts = data.map((item: any) => ({
                             ...item,
-                            // Tworzymy sztuczny obiekt user dla autora posta na podstawie nowego pola z backendu
                             user: {
-                                id: 0, // ID autora ngit ie jest konieczne do wyświetlenia nazwy, ale TS może go wymagać
+                                id: 0,
                                 username: item.authorName || "Nieznany autor"
                             }
                         }));
@@ -211,36 +210,6 @@ function UserPage() {
                                 <p className="text-gray-500">You haven't created any posts yet.</p>
                             </div>
                         )}
-
-                        {/* UŻYCIE PAGINATED LIST DLA MY POSTS */}
-                        {/*{!loadingPosts && !errorPosts && (*/}
-                        {/*    <PaginatedList*/}
-                        {/*        items={posts}*/}
-                        {/*        itemsPerPage={5}*/}
-                        {/*        renderItem={(post) => (*/}
-                        {/*            <div*/}
-                        {/*                key={post.id}*/}
-                        {/*                onClick={() => handlePostClick(post)}*/}
-                        {/*                className="p-5 bg-white rounded-lg shadow-sm hover:shadow-md transition border border-gray-100 cursor-pointer group"*/}
-                        {/*            >*/}
-                        {/*                <div className="flex justify-between items-start">*/}
-                        {/*                    <h4 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors">*/}
-                        {/*                        {post.title}*/}
-                        {/*                    </h4>*/}
-                        {/*                    {post.category?.name && (*/}
-                        {/*                        <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">*/}
-                        {/*                            {post.category.name}*/}
-                        {/*                        </span>*/}
-                        {/*                    )}*/}
-                        {/*                </div>*/}
-                        {/*                <p className="text-gray-600 mt-2 line-clamp-3">{post.content}</p>*/}
-                        {/*                <div className="mt-2 text-xs text-gray-400">*/}
-                        {/*                    Kliknij, aby zobaczyć szczegóły*/}
-                        {/*                </div>*/}
-                        {/*            </div>*/}
-                        {/*        )}*/}
-                        {/*    />*/}
-                        {/*)}*/}
 
                         {!loadingPosts && !errorPosts && (
                             <PaginatedList
@@ -338,56 +307,6 @@ function UserPage() {
                     <div className="py-8">
                         <h3 className="text-xl font-semibold text-center mb-4">Zapisane Posty</h3>
 
-                        {/* ... loading i error bez zmian ... */}
-
-                        {/*{!loadingSaved && !errorSaved && (*/}
-                        {/*    <PaginatedList*/}
-                        {/*        items={savedPosts}*/}
-                        {/*        itemsPerPage={5}*/}
-                        {/*        renderItem={(savedItem) => (*/}
-                        {/*            <div*/}
-                        {/*                key={savedItem.id}*/}
-                        {/*                onClick={() => {*/}
-                        {/*                    // Zabezpieczenie na wypadek gdyby postId było nullem*/}
-                        {/*                    const correctPostObject = {*/}
-                        {/*                        ...savedItem,*/}
-                        {/*                        id: savedItem.postId ?? 0*/}
-                        {/*                    };*/}
-
-                        {/*                    // Klikamy tylko jeśli ID jest poprawne*/}
-                        {/*                    if (correctPostObject.id !== 0) {*/}
-                        {/*                        handlePostClick(correctPostObject);*/}
-                        {/*                    }*/}
-                        {/*                }}*/}
-                        {/*                className="p-5 bg-white rounded-lg shadow-sm hover:shadow-md transition border border-gray-100 cursor-pointer group"*/}
-                        {/*            >*/}
-                        {/*                <div className="flex justify-between items-start">*/}
-                        {/*                    <h4 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors">*/}
-                        {/*                        {savedItem.title}*/}
-                        {/*                    </h4>*/}
-                        {/*                    {savedItem.category?.name && (*/}
-                        {/*                        <span*/}
-                        {/*                            className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">*/}
-                        {/*            {savedItem.category.name}*/}
-                        {/*        </span>*/}
-                        {/*                    )}*/}
-                        {/*                </div>*/}
-                        {/*                <p className="text-gray-600 mt-2 line-clamp-3">{savedItem.content}</p>*/}
-
-                        {/*                <div className="mt-3 flex justify-between items-center text-xs text-gray-500">*/}
-                        {/*                    <div className="flex items-center">*/}
-                        {/*                        <span className="mr-1">Autor:</span>*/}
-                        {/*                        <div className="flex items-center font-bold text-gray-700">*/}
-                        {/*                            <FaUserCircle className="w-4 h-4 mr-1 text-gray-400"/>*/}
-                        {/*                            {savedItem.user?.username || "Nieznany"}*/}
-                        {/*                        </div>*/}
-                        {/*                    </div>*/}
-                        {/*                </div>*/}
-                        {/*                /!* --------------------------------------- *!/*/}
-                        {/*            </div>*/}
-                        {/*        )}*/}
-                        {/*    />*/}
-                        {/*)}*/}
                         {!loadingSaved && !errorSaved && (
                             <PaginatedList
                                 items={savedPosts}
