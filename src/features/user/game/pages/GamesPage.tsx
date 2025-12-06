@@ -53,7 +53,6 @@ return (
         <div className="min-h-screen bg-gray-50">
             <div className="max-w-[1920px] mx-auto px-4 py-6">
                 <div className="grid grid-cols-12 gap-4">
-                    {/* LEFT SIDEBAR - Configuration (narrower) */}
                     <div className="col-span-2">
                         <div className="bg-white rounded-lg shadow-sm border border-gray-200 sticky top-6">
                             <div className="p-3 border-b border-gray-200">
@@ -142,34 +141,7 @@ return (
                                     </select>
                                 </div>
 
-                                <div>
-                                    <label className="text-[10px] font-semibold text-midnight-dark mb-1 block">
-                                        Budżet (zł)
-                                    </label>
-                                    <input
-                                        type="number"
-                                        value={gameFpsConfig?.budget || ""}
-                                        onChange={(e) => setGameFpsConfig(prev => ({ ...prev, budget: Number(e.target.value) }))}
-                                        className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-300 rounded focus:ring-1 focus:ring-ocean-blue focus:border-ocean-blue"
-                                        placeholder="Budżet"
-                                    />
-                                </div>
 
-                                {selectedGame && (
-                                    <div className="pt-2 border-t border-gray-200">
-                                        <p className="text-[9px] font-semibold text-gray-500 mb-1.5">WYBRANA GRA</p>
-                                        <div className="flex items-center gap-1.5 p-1.5 bg-ocean-light-blue/10 rounded border border-ocean-light-blue">
-                                            <img
-                                                src={`data:image/png;base64,${games?.find(g => g.title === gameFpsConfig?.gameTitle)?.imageUrl}`}
-                                                alt={gameFpsConfig?.gameTitle}
-                                                className="w-8 h-8 rounded object-cover"
-                                            />
-                                            <p className="text-[10px] font-medium text-midnight-dark flex-1 line-clamp-2">
-                                                {gameFpsConfig?.gameTitle}
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
 
                                 <button
                                     onClick={() => {
@@ -188,23 +160,32 @@ return (
                                     Szukaj wideo
                                 </button>
 
+                                <div>
+                                    <label className="text-[10px] font-semibold text-midnight-dark mb-1 block">
+                                        Budżet (zł)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={gameFpsConfig?.budget || ""}
+                                        onChange={(e) => setGameFpsConfig(prev => ({ ...prev, budget: Number(e.target.value) }))}
+                                        className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-300 rounded focus:ring-1 focus:ring-ocean-blue focus:border-ocean-blue"
+                                        placeholder="Budżet"
+                                    />
+                                </div>
+
                                 <button
                                     onClick={() => refetchRecGame()}
-                                    disabled={!selectedGame || !gameFpsConfig.budget || isFetchingRec}
+                                    disabled={!canSearch}
                                     className={`w-full px-2 py-2 rounded text-[11px] font-semibold transition-all flex items-center justify-center gap-1.5
-                                    ${selectedGame && gameFpsConfig.budget && !isFetchingRec
+                                    ${selectedGame 
                                         ? 'bg-ocean-blue text-white hover:bg-ocean-dark-blue'
                                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                     }`}
                                 >
-                                    {isFetchingRec ? (
-                                        <>Szukanie...</>
-                                    ) : (
                                         <>
                                             <Search className="w-3 h-3" />
-                                            Podzespoły
+                                            Szukaj ofert
                                         </>
-                                    )}
                                 </button>
                             </div>
                         </div>
@@ -331,12 +312,27 @@ return (
                                 <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center">
                                     <Cpu className="w-8 h-8 text-gray-400" />
                                 </div>
-                                <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                                    Brak rekomendacji
-                                </h3>
-                                <p className="text-xs text-gray-500">
-                                    Wybierz grę i budżet, aby zobaczyć rekomendowane podzespoły
-                                </p>
+                                {recOffersGame?.minRec.length == 0 && recOffersGame?.maxRec.length == 0 && (
+                                    <>
+                                        <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                                            Brak rekomendacji dl podanej gry
+                                        </h3>
+                                        <p className="text-xs text-gray-500">
+                                            Możliwe że dla podanych podzespołów z wymagań gry nie ma aktualnych ofert.
+                                        </p>
+                                    </>
+                                ) }
+                                {recOffersGame == null && (
+                                    <>
+                                        <h3 className="textS-sm font-semibold text-gray-700 mb-2">
+                                            Brak dopasowania ofert do wymagan gry
+                                        </h3>
+
+                                        <p className="text-xs text-gray-500">
+                                            Spróbuj zmienić budżet,gre albo szukaj bez budżetu
+                                        </p>
+                                    </>
+                                )}
                             </div>
                         )}
                     </div>

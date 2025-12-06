@@ -3,7 +3,7 @@ import {RemoveIcon} from "../../../assets/icons/removeIcon.tsx"
 import {EditIcon} from "lucide-react";
 import {EditUserModal} from "./EditUserModal.tsx";
 import {UserRole, type UserUpdateDto} from "./UserUpdateDto.ts";
-import {deleteUserByIdApi} from "./deleteUserByIdApi.ts";
+import {deleteUserByEmailApi} from "./deleteUserByEmailApi.ts";
 import {showToast} from "../../../lib/ToastContainer.tsx";
 import {useAllUsers} from "./useAllUsers.ts";
 import type {UserToShowDto} from "./UserToShowDto.ts";
@@ -36,8 +36,9 @@ const UsersPage = () => {
         role: UserRole.USER
     });
 
-    function handleDeleteUSerByEmail(email:string) {
-        deleteUserByIdApi(email).then(r => showToast.success(r.message));
+    function handleDeleteUserByEmail(email:string) {
+        deleteUserByEmailApi(email).then(r => showToast.success(r.message));
+        refetch();
     }
 
     return (
@@ -141,7 +142,7 @@ const UsersPage = () => {
 
 
                                         {role != "ADMIN" && <button
-                                            onClick={() => handleDeleteUSerByEmail(email)}
+                                            onClick={() => handleDeleteUserByEmail(email)}
                                             className="p-1.5 text-ocean-red hover:bg-ocean-red/10 rounded transition-colors" title="Usuń">
                                             <RemoveIcon/>
                                         </button>}

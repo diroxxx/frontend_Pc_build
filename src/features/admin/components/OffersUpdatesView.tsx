@@ -58,7 +58,6 @@ const OffersUpdatesView = () => {
                 const started = new Date(update.startedAt);
                 const finished = update.finishedAt ? new Date(update.finishedAt) : null;
                 
-                // Sprawdź czy jakikolwiek sklep jest w trakcie
                 const isActive = update.shops?.some(shop => shop.status === 'RUNNING') ?? false;
 
                 const duration =
@@ -118,7 +117,6 @@ const OffersUpdatesView = () => {
                                     const totalAdded = Object.values(shop.offersAdded ?? {})
                                         .reduce((sum, val) => sum + val, 0);
 
-                                    // Połącz typy z dodanych i usuniętych ofert
                                     const allTypes = new Set([
                                         ...Object.keys(shop.offersAdded ?? {}),
                                         ...Object.keys(shop.offersDeleted ?? {})
@@ -145,7 +143,6 @@ const OffersUpdatesView = () => {
                                                     </h3>
                                                 </div>
                                                 
-                                                {/* Podsumowanie zmian */}
                                                 <div className="flex items-center gap-3">
                                                     {totalAdded > 0 && (
                                                         <div className="flex items-center gap-1 text-sm">

@@ -4,10 +4,12 @@ import { fetchOfferUpdates } from "../api/offerUpdateApi.ts";
 import {type OfferUpdateInfo } from '../../../types/OfferUpdateInfo.ts'
 import { useWebSocketStomp } from '../../../hooks/webSocketHook.ts';
 import { showToast } from "../../../lib/ToastContainer";
+import {useGetComponentsStats} from "./useGetComponentsStats.ts";
 
 export function useOfferUpdates() {
     const queryClient = useQueryClient();
     const webSocketUrl = "http://localhost:8080/offers";
+    const {refetch} = useGetComponentsStats();
 
     const query = useQuery<OfferUpdateInfo[]>({
         queryKey: ["offersUpdates"],
@@ -28,7 +30,8 @@ export function useOfferUpdates() {
                     return [...old, parsed];
                 });
 
-                queryClient.invalidateQueries({ queryKey: ["componentsStats"] });
+                // queryClient.invalidateQueries({ queryKey: ["componentsStats"] });
+                refetch();
                 
             } catch (err) {
                 console.error("WebSocket parse error:", err);

@@ -3,6 +3,9 @@ import {useState} from "react";
 import {useGetComponentsStats} from "../hooks/useGetComponentsStats.ts";
 import type {ComponentsStats} from "../../../types/ComponentsStats.ts";
 
+
+
+
 export default function ComponentsStatsPanel() {
     const { data, isLoading, isError, isFetching } = useGetComponentsStats();
     const [expanded, setExpanded] = useState<string | null>(null);
