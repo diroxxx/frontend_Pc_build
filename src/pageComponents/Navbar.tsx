@@ -106,7 +106,6 @@ return (
                 </div>
             </div>
 
-            {/* Navigation - tylko gdy nie jesteśmy na home */}
             { (
                 <div className="border-t border-white border-opacity-20">
                     <nav className="px-6 py-3">
@@ -161,16 +160,16 @@ return (
                             >
                                 Sprawdz gry
                             </button>
-                            <button 
-                                onClick={() => navigate("/recommendations")} 
-                                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                                    location.pathname === "/recommendations" 
-                                        ? "bg-white text-ocean-blue shadow-sm" 
-                                        : "text-white hover:bg-ocean-light-blue hover:bg-opacity-25 hover:shadow-md hover:backdrop-blur-sm"
-                                }`}
-                            >
-                                Rekomendacje
-                            </button>
+                            {/*<button */}
+                            {/*    onClick={() => navigate("/recommendations")} */}
+                            {/*    className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${*/}
+                            {/*        location.pathname === "/recommendations" */}
+                            {/*            ? "bg-white text-ocean-blue shadow-sm" */}
+                            {/*            : "text-white hover:bg-ocean-light-blue hover:bg-opacity-25 hover:shadow-md hover:backdrop-blur-sm"*/}
+                            {/*    }`}*/}
+                            {/*>*/}
+                            {/*    Rekomendacje*/}
+                            {/*</button>*/}
                         </div>
                     </nav>
                 </div>
