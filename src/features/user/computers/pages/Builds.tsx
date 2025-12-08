@@ -8,9 +8,8 @@ import BuildList from "../components/BuildList.tsx";
 import BuildConfiguration from "../components/BuildConfiguration.tsx";
 import {useSaveComputerByUserEmail} from "../../../../hooks/useSaveComputersByUserEmail.ts";
 import type {ComputerDto} from "../../../../types/ComputerDto.ts";
-import  {ComponentTypeEnum} from "../../../../types/BaseItemDto.ts";
+import {ComponentTypeEnum} from "../../../../types/BaseItemDto.ts";
 import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
-import {showToast} from "../../../../lib/ToastContainer.tsx";
 
 
 export default function Builds() {
@@ -20,6 +19,7 @@ export default function Builds() {
         ComponentTypeEnum.PROCESSOR,
         ComponentTypeEnum.CASE_PC,
         ComponentTypeEnum.GRAPHICS_CARD,
+        ComponentTypeEnum.MOTHERBOARD,
         ComponentTypeEnum.MEMORY,
         ComponentTypeEnum.POWER_SUPPLY,
         ComponentTypeEnum.STORAGE,

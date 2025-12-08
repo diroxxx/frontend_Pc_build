@@ -7,16 +7,14 @@ interface BuildConfigurationProps {
     onAddComponent: (category: ComponentTypeEnum) => void;
 }
 const categoryLabels: Record<string, string> = {
-    processor: "CPU",
-    graphicsCard: "GPU",
-    motherboard: "Płyta główna",
-    cooler: "Chłodzenie",
-    casePc: "Obudowa",
-    memory: "RAM",
-    powerSupply: "Zasilacz",
-    ssd: "Dysk SSD",
-    hdd: "Dysk HDD",
-    storage: "Pamięć",
+    PROCESSOR: "CPU",
+    GRAPHICS_CARD: "GPU",
+    MOTHERBOARD: "Płyta główna",
+    CPU_COOLER: "Chłodzenie cpu",
+    CASE_PC: "Obudowa",
+    MEMORY: "RAM",
+    POWER_SUPPLY: "Zasilacz",
+    STORAGE: "Pamięć",
 };
 
 export default function BuildConfiguration({

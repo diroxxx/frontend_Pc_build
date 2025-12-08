@@ -65,7 +65,6 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
             <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 sticky top-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Filtry</h3>
 
-                {/* Category filter */}
                 <div className="mb-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Kategoria

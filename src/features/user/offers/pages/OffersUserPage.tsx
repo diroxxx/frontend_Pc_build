@@ -57,7 +57,7 @@ function OffersUserPage() {
         <div className="min-h-screen bg-gray-50">
             <SidePanelBuilds />
 
-            <div className="border-b border-gray-200 bg-white">
+            <div className="border-b border-gray-200 ">
                 <div className="max-w-7xl mx-auto px-4 py-5">
                     <div className="flex items-start justify-between gap-6">
 

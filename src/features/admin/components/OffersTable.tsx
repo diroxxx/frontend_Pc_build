@@ -25,7 +25,7 @@ const OffersTable: FC<OffersTableProps> = ({ offers, isFetching, isLoading }) =>
 
     return (
         <div className="rounded-lg shadow-sm border border-gray-200 overflow-hidden relative">
-            {isFetching && (
+            {isFetching && isLoading && (
                 <div className="absolute top-2 right-2">
                     <div className="w-4 h-4 border-2 border-t-transparent border-ocean-dark-blue rounded-full animate-spin"></div>
                 </div>
