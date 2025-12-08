@@ -8,21 +8,21 @@ export function validateCompatibility(computer: ComputerDto, offer: ComponentOff
     if (offer.componentType === ComponentTypeEnum.PROCESSOR) {
         const motherboard = existingOffers.find(o => o.componentType === ComponentTypeEnum.MOTHERBOARD);
         if (motherboard && motherboard.socketType !== offer.socketType) {
-            return "Wybrany procesor nie pasuje do gniazda płyty głównej.";
+            return "Wybrany procesor nie pasuje do gniazda płyty głównej. Wymagany jest " + motherboard.socketType;
         }
     }
 
     if (offer.componentType === ComponentTypeEnum.MOTHERBOARD) {
         const cpu = existingOffers.find(o => o.componentType === ComponentTypeEnum.PROCESSOR);
         if (cpu && cpu.socketType !== offer.socketType) {
-            return "Płyta główna nie jest kompatybilna z procesorem.";
+            return "Płyta główna nie jest kompatybilna z procesorem. Wymagany jest " + cpu.socketType;
         }
     }
 
     if (offer.componentType === ComponentTypeEnum.MEMORY) {
         const motherboard = existingOffers.find(o => o.componentType === ComponentTypeEnum.MOTHERBOARD);
         if (motherboard && motherboard.memoryType !== offer.type) {
-            return "Pamięć RAM nie jest kompatybilna z płytą główną.";
+            return "Pamięć RAM nie jest kompatybilna z płytą główną. Wymagany jest " + motherboard.memoryType;
         }
     }
 
@@ -52,7 +52,7 @@ export function validateCompatibility(computer: ComputerDto, offer: ComponentOff
     if (offer.componentType === ComponentTypeEnum.CPU_COOLER) {
         const cpu = existingOffers.find(o => o.componentType === ComponentTypeEnum.PROCESSOR);
         if (cpu && offer.coolerSocketsType && !offer.coolerSocketsType.includes(cpu.socketType)) {
-            return "Chłodzenie nie pasuje do gniazda procesora.";
+            return "Chłodzenie nie pasuje do gniazda procesora. Wymaganie jest " + cpu.socketType;
         }
     }
 
