@@ -100,14 +100,12 @@ customAxios.interceptors.response.use(
             }
         }
 
-        // === 403 FORBIDDEN ===
         if (error.response?.status === 403) {
             console.warn("Brak uprawnień do wykonania operacji (403)");
             showToast.error("Brak uprawnień do wykonania tej operacji.");
             return Promise.reject(error);
         }
 
-        // === 400 BAD REQUEST ===
         if (error.response?.status === 400) {
             const axiosError = error as AxiosError<ApiErrorResponse>;
             const msg = axiosError.response?.data?.message || "Nieprawidłowe dane";

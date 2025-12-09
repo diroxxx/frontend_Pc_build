@@ -1,21 +1,33 @@
-import {Check, PlusIcon, X} from "lucide-react";
-import {type ComponentItem, ComponentTypeEnum} from "../../../types/BaseItemDto.ts";
-import React, {useState} from "react";
-
+import React, { useState } from 'react';
+import {
+    Modal,
+    Box,
+    Typography,
+    TextField,
+    Button,
+    Stack,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    IconButton
+} from '@mui/material';
+import { Check, X } from 'lucide-react';
+import {type ComponentItem, ComponentTypeEnum } from '../../../types/BaseItemDto';
+import {modalSx} from "../../../types/modalStyle.ts";
 interface AddComponentModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (data: any) => void;
+    onSubmit: (data: ComponentItem) => void;
 }
 
+
+
 const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, onSubmit }) => {
-    const [componentType, setComponentType] = useState<ComponentTypeEnum | undefined>(undefined);
-
-    const [brand, setBrand] = useState("");
-    const [model, setModel] = useState("");
+    const [componentType, setComponentType] = useState<ComponentTypeEnum | ''>('');
+    const [brand, setBrand] = useState('');
+    const [model, setModel] = useState('');
     const [details, setDetails] = useState<Record<string, string>>({});
-
-    if (!isOpen) return null;
 
     const handleDetailChange = (key: string, value: string) => {
         setDetails((prev) => ({ ...prev, [key]: value }));
@@ -25,7 +37,7 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
         e.preventDefault();
 
         if (!componentType || !brand || !model) {
-            alert("Uzupełnij wszystkie wymagane pola");
+            alert('Uzupełnij wszystkie wymagane pola');
             return;
         }
 
@@ -41,6 +53,9 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
                     threads: Number(details.threads),
                     baseClock: Number(details.baseClock),
                     socketType: details.socketType,
+                    boostClock: Number(details.boostClock),
+                    integratedGraphics: details.integratedGraphics,
+                    tdp: Number(details.tdp),
                 };
                 break;
 
@@ -52,6 +67,8 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
                     vram: Number(details.vram),
                     gddr: details.gddr,
                     powerDraw: Number(details.powerDraw),
+                    boostClock: Number(details.boostClock),
+                    lengthInMM: Number(details.lengthInMM),
                 };
                 break;
 
@@ -62,56 +79,84 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
                     model,
                     type: details.type,
                     capacity: Number(details.capacity),
-                    speed: details.speed,
-                    latency: details.latency,
+                    speed: Number(details.speed),
+                    latency: Number(details.latency),
+                    amount: Number(details.amount),
                 };
                 break;
 
-                case ComponentTypeEnum.MOTHERBOARD:
-                    newComponent = {
-                        componentType : ComponentTypeEnum.MOTHERBOARD,
-                        brand,
-                        model,
-                        chipset: details.chipset,
-                        socketType: details.socketType,
-                        memoryType: details.memoryType,
-                        format: details.format,
-                        ramSlots: Number(details.ramSlots),
-                        ramCapacity: Number(details.ramCapacity)
-                    }
-                    break;
+            case ComponentTypeEnum.MOTHERBOARD:
+                newComponent = {
+                    componentType: ComponentTypeEnum.MOTHERBOARD,
+                    brand,
+                    model,
+                    chipset: details.chipset,
+                    socketType: details.socketType,
+                    memoryType: details.memoryType,
+                    format: details.format,
+                    ramSlots: Number(details.ramSlots),
+                    ramCapacity: Number(details.ramCapacity),
+                };
+                break;
 
-                    case ComponentTypeEnum.POWER_SUPPLY:
-                        newComponent = {
-                            componentType : ComponentTypeEnum.POWER_SUPPLY,
-                            brand,
-                            model,
-                            maxPowerWatt: Number(details.maxPowerWatt)
-                        }
-                        break;
-                        case ComponentTypeEnum.STORAGE:
-                            newComponent = {
-                                componentType : ComponentTypeEnum.STORAGE,
-                                brand,
-                                model,
-                                capacity: Number(details.capacity)
-                            }
-                            break;
+            case ComponentTypeEnum.POWER_SUPPLY:
+                newComponent = {
+                    componentType: ComponentTypeEnum.POWER_SUPPLY,
+                    brand,
+                    model,
+                    maxPowerWatt: Number(details.maxPowerWatt),
+                    efficiencyRating: details.efficiencyRating,
+                    modular: details.modular,
+                    type: details.type,
+                };
+                break;
 
-                            case ComponentTypeEnum.CPU_COOLER:
-                                newComponent = {
-                                    componentType : ComponentTypeEnum.CPU_COOLER,
-                                    brand,
-                                    model,
-                                    coolerSocketsType: Array.of(details.coolerSocketsType)
-                                }
-                                break;
+            case ComponentTypeEnum.STORAGE:
+                newComponent = {
+                    componentType: ComponentTypeEnum.STORAGE,
+                    brand,
+                    model,
+                    capacity: Number(details.capacity),
+                };
+                break;
+
+            case ComponentTypeEnum.CPU_COOLER:
+                newComponent = {
+                    componentType: ComponentTypeEnum.CPU_COOLER,
+                    brand,
+                    model,
+                    coolerSocketsType: details.coolerSocketsType
+                        ? details.coolerSocketsType.split(',').map((s) => s.trim())
+                        : [],
+                    fanRpm: details.fanRpm,
+                    noiseLevel: details.noiseLevel,
+                    radiatorSize: details.radiatorSize,
+                };
+                break;
+
+            case ComponentTypeEnum.CASE_PC:
+                newComponent = {
+                    componentType: ComponentTypeEnum.CASE_PC,
+                    brand,
+                    model,
+                    format: details.format,
+                };
+                break;
+
             default:
-                alert("Nieobsługiwany typ komponentu");
+                alert('Nieobsługiwany typ komponentu');
                 return;
         }
 
         onSubmit(newComponent);
+        handleClose();
+    };
+
+    const handleClose = () => {
+        setComponentType('');
+        setBrand('');
+        setModel('');
+        setDetails({});
         onClose();
     };
 
@@ -119,72 +164,83 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
         switch (componentType) {
             case ComponentTypeEnum.PROCESSOR:
                 return (
-                    <>
-                        <Field label="Socket" value={details.socketType} onChange={(v) => handleDetailChange("socketType", v)} />
-                        <Field label="Taktowanie bazowe (GHz)" value={details.baseClock} onChange={(v) => handleDetailChange("baseClock", v)} />
-                        <Field label="Rdzenie" value={details.cores} onChange={(v) => handleDetailChange("cores", v)} />
-                        <Field label="Wątki" value={details.threads} onChange={(v) => handleDetailChange("threads", v)} />
-                    </>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <CustomTextField label="Socket (string)" value={details.socketType} onChange={(v) => handleDetailChange('socketType', v)} />
+                        <CustomTextField label="Rdzenie (number)" value={details.cores} onChange={(v) => handleDetailChange('cores', v)} />
+                        <CustomTextField label="Taktowanie bazowe GHz (number)" value={details.baseClock} onChange={(v) => handleDetailChange('baseClock', v)} />
+                        <CustomTextField label="Taktowanie boost GHz (number)" value={details.boostClock} onChange={(v) => handleDetailChange('boostClock', v)} />
+                        <CustomTextField label="Wątki (number)" value={details.threads} onChange={(v) => handleDetailChange('threads', v)} />
+                        <CustomTextField label="Zintegrowana grafika (string)" value={details.integratedGraphics} onChange={(v) => handleDetailChange('integratedGraphics', v)} />
+                        <CustomTextField label="TDP (number)" value={details.tdp} onChange={(v) => handleDetailChange('tdp', v)} />
+                    </div>
                 );
 
             case ComponentTypeEnum.GRAPHICS_CARD:
                 return (
-                    <>
-                        <Field label="Pamięć VRAM (GB)" value={details.vram} onChange={(v) => handleDetailChange("vram", v)} />
-                        <Field label="Rodzaj pamięci" value={details.gddr} onChange={(v) => handleDetailChange("gddr", v)} />
-                        <Field label="TDP (W)" value={details.powerDraw} onChange={(v) => handleDetailChange("powerDraw", v)} />
-                    </>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <CustomTextField label="Pamięć VRAM (number)" value={details.vram} onChange={(v) => handleDetailChange('vram', v)} />
+                        <CustomTextField label="Rodzaj pamięci (string)" value={details.gddr} onChange={(v) => handleDetailChange('gddr', v)} />
+                        <CustomTextField label="TDP (number)" value={details.powerDraw} onChange={(v) => handleDetailChange('powerDraw', v)} />
+                        <CustomTextField label="Boost Clock (number)" value={details.boostClock} onChange={(v) => handleDetailChange('boostClock', v)} />
+                        <CustomTextField label="Długość karty mm (number)" value={details.lengthInMM} onChange={(v) => handleDetailChange('lengthInMM', v)} />
+                    </div>
                 );
 
             case ComponentTypeEnum.MEMORY:
                 return (
-                    <>
-                        <Field label="Typ pamięci" value={details.type} onChange={(v) => handleDetailChange("type", v)} />
-                        <Field label="Pojemność (GB)" value={details.capacity} onChange={(v) => handleDetailChange("capacity", v)} />
-                        <Field label="Taktowanie (MHz)" value={details.speed} onChange={(v) => handleDetailChange("speed", v)} />
-                        <Field label="Opóźnienie (CL)" value={details.latency} onChange={(v) => handleDetailChange("latency", v)} />
-                    </>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <CustomTextField label="Typ pamięci (string)" value={details.type} onChange={(v) => handleDetailChange('type', v)} />
+                        <CustomTextField label="Pojemność GB (number)" value={details.capacity} onChange={(v) => handleDetailChange('capacity', v)} />
+                        <CustomTextField label="Taktowanie MHz (number)" value={details.speed} onChange={(v) => handleDetailChange('speed', v)} />
+                        <CustomTextField label="Opóźnienie CL (number)" value={details.latency} onChange={(v) => handleDetailChange('latency', v)} />
+                        <CustomTextField label="Ilość (number)" value={details.amount} onChange={(v) => handleDetailChange('amount', v)} />
+                    </div>
                 );
 
             case ComponentTypeEnum.MOTHERBOARD:
                 return (
-                    <>
-                        <Field label="Chipset" value={details.chipset} onChange={(v) => handleDetailChange("chipset", v)} />
-                        <Field label="Typ socketu" value={details.socketType} onChange={(v) => handleDetailChange("socketType", v)} />
-                        <Field label="Rodzaj pamięci" value={details.memoryType} onChange={(v) => handleDetailChange("memoryType", v)} />
-                        <Field label="Format płyty" value={details.format} onChange={(v) => handleDetailChange("format", v)} />
-                        <Field label="ilość slotów ram" value={details.ramSlots} onChange={(v) => handleDetailChange("ramSlots", v)} />
-                        <Field label="max pojemnosci ram" value={details.ramCapacity} onChange={(v) => handleDetailChange("ramCapacity", v)} />
-                    </>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <CustomTextField label="Chipset (string)" value={details.chipset} onChange={(v) => handleDetailChange('chipset', v)} />
+                        <CustomTextField label="Typ socketu (string)" value={details.socketType} onChange={(v) => handleDetailChange('socketType', v)} />
+                        <CustomTextField label="Rodzaj pamięci (string)" value={details.memoryType} onChange={(v) => handleDetailChange('memoryType', v)} />
+                        <CustomTextField label="Format płyty (string)" value={details.format} onChange={(v) => handleDetailChange('format', v)} />
+                        <CustomTextField label="Ilość slotów RAM (number)" value={details.ramSlots} onChange={(v) => handleDetailChange('ramSlots', v)} />
+                        <CustomTextField label="Max pojemność RAM GB (number)" value={details.ramCapacity} onChange={(v) => handleDetailChange('ramCapacity', v)} />
+                    </div>
                 );
 
             case ComponentTypeEnum.POWER_SUPPLY:
                 return (
-                    <>
-                        <Field label="Moc maksymalna (W)" value={details.maxPowerWatt} onChange={(v) => handleDetailChange("maxPowerWatt", v)} />
-                    </>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <CustomTextField label="Moc maksymalna W (number)" value={details.maxPowerWatt} onChange={(v) => handleDetailChange('maxPowerWatt', v)} />
+                        <CustomTextField label="Certyfikat (string)" value={details.efficiencyRating} onChange={(v) => handleDetailChange('efficiencyRating', v)} />
+                        <CustomTextField label="Modular (string)" value={details.modular} onChange={(v) => handleDetailChange('modular', v)} />
+                        <CustomTextField label="Typ (string)" value={details.type} onChange={(v) => handleDetailChange('type', v)} />
+                    </div>
                 );
 
             case ComponentTypeEnum.STORAGE:
                 return (
-                    <>
-                        <Field label="Pojemność (GB)" value={details.capacity} onChange={(v) => handleDetailChange("capacity", v)} />
-                        <Field label="Typ dysku" value={details.type} onChange={(v) => handleDetailChange("type", v)} />
-                    </>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <CustomTextField label="Pojemność GB (number)" value={details.capacity} onChange={(v) => handleDetailChange('capacity', v)} />
+                    </div>
                 );
 
             case ComponentTypeEnum.CPU_COOLER:
                 return (
-                    <>
-                        <Field label="Socket" value={details.socketType} onChange={(v) => handleDetailChange("socketType", v)} />
-                    </>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <CustomTextField label="Sockety (rozdziel przecinkami)" value={details.coolerSocketsType} onChange={(v) => handleDetailChange('coolerSocketsType', v)} />
+                        <CustomTextField label="Obroty wentylatorów (string)" value={details.fanRpm} onChange={(v) => handleDetailChange('fanRpm', v)} />
+                        <CustomTextField label="Hałas wentylatorów (string)" value={details.noiseLevel} onChange={(v) => handleDetailChange('noiseLevel', v)} />
+                        <CustomTextField label="Wielkość radiatora (string)" value={details.radiatorSize} onChange={(v) => handleDetailChange('radiatorSize', v)} />
+                    </div>
                 );
 
             case ComponentTypeEnum.CASE_PC:
                 return (
-                    <>
-                        <Field label="Format" value={details.format} onChange={(v) => handleDetailChange("format", v)} />
-                    </>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <CustomTextField label="Format (string)" value={details.format} onChange={(v) => handleDetailChange('format', v)} />
+                    </div>
                 );
 
             default:
@@ -193,85 +249,85 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
     };
 
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center"
-            onClick={onClose}
+        <Modal
+            open={isOpen}
+            onClose={handleClose}
+            aria-labelledby="component-modal-title"
+            closeAfterTransition
+            BackdropProps={{ sx: { bgcolor: 'rgba(0,0,0,0.45)' } }}
         >
-            <div
-                className="pointer-events-auto bg-white rounded-xl shadow-xl border border-ocean-light-blue w-full max-w-lg p-6 relative animate-fadeIn"
-                style={{
-                    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-                }}
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-semibold text-midnight-dark flex items-center gap-2">
-                        <PlusIcon className="w-5 h-5 text-ocean-dark-blue" />
+            <Box sx={modalSx} component="form" onSubmit={handleSubmit}>
+                <div className="flex items-start justify-between mb-4">
+                    <Typography id="component-modal-title" variant="h6" component="h2" sx={{ fontWeight: 700 }}>
                         Dodaj nowy komponent
-                    </h2>
-                    <button onClick={onClose} className="text-ocean-blue hover:text-ocean-dark-blue transition-colors">
-                        <X className="w-6 h-6" />
-                    </button>
+                    </Typography>
+                    <IconButton onClick={handleClose} size="small" aria-label="Zamknij" className="text-[var(--color-ocean-white)] bg-white/3 hover:bg-white/6">
+                        <X size={20} />
+                    </IconButton>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-midnight-dark mb-1">
-                            Typ komponentu
-                        </label>
-                        <select
+                <Stack spacing={2}>
+                    <FormControl size="small" fullWidth required>
+                        <InputLabel id="component-type-label" sx={{ color: 'rgba(241,250,238,0.8)' }}>Typ komponentu</InputLabel>
+                        <Select
+                            labelId="component-type-label"
                             value={componentType}
+                            label="Typ komponentu"
                             onChange={(e) => setComponentType(e.target.value as ComponentTypeEnum)}
-                            className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-ocean-blue focus:border-ocean-blue"
+                            sx={{
+                                '& .MuiSelect-select': { py: 1 },
+                                bgcolor: 'rgba(255,255,255,0.02)',
+                                color: 'var(--color-ocean-white)',
+                                '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(241,250,238,0.23)' },
+                                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(241,250,238,0.4)' },
+                            }}
                         >
-                            <option value="">-- Wybierz typ --</option>
+                            <MenuItem value=""><em>-- Wybierz typ --</em></MenuItem>
                             {Object.values(ComponentTypeEnum).map((type) => (
-                                <option key={type} value={type}>
-                                    {type.replaceAll("_", " ")}
-                                </option>
+                                <MenuItem key={type} value={type}>{type.replaceAll('_', ' ')}</MenuItem>
                             ))}
-                        </select>
-                    </div>
+                        </Select>
+                    </FormControl>
 
-                    <Field label="Marka" value={brand} onChange={setBrand} />
-                    <Field label="Model" value={model} onChange={setModel} />
+                    <CustomTextField label="Marka" value={brand} onChange={setBrand} required />
+                    <CustomTextField label="Model" value={model} onChange={setModel} required />
                     {renderDynamicFields()}
+                </Stack>
 
-                    <div className="flex justify-end pt-4">
-                        <button
-                            type="submit"
-                            className="flex items-center gap-2 px-4 py-2 bg-ocean-blue text-white text-sm font-semibold rounded-md shadow-sm hover:bg-ocean-dark-blue hover:shadow-md transition-all duration-200"
-                        >
-                            <Check className="w-5 h-5" />
-                            Zapisz
-                        </button>
-                    </div>
-                </form>
-
-            </div>
-        </div>
+                <div className="mt-4 flex justify-end gap-2">
+                    <Button onClick={handleClose} variant="outlined" size="small" className="border-[var(--color-ocean-light-blue)] text-[var(--color-ocean-light-blue)]">
+                        Anuluj
+                    </Button>
+                    <Button type="submit" variant="contained" size="small" className="bg-[var(--color-ocean-blue)] hover:bg-[var(--color-ocean-dark-blue)] text-[var(--color-ocean-white)]" startIcon={<Check size={16} />}>
+                        Zapisz
+                    </Button>
+                </div>
+            </Box>
+        </Modal>
     );
 };
 
-const Field = ({
-                   label,
-                   value,
-                   onChange,
-               }: {
+const CustomTextField: React.FC<{
     label: string;
     value?: string;
     onChange: (v: string) => void;
-}) => (
-    <div>
-        <label className="block text-sm font-medium text-midnight-dark mb-1">{label}</label>
-        <input
-            type="text"
-            value={value || ""}
-            onChange={(e) => onChange(e.target.value)}
-            className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-ocean-blue focus:border-ocean-blue"
-        />
-    </div>
+    required?: boolean;
+}> = ({ label, value, onChange, required = false }) => (
+    <TextField
+        label={label}
+        value={value || ''}
+        onChange={(e) => onChange(e.target.value)}
+        size="small"
+        fullWidth
+        required={required}
+        sx={{
+            '& .MuiInputBase-root': { bgcolor: 'rgba(255,255,255,0.02)', color: 'var(--color-ocean-white)' },
+            '& .MuiInputLabel-root': { color: 'rgba(241,250,238,0.8)' },
+            '& .MuiInputBase-input': { color: 'var(--color-ocean-white)' },
+            '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(241,250,238,0.23)' },
+            '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(241,250,238,0.4)' },
+        }}
+    />
 );
-
 
 export default AddComponentForm;

@@ -39,42 +39,33 @@ export const modalSx = {
         pt: 1,
     },
 
-    // INPUTS: spraw, aby TextField/Select/Input miały biały tekst i estetyczne obramowania
     "& .MuiFormControl-root, & .MuiTextField-root": {
         backgroundColor: "rgba(255,255,255,0.03)",
         borderRadius: 1,
     },
-    // główny tekst w inputach
     "& .MuiInputBase-root": {
         color: "var(--color-ocean-white)",
     },
-    // placeholder w inputach
     "& .MuiInputBase-input::placeholder": {
         color: "rgba(255,255,255,0.55)",
         opacity: 1,
     },
-    // label (gdy nieaktywny)
     "& .MuiInputLabel-root": {
         color: "rgba(255,255,255,0.75)",
     },
-    // label gdy skupiony
     "& .MuiInputLabel-root.Mui-focused": {
         color: "var(--color-ocean-blue)",
     },
-    // helper text (np. validation)
     "& .MuiFormHelperText-root": {
         color: "rgba(255,255,255,0.7)",
     },
-    // obramowanie dla Outlined variant
     "& .MuiOutlinedInput-notchedOutline": {
         borderColor: "rgba(255,255,255,0.12)",
     },
-    // obramowanie gdy input skupiony
     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
         borderColor: "var(--color-ocean-blue)",
         borderWidth: 1.5,
     },
-    // ikonki wewnątrz inputów (np. visibility)
     "& .MuiInputAdornment-root .MuiSvgIcon-root": {
         color: "rgba(255,255,255,0.85)",
     },

@@ -8,10 +8,7 @@ export const postComponentsCsvFile = async (
     params.append("componentType", componentType);
     const formData = new FormData();
     formData.append("file", file);
-    const response = await customAxios.post(`/admin/import/components?${params.toString()}`, formData, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-    });
+
+    const response = await customAxios.post(`/admin/import/components?${params.toString()}`, formData);
     return response.data;
 }
