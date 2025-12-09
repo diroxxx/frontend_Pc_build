@@ -16,6 +16,10 @@ const categoryLabels: Record<string, string> = {
     POWER_SUPPLY: "Zasilacz",
     STORAGE: "Pamięć",
 };
+const conditionLabel: Record<string, string> = {
+    NEW: "Nowe",
+    USED: "Używane",
+}
 
 export default function BuildConfiguration({
                                                categories,
@@ -72,10 +76,23 @@ export default function BuildConfiguration({
 
                                             <div>
                                                 <div className="font-medium text-midnight-dark text-sm leading-tight">
-                                                    {offer.brand} {offer.model}
+
+                                                    <a
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        href={offer.websiteUrl}
+                                                        className="hover:underline"
+                                                    >
+                                                        {offer.brand} {offer.model}
+
+                                                    </a>
                                                 </div>
                                                 <div className="text-xs text-gray-500">
-                                                    {offer.shopName ? offer.shopName : "—"} • {offer.condition}
+                                                    {offer.shopName}
+                                                </div>
+                                                <div className="text-xs text-gray-500">
+
+                                                    {conditionLabel[offer.condition]}
                                                 </div>
                                             </div>
                                         </div>
@@ -114,7 +131,6 @@ export default function BuildConfiguration({
                         );
                     })}
 
-                    {/* Podsumowanie */}
                     {selectedComputer.offers?.length > 0 && (
                         <div className="bg-gray-100 border-t border-ocean-light-blue p-4 flex justify-between items-center">
               <span className="text-sm font-medium text-midnight-dark">
@@ -127,7 +143,6 @@ export default function BuildConfiguration({
                     )}
                 </div>
             ) : (
-                // Gdy nie wybrano zestawu
                 <div className="mt-6 text-center p-8 bg-ocean-light-blue bg-opacity-20 border border-ocean-light-blue rounded-lg">
                     <p className="text-ocean-dark-blue">
                         Wybierz istniejący zestaw lub utwórz nowy, aby rozpocząć

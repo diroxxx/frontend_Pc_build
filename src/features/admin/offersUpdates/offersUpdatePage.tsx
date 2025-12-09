@@ -9,6 +9,7 @@ import ComponentsStatsPanel from "../components/ComponentsStatsPanel.tsx";
 import { putOfferUpdateConfig } from './api/putOfferUpdateConfig.ts';
 import type {OfferUpdateConfigDto, OfferUpdateType} from "../types/OfferUpdateConfigDto.ts";
 import {IntervalsMap} from "../types/intervalsMap.ts";
+import {useGetLastUpdateType} from "./hooks/useGetLastUpdateType.ts";
 
 interface Shop {
     name: string;
@@ -54,6 +55,10 @@ const ShopSelector  = ({ shops, selectedShopNames, onShopToggle, isDisabled }: S
     );
 };
 
+const updateTypeLabel: Record<string, string> = {
+    MANUAL: "Manualna",
+    AUTOMATIC: "Automatyczna",
+}
 const OffersComponent = () => {
     const [updateType, setUpdateType] = useState<OfferUpdateType>('MANUAL');
     const [shops] = useAtom(shopsAtom);
@@ -63,7 +68,8 @@ const OffersComponent = () => {
     const [interval, setInterval] = useState<string>();
 
     const { data: updates, isLoading, error, handleManualFetchOffers } = useOfferUpdates();
-
+    const {data: lastOferUpdateType} = useGetLastUpdateType();
+    const lastType = lastOferUpdateType || "MANUAL";
     useEffect(() => {
         fetchShops();
     }, [fetchShops]);
@@ -152,10 +158,17 @@ const saveOfferUpdateConfig = useCallback(async () => {
     
 
     return (
-        <div className="space-y-6 p-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="space-y-5 p-5">
+            <span className="text-sm font-medium rounded-lg bg-ocean-blue text-ocean-white shadow-sm border border-gray-200 p-3 mb-6 ">
+                Ostatnia aktualizacja - {updateTypeLabel[lastType]}
+
+            </span>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-5">
+
+
                 <div className="flex items-center justify-between">
                     <div>
+
                         <h2 className="text-xl font-semibold text-midnight-dark">Aktualizacja ofert</h2>
                         <p className="text-sm text-gray-600 mt-1">
                             Zarządzaj procesem aktualizacji ofert ze sklepów

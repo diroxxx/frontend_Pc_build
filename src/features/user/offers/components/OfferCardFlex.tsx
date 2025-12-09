@@ -19,7 +19,6 @@ const OfferCardFlex = ({ offer } : Props) => {
     const [imgError, setImgError] = useState(false);
     const [user, setUser] =useAtom(userAtom);
 
-    // const [guestComputers, setGuestComputers] = useAtom(guestComputersAtom);
 
     async function updateComputer() {
 

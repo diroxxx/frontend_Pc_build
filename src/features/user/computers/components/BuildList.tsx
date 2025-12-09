@@ -24,11 +24,8 @@ const BuildList = ({
 
     const user = useAtomValue(userAtom)
     const deleteMutation = useDeleteComputer(user?.email);
-    const [selectedComputer, setSelectedComputer] = useAtom(selectedComputerAtom);
+    const [selectedComputer,] = useAtom(selectedComputerAtom);
     const disabled = !user?.email;
-    // console.log("user:", user, "disabled:", disabled);
-
-    
 
     const updateNameMutation = useUpdateComputerName();
 

@@ -12,6 +12,22 @@ type OffersFiltersProps = {
     chooseComponentTypeParam?: ComponentTypeEnum;
 };
 
+const categoryLabels: Record<string, string> = {
+    PROCESSOR: "CPU",
+    GRAPHICS_CARD: "GPU",
+    MOTHERBOARD: "Płyta główna",
+    CPU_COOLER: "Chłodzenie cpu",
+    CASE_PC: "Obudowa",
+    MEMORY: "RAM",
+    POWER_SUPPLY: "Zasilacz",
+    STORAGE: "Pamięć",
+};
+
+const conditionLabel: Record<string, string> = {
+    NEW: "Nowe",
+    USED: "Używane",
+}
+
 export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersProps) => {
 
     const [offerLeftPanelFilters, setOfferLeftPanelFilters] = useAtom(offerLeftPanelFiltersAtom);
@@ -48,7 +64,6 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
 
     }, [chooseComponentTypeParam]);
 
-
     const applyFilters = () => {
         setPage(0);
         setOfferLeftPanelFilters(tempFilters);
@@ -77,13 +92,12 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
                         <option value="">Wszystkie kategorie</option>
                         {componentTypes.map(type => (
                             <option key={type} value={type}>
-                                {type}
+                                {categoryLabels[type]}
                             </option>
                         ))}
                     </select>
                 </div>
 
-                {/*Price filter */}
                 <div className="mb-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Cena: {tempFilters.minPrize} zł – {tempFilters.maxPrize} zł
@@ -137,7 +151,7 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
                         <option value="">Wszystkie stany</option>
                         {componentConditions.map(condition => (
                             <option key={condition} value={condition}>
-                                {condition}
+                                {conditionLabel[condition]}
                             </option>
                         ))}
                     </select>

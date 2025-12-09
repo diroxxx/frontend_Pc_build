@@ -41,18 +41,15 @@ export default function Builds() {
     }, [fetchedComputers, selectedComputer, setSelectedComputer]);
 
 
-
     const handleAddComponent = (category: ComponentTypeEnum) => {
         setSelectedCategory(category);
         navigate(`/offers?category=${category}`);
     };
 
-
     const handleSelectBuild = (id: number) => {
         const computer = fetchedComputers.find(c => c.id === id) || null;
         setSelectedComputer(computer);
     };
-
 
     const handleCreateNewBuild = () => {
 
@@ -80,7 +77,6 @@ export default function Builds() {
 
     return (
         <div className="max-w-7xl mx-auto p-5 min-h-screen">
-            {/* Header */}
             <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold text-midnight-dark mb-4">Konfigurator PC</h1>
                 <p className="text-text-midnight-dark">Stwórz swój wymarzony zestaw komputerowy</p>
@@ -91,11 +87,10 @@ export default function Builds() {
             )}
 
             {saveMutation.isError && (
-                <p className="text-sm text-red-500 mt-2">Nie udało się utworzyć zestawu</p>
+                <p className="text-sm text-ocean-red mt-2">Nie udało się utworzyć zestawu</p>
             )}
 
 
-            {/* User builds */}
             <BuildList
                 computers={fetchedComputers}
                 onSelectBuild={handleSelectBuild}
@@ -103,7 +98,6 @@ export default function Builds() {
                 isLoading={isLoading}
             />
 
-            {/* Selected build configuration */}
             <BuildConfiguration
                 categories={categories}
                 onAddComponent={handleAddComponent}

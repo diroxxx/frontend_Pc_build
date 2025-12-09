@@ -32,7 +32,7 @@ const GeneralPage = ({ onNavigate }: GeneralInfoProps) => {
                     <h3 className="text-ocean-white text-sm font-semibold">Użytkownicy</h3>
                     <p className="text-ocean-white text-2xl font-bold">{data?.length}</p>
                     <button onClick={() => onNavigate("users")} className="text-ocean-light-blue text-xs mt-1 hover:underline">
-                        Zobacz →
+                        Zobacz
                     </button>
                 </div>
 
@@ -44,7 +44,7 @@ const GeneralPage = ({ onNavigate }: GeneralInfoProps) => {
                     <h3 className="text-ocean-white text-sm font-semibold">Komponenty</h3>
                     <p className="text-ocean-white text-2xl font-bold">{components?.totalElements ?? 0}</p>
                     <button onClick={() => onNavigate("components")} className="text-ocean-light-blue text-xs mt-1 hover:underline">
-                        Zobacz →
+                        Zobacz
                     </button>
                 </div>
 
@@ -56,7 +56,7 @@ const GeneralPage = ({ onNavigate }: GeneralInfoProps) => {
                     <h3 className="text-ocean-white text-sm font-semibold">Oferty</h3>
                     <p className="text-ocean-white text-2xl font-bold">{offersCount?.toLocaleString() ?? 0}</p>
                     <button onClick={() => onNavigate("offers")} className="text-ocean-light-blue text-xs mt-1 hover:underline">
-                        Zobacz →
+                        Zobacz
                     </button>
                 </div>
             </div>

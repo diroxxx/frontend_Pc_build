@@ -1,6 +1,6 @@
-import type {OfferRecDto} from "./OfferRecDto.ts";
+import type {ComponentOffer} from "../../../../types/OfferBase.ts";
 
 export type CpuGpuRecGameDto = {
-    minRec: OfferRecDto[],
-    maxRec: OfferRecDto[]
+    minRec: ComponentOffer[],
+    maxRec: ComponentOffer[]
 }

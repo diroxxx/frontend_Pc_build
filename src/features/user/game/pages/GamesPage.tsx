@@ -10,6 +10,9 @@ import { useReccommendedVideo } from "../hooks/useReccommendedVideo.ts";
 import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.tsx";
 import {useCpuGpuGame} from "../hooks/useCpuGpuGame.ts";
 import {OfferRecGameCard} from "../components/OfferRecGameCard.tsx";
+import {useAtomValue} from "jotai";
+import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
+import OfferCardFlex from "../../offers/components/OfferCardFlex.tsx";
 
 const GamesPage = () => {
     const { data: games, isLoading, isError } = useGetAllGamesApi();
@@ -38,7 +41,8 @@ const completeConfig = isConfigComplete(gameFpsConfig) ? gameFpsConfig : null;
 const {data: recommendedVideoData, refetch, isError:videoError,isLoading:videoLoading, isFetching:videoFetching} = useReccommendedVideo(completeConfig || undefined);
 const canSearch = isConfigComplete(gameFpsConfig);
 
-const {data: recOffersGame, refetch: refetchRecGame, isFetching: isFetchingRec } = useCpuGpuGame(gameFpsConfig.gameTitle, gameFpsConfig.budget)
+const {data: recOffersGame, refetch: refetchRecGame, isFetching: isFetchingRec, isLoading: isLoadingRec } = useCpuGpuGame(gameFpsConfig.gameTitle, gameFpsConfig.budget)
+
 
 
     if (isError) {
@@ -56,7 +60,7 @@ return (
                     <div className="col-span-2">
                         <div className="bg-white rounded-lg shadow-sm border border-gray-200 sticky top-6">
                             <div className="p-3 border-b border-gray-200">
-                                <h2 className="text-sm font-bold">Konfiguracja</h2>
+                                <h2 className="text-sm font-bold">Rekomendacje</h2>
                             </div>
                             <div className="p-3 space-y-2.5">
                                 <div>
@@ -167,6 +171,7 @@ return (
                                     <input
                                         type="number"
                                         value={gameFpsConfig?.budget || ""}
+                                        min={500}
                                         onChange={(e) => setGameFpsConfig(prev => ({ ...prev, budget: Number(e.target.value) }))}
                                         className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-300 rounded focus:ring-1 focus:ring-ocean-blue focus:border-ocean-blue"
                                         placeholder="Budżet"
@@ -233,7 +238,6 @@ return (
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                                 <div className="bg-gradient-to-r from-ocean-blue to-ocean-dark-blue p-3">
                                     <h2 className="text-sm font-bold text-white flex items-center gap-2">
-                                        <svg className="w-4 h-4" fill="currentColor" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>YouTube</title><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                                         Rekomendowane wideo
                                     </h2>
                                 </div>
@@ -273,35 +277,39 @@ return (
                     </div>
 
                     <div className="col-span-4 space-y-4">
-                        {recOffersGame && (recOffersGame.minRec.length >=1 || recOffersGame.maxRec.length >= 1) ? (
+
+                        {
+                            isLoadingRec || isFetchingRec ? (
+                                    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                                        <LoadingSpinner />
+                                    </div>
+                                ): recOffersGame && (recOffersGame.minRec.length >=1 || recOffersGame.maxRec.length >= 1) ? (
                             <>
                                 {recOffersGame.minRec && recOffersGame.minRec.length > 0 && (
                                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                                         <div className="bg-indigo-400 p-3">
                                             <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                                                <Cpu className="w-4 h-4" />
                                                 Budżetowe podzespoły
                                             </h3>
                                         </div>
                                         <div className="p-3 space-y-3 max-h-[calc(50vh-80px)] overflow-y-auto">
                                             {recOffersGame.minRec.map((offer, key) => (
-                                                <OfferRecGameCard key={key} offerRec={offer}/>
+                                                <OfferCardFlex key={key} offer={offer} />
                                             ))}
                                         </div>
                                     </div>
                                 )}
 
                                 {recOffersGame.maxRec && recOffersGame.maxRec.length > 0 && (
-                                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 ">
+                                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hiddenoverflow-hidden ">
                                         <div className="bg-indigo-400 p-3">
                                             <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                                                <Gpu className="w-4 h-4" />
                                                 Rekomendowane podzespoły
                                             </h3>
                                         </div>
                                         <div className="p-3 space-y-3 max-h-[calc(50vh-80px)] overflow-y-auto">
                                             {recOffersGame.maxRec.map((offer, key) => (
-                                                <OfferRecGameCard key={key} offerRec={offer}/>
+                                                <OfferCardFlex key={ key} offer={offer} />
                                             ))}
                                         </div>
                                     </div>
@@ -315,7 +323,7 @@ return (
                                 {recOffersGame?.minRec.length == 0 && recOffersGame?.maxRec.length == 0 && (
                                     <>
                                         <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                                            Brak rekomendacji dl podanej gry
+                                            Brak rekomendacji dla podanej gry
                                         </h3>
                                         <p className="text-xs text-gray-500">
                                             Możliwe że dla podanych podzespołów z wymagań gry nie ma aktualnych ofert.
