@@ -84,97 +84,6 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
     const handleClose = () => setOpen(false);
 
 
-//     useEffect(() => {
-//         if (!postId) {
-//             setLoading(false);
-//             return;
-//         }
-//
-//         const fetchImages = async () => {
-//             setLoading(true);
-//             try {
-//                 const response = await customAxios.get<PostImageDTO[]>(
-//                     `/community/posts/${postId}/images`
-//                 );
-//                 setImages(response.data);
-//             } catch (err) {
-//                 console.error("Błąd pobierania zdjęć:", err);
-//                 setError("Nie udało się załadować listy zdjęć.");
-//             } finally {
-//                 setLoading(false);
-//             }
-//         };
-//
-//         fetchImages();
-//     }, [postId]);
-//
-//     const prevImage = () => {
-//         setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-//     };
-//
-//     const nextImage = () => {
-//         setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-//     };
-//
-//     if (loading) return <p className="text-blue-500 mt-4">Ładowanie zdjęć...</p>;
-//     if (error) return <p className="text-red-500 mt-4">{error}</p>;
-//     if (images.length === 0) return <p className="text-gray-500 mt-4 italic">Brak zdjęć do wyświetlenia.</p>;
-//
-//     return (
-//         <div className="mt-6">
-//             {/*<h3 className="text-xl font-bold text-gray-800 mb-4">Galeria zdjęć:</h3>*/}
-//
-//             <div className="relative w-full max-w-3xl mx-auto">
-//                 {/* Duże zdjęcie */}
-//                 <img
-//                     src={images[currentIndex].imageUrl}
-//                     alt={images[currentIndex].filename}
-//                     className="w-full aspect-square object-cover rounded-lg shadow-md"
-//                     onError={(e) => {
-//                         e.currentTarget.src = "https://placehold.co/600x338?text=Błąd+ładowania";
-//                     }}
-//                 />
-//
-//                 {/* Strzałki do przewijania */}
-//                 {images.length > 1 && (
-//                     <>
-//                         <button
-//                             onClick={prevImage}
-//                             className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-black bg-opacity-40 text-white p-2 rounded-full hover:bg-opacity-60 transition"
-//                         >
-//                             <FaChevronLeft />
-//                         </button>
-//                         <button
-//                             onClick={nextImage}
-//                             className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-black bg-opacity-40 text-white p-2 rounded-full hover:bg-opacity-60 transition"
-//                         >
-//                             <FaChevronRight />
-//                         </button>
-//                     </>
-//                 )}
-//
-//                 {images.length > 1 && (
-//                     <div className="flex justify-center mt-4 space-x-2 overflow-x-auto">
-//                         {images.map((img, index) => (
-//                             <img
-//                                 key={img.id}
-//                                 src={img.imageUrl}
-//                                 alt={img.filename}
-//                                 className={`w-20 aspect-square object-cover rounded cursor-pointer border-2 ${
-//                                     index === currentIndex ? "border-blue-500" : "border-transparent"
-//                                 }`}
-//                                 onClick={() => setCurrentIndex(index)}
-//                                 onError={(e) => {
-//                                     e.currentTarget.src = "https://placehold.co/100x100?text=Błąd+ładowania";
-//                                 }}
-//                             />
-//                         ))}
-//                     </div>
-//                 )}
-//             </div>
-//         </div>
-//     );
-// };
     useEffect(() => {
         if (!postId) {
             setLoading(false);
@@ -266,21 +175,20 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
                 )}
             </div>
 
-            {/* --- MODAL MUI (LIGHTBOX) --- */}
             <Dialog
                 open={open}
                 onClose={handleClose}
-                maxWidth="xl" // Pozwala na bardzo szeroki modal
+                maxWidth="xl"
                 PaperProps={{
                     style: {
-                        backgroundColor: 'transparent', // Przezroczyste tło "kartki" dialogu
-                        boxShadow: 'none', // Usunięcie cienia
+                        backgroundColor: 'transparent',
+                        boxShadow: 'none',
                         overflow: 'hidden'
                     }
                 }}
                 slotProps={{
                     backdrop: {
-                        style: { backgroundColor: 'rgba(0, 0, 0, 0.9)' } // Ciemniejsze tło za zdjęciem
+                        style: { backgroundColor: 'rgba(0, 0, 0, 0.9)' }
                     }
                 }}
             >
@@ -341,8 +249,8 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [toastMessage, setToastMessage] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const closeToast = () => setToastMessage(null);
-    const [commentVotes, setCommentVotes] = useState<Record<number, number>>({});
-    const [commentUserVote, setCommentUserVote] = useState<Record<number, 'upvote' | 'downvote' | null>>({});
+    const [commentVotes, setCommentVotes] = useState<{ [key: number]: number }>({});
+    const [commentUserVote, setCommentUserVote] = useState<{ [key: number]: "upvote" | "downvote" | null }>({});
 
     const [user] = useAtom(userAtom);
     // const isAuthor = user && user.nickname === post.user.username;
@@ -764,43 +672,94 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         }
     };
 
-    const handleCommentVote = async (commentId: number, vote: 'upvote' | 'downvote') => {
-        // --- ZMIANA: Blokada dla niezalogowanych ---
+
+    const handleCommentVote = async (commentId: number, vote: "upvote" | "downvote") => {
         if (!user) {
             setToastMessage({
                 message: "Musisz być zalogowany, aby oceniać komentarze.",
-                type: 'error'
+                type: "error",
             });
             return;
         }
-        // -------------------------------------------
 
         try {
             const response = await customAxios.post(
                 `/community/comments/${commentId}/vote?type=${vote}`
             );
 
+            const newScore = response.data;
+
+            // aktualizacja wyniku
             setCommentVotes(prev => ({
                 ...prev,
-                [commentId]: response.data
+                [commentId]: newScore,
             }));
 
+            // toggle ikon
             setCommentUserVote(prev => ({
                 ...prev,
-                [commentId]: prev[commentId] === vote ? null : vote
+                [commentId]: prev[commentId] === vote ? null : vote,
             }));
 
-        } catch (err) {
-            console.error("Błąd głosowania na komentarz:", err);
-            // Opcjonalnie: obsługa błędu z backendu
-            setToastMessage({ message: "Wystąpił błąd podczas głosowania.", type: 'error' });
+        } catch (err: any) {
+
+            if (err.response?.status === 403) {
+                setToastMessage({
+                    message: "Nie możesz głosować na własny komentarz.",
+                    type: "error"
+                });
+                return;
+            }
+
+            setToastMessage({
+                message: "Wystąpił błąd podczas głosowania.",
+                type: "error"
+            });
         }
     };
 
     useEffect(() => {
-        fetchComments();
-        fetchVoteStatus();
-        fetchCommentVotes()
+        if (comments.length === 0) return;
+
+        const loadVotes = async () => {
+            const scoreMap: { [key: number]: number } = {};
+            const statusMap: { [key: number]: any } = {};
+
+            for (const c of comments) {
+
+                // pobranie net score
+                try {
+                    // const scoreRes = await customAxios.get(`/community/comments/${c.id}/vote`);
+                    const scoreRes = await customAxios.get(`/community/comments/${c.id}/vote`);
+                    scoreMap[c.id] = scoreRes.data;
+                } catch {
+                    scoreMap[c.id] = 0;
+                }
+
+                // pobranie statusu użytkownika
+                try {
+                    const statusRes = await customAxios.get(`/community/comments/${c.id}/vote/status`);
+                    statusMap[c.id] = statusRes.data; // null | "upvote" | "downvote"
+                } catch {
+                    statusMap[c.id] = null;
+                }
+            }
+
+            setCommentVotes(scoreMap);
+            setCommentUserVote(statusMap);
+        };
+
+        loadVotes();
+    }, [comments]);
+
+    useEffect(() => {
+        const loadData = async () => {
+            await fetchComments();
+            await fetchVoteStatus();
+            await fetchCommentVotes();
+        };
+
+        loadData();
     }, [post.id]);
 
 
@@ -955,12 +914,15 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                                             </div>
                                         </div>
                                         <p className="text-gray-700 whitespace-pre-wrap">{comment.content}</p>
+
                                         {/*<div className="flex items-center space-x-4 mt-3">*/}
 
                                         {/*    <button*/}
-                                        {/*        className={`p-1 rounded ${*/}
+                                        {/*        className={`p-1 rounded transition-colors ${*/}
+                                        {/*            !user ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'*/}
+                                        {/*        } ${*/}
                                         {/*            commentUserVote[comment.id] === 'upvote'*/}
-                                        {/*                ? 'text-white bg-blue-600'*/}
+                                        {/*                ? 'text-white bg-blue-600 hover:bg-blue-700'*/}
                                         {/*                : 'text-gray-600 bg-gray-200'*/}
                                         {/*        }`}*/}
                                         {/*        onClick={() => handleCommentVote(comment.id, 'upvote')}*/}
@@ -969,13 +931,15 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                                         {/*    </button>*/}
 
                                         {/*    <span className="font-bold text-gray-800">*/}
-                                        {/*            {commentVotes[comment.id] ?? 0}*/}
-                                        {/*     </span>*/}
+                                        {/*         {commentVotes[comment.id] ?? 0}*/}
+                                        {/*    </span>*/}
 
                                         {/*    <button*/}
-                                        {/*        className={`p-1 rounded ${*/}
+                                        {/*        className={`p-1 rounded transition-colors ${*/}
+                                        {/*            !user ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'*/}
+                                        {/*        } ${*/}
                                         {/*            commentUserVote[comment.id] === 'downvote'*/}
-                                        {/*                ? 'text-white bg-red-600'*/}
+                                        {/*                ? 'text-white bg-red-600 hover:bg-red-700'*/}
                                         {/*                : 'text-gray-600 bg-gray-200'*/}
                                         {/*        }`}*/}
                                         {/*        onClick={() => handleCommentVote(comment.id, 'downvote')}*/}
@@ -986,19 +950,16 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                                         {/*</div>*/}
                                         <div className="flex items-center space-x-4 mt-3">
 
+                                            {/* UPVOTE */}
                                             <button
-                                                // Dodano warunek !user do stylów (opacity-50 i cursor-not-allowed)
                                                 className={`p-1 rounded transition-colors ${
-                                                    !user ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'
+                                                    !user ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
                                                 } ${
-                                                    commentUserVote[comment.id] === 'upvote'
-                                                        ? 'text-white bg-blue-600 hover:bg-blue-700'
-                                                        : 'text-gray-600 bg-gray-200'
+                                                    commentUserVote[comment.id] === "upvote"
+                                                        ? "text-white bg-blue-600 hover:bg-blue-700"
+                                                        : "text-gray-600 bg-gray-200"
                                                 }`}
-                                                onClick={() => handleCommentVote(comment.id, 'upvote')}
-                                                // Opcjonalnie: możesz dodać disabled={!user} jeśli wolisz,
-                                                // ale wtedy Toast z komunikatem się nie pokaże.
-                                                // Zostawiam bez disabled, aby funkcja handleCommentVote wyświetliła błąd.
+                                                onClick={() => handleCommentVote(comment.id, "upvote")}
                                             >
                                                 <FaThumbsUp/>
                                             </button>
@@ -1007,15 +968,16 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         {commentVotes[comment.id] ?? 0}
     </span>
 
+                                            {/* DOWNVOTE */}
                                             <button
                                                 className={`p-1 rounded transition-colors ${
-                                                    !user ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'
+                                                    !user ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
                                                 } ${
-                                                    commentUserVote[comment.id] === 'downvote'
-                                                        ? 'text-white bg-red-600 hover:bg-red-700'
-                                                        : 'text-gray-600 bg-gray-200'
+                                                    commentUserVote[comment.id] === "downvote"
+                                                        ? "text-white bg-red-600 hover:bg-red-700"
+                                                        : "text-gray-600 bg-gray-200"
                                                 }`}
-                                                onClick={() => handleCommentVote(comment.id, 'downvote')}
+                                                onClick={() => handleCommentVote(comment.id, "downvote")}
                                             >
                                                 <FaThumbsDown/>
                                             </button>
