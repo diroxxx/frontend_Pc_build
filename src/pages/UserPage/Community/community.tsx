@@ -494,9 +494,11 @@ interface Post {
     title: string;
     content: string;
     user: User;
+    authorName?: string;
     createdAt: number[];
     category?: Category;
     images: PostImageDTO[];
+    thumbnailImageId?: number
 }
 
 interface Category {
@@ -821,13 +823,74 @@ const Community: React.FC = () => {
             {posts.length === 0 ? (
                 <p className="text-center text-gray-500">Brak postów do wyświetlenia w tej kategorii.</p>
             ) : (
+                // <PaginatedList
+                //     items={sortedPosts}
+                //     itemsPerPage={12}
+                //     renderItem={(post) => {
+                //         const date = parseDateArray(post.createdAt);
+                //         const categoryName = post.category?.name || 'Brak kategorii';
+                //         const firstImage = post.images && post.images.length > 0 ? post.images[0] : null;
+                //
+                //         return (
+                //             <li
+                //                 key={post.id}
+                //                 onClick={() => setSelectedPost(post)}
+                //                 className="cursor-pointer bg-white p-4 rounded shadow-lg hover:shadow-xl transition duration-200 flex justify-between items-start border-l-4 border-blue-500"
+                //             >
+                //                 <div className="flex flex-1 min-w-0 pr-4">
+                //                     {firstImage ? (
+                //                         <div className="mr-4 flex-shrink-0">
+                //                             <img
+                //                                 src={firstImage.imageUrl}
+                //                                 alt="Miniatura"
+                //                                 className="w-24 h-24 object-cover rounded-md border border-gray-200"
+                //                                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                //                             />
+                //                         </div>
+                //                     ) : (
+                //                         <div className="mr-4 flex-shrink-0 w-24 h-24 bg-gray-100 rounded-md flex items-center justify-center border border-gray-200 text-gray-400 text-xs text-center p-1">
+                //                             Brak zdjęcia
+                //                         </div>
+                //                     )}
+                //
+                //                     <div className="flex-1 min-w-0">
+                //                         <div className="flex items-center mb-2">
+                //                             <span className={`inline-block text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md ${getCategoryColor(post.category?.name)}`}>
+                //                                 {categoryName}
+                //                             </span>
+                //                             <h3 className="text-xl font-bold text-gray-800 truncate">{post.title}</h3>
+                //                         </div>
+                //                         <p className="text-gray-600 mt-1 line-clamp-2">{post.content}</p>
+                //                         <div className="text-gray-500 text-sm mt-2 flex items-center">
+                //                             <span className="mr-1">Autor:</span>
+                //                             <div className="flex items-center text-gray-900 font-bold">
+                //                                 <FaUserCircle className="w-4 h-4 mr-1 text-gray-400"/>
+                //                                 {post.user.username}
+                //                             </div>
+                //                         </div>
+                //                     </div>
+                //                 </div>
+                //                 <div className="text-gray-400 text-sm text-right flex-shrink-0 pt-1 pl-2">
+                //                     <span className="block">{formatDate(date)}</span>
+                //                     <span className="block text-xs">({timeAgo(date)})</span>
+                //                 </div>
+                //             </li>
+                //         );
+                //     }}
+                // />
                 <PaginatedList
                     items={sortedPosts}
                     itemsPerPage={12}
                     renderItem={(post) => {
                         const date = parseDateArray(post.createdAt);
                         const categoryName = post.category?.name || 'Brak kategorii';
-                        const firstImage = post.images && post.images.length > 0 ? post.images[0] : null;
+
+                        // --- ZMIANA TUTAJ: Budowanie URL do obrazka ---
+                        // Zakładam, że Twój backend stoi na localhost:8080.
+                        // Jeśli jest inaczej, zmień początek adresu.
+                        const thumbnailUrl = post.thumbnailImageId
+                            ? `http://localhost:8080/community/image/${post.thumbnailImageId}`
+                            : null;
 
                         return (
                             <li
@@ -836,10 +899,12 @@ const Community: React.FC = () => {
                                 className="cursor-pointer bg-white p-4 rounded shadow-lg hover:shadow-xl transition duration-200 flex justify-between items-start border-l-4 border-blue-500"
                             >
                                 <div className="flex flex-1 min-w-0 pr-4">
-                                    {firstImage ? (
+
+                                    {/* --- ZMIANA TUTAJ: Wyświetlanie obrazka z URL --- */}
+                                    {thumbnailUrl ? (
                                         <div className="mr-4 flex-shrink-0">
                                             <img
-                                                src={firstImage.imageUrl}
+                                                src={thumbnailUrl}
                                                 alt="Miniatura"
                                                 className="w-24 h-24 object-cover rounded-md border border-gray-200"
                                                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
@@ -853,9 +918,9 @@ const Community: React.FC = () => {
 
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center mb-2">
-                                            <span className={`inline-block text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md ${getCategoryColor(post.category?.name)}`}>
-                                                {categoryName}
-                                            </span>
+                            <span className={`inline-block text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md ${getCategoryColor(post.category?.name)}`}>
+                                {categoryName}
+                            </span>
                                             <h3 className="text-xl font-bold text-gray-800 truncate">{post.title}</h3>
                                         </div>
                                         <p className="text-gray-600 mt-1 line-clamp-2">{post.content}</p>
@@ -863,7 +928,8 @@ const Community: React.FC = () => {
                                             <span className="mr-1">Autor:</span>
                                             <div className="flex items-center text-gray-900 font-bold">
                                                 <FaUserCircle className="w-4 h-4 mr-1 text-gray-400"/>
-                                                {post.user.username}
+                                                {/* Użyj authorName (z listy) lub user.username (ze szczegółów) lub zapasowego tekstu */}
+                                                {post.authorName || post.user?.username || 'Nieznany'}
                                             </div>
                                         </div>
                                     </div>
