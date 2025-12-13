@@ -2,11 +2,13 @@ import {ImageOff, Plus} from "lucide-react";
 import type {ComponentOffer} from "../../../../types/OfferBase.ts";
 import {showToast} from "../../../../lib/ToastContainer.tsx";
 import {validateCompatibility} from "../../computers/hooks/validateCompatibility.ts";
-import {useAtomValue} from "jotai";
+import {useAtom, useAtomValue} from "jotai";
 import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
 import {useUpdateOffersToComputer} from "../../../admin/hooks/useUpdateOffersToComputer.ts";
 import {useState} from "react";
 import {ShopImageComponent} from "./ShopImageComponent.tsx";
+import {guestComputersAtom} from "../../atoms/guestComputersAtom.ts";
+import {userAtom} from "../../../../atomContext/userAtom.tsx";
 
 interface OfferCardGridProps {
     offer: ComponentOffer;
@@ -15,11 +17,11 @@ interface OfferCardGridProps {
 const OfferCardGrid: React.FC<OfferCardGridProps> = ({ offer }) => {
 
 
-
+    const user = useAtomValue(userAtom);
     const selectedComputer = useAtomValue(selectedComputerAtom);
     const updateMutation = useUpdateOffersToComputer();
     const [imgError, setImgError] = useState(false);
-
+    const [guestcomputers, setGuestComputers] = useAtom(guestComputersAtom);
     async function updateComputer() {
         if (!selectedComputer) {
             showToast.warning("Najpierw wybierz zestaw komputerowy");
@@ -38,6 +40,37 @@ const OfferCardGrid: React.FC<OfferCardGridProps> = ({ offer }) => {
         });
 
         showToast.success("Podzespół został dodany do zestawu!");
+    }
+
+    const updateComputerGuest = () => {
+        if (!selectedComputer) {
+            showToast.warning("Najpierw wybierz zestaw komputerowy");
+            return;
+        }
+
+        const error = validateCompatibility(selectedComputer, offer);
+        if (error) {
+            showToast.error(error);
+            return;
+        }
+        const updatedComputer = {
+            ...selectedComputer,
+            offers: [
+                ...selectedComputer.offers.filter(o => o.componentType !== offer.componentType),
+                offer
+            ],
+            price: selectedComputer.offers
+                .filter(o => o.componentType !== offer.componentType)
+                .reduce((sum, o) => sum + o.price, offer.price)
+        };
+
+        const updatedGuestComputers = guestcomputers.map(c =>
+            c.id === selectedComputer.id ? updatedComputer : c
+        );
+
+        setGuestComputers(updatedGuestComputers);
+        showToast.success("Podzespół został dodany do zestawu!");
+
     }
 
 
@@ -98,7 +131,7 @@ const OfferCardGrid: React.FC<OfferCardGridProps> = ({ offer }) => {
         </div>
 
         <button
-            onClick={updateComputer}
+            onClick={user ? updateComputer : updateComputerGuest}
             className="p-2 rounded-md bg-ocean-blue text-white hover:bg-ocean-dark-blue transition-colors flex items-center justify-center flex-shrink-0"
             aria-label="Dodaj do zestawu"
         >

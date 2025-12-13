@@ -5,26 +5,34 @@ import {useAtom} from "jotai";
 import {useFetchComputersByEmail} from "../../../../hooks/useFetchComputersByEmail.ts";
 import {userAtom} from "../../../../atomContext/userAtom.tsx";
 import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
+import {guestComputersAtom} from "../../atoms/guestComputersAtom.ts";
 
 export default function SidePanelBuilds() {
     const [hovered, setHovered] = useState(false);
     const [user] = useAtom(userAtom);
     const { data: fetchedComputers = [], isLoading } = useFetchComputersByEmail(user?.email);
     const [selectedComputer, setSelectedComputer] = useAtom(selectedComputerAtom);
+    const [guestcomputers,] = useAtom(guestComputersAtom);
+
+    const computers = user ? fetchedComputers : guestcomputers || [];
 
 
     const handleSelectBuild = (id: number) => {
-        const computer = fetchedComputers.find(c => c.id === id) || null;
+        const computer = computers.find(c => c.id === id) || null;
         setSelectedComputer(computer);
     };
 
+    const handleSelectGuestBuild = (id: number) => {
+        const computer = guestcomputers?.find(c => c.id === id) || null;
+        setSelectedComputer(computer);
+    }
+
 
     useEffect(() => {
-        if (!selectedComputer || fetchedComputers.length === 0) return;
-        const fresh = fetchedComputers.find(c => c.id === selectedComputer.id);
+        if (!selectedComputer || computers.length === 0) return;
+        const fresh = computers.find(c => c.id === selectedComputer.id);
         if (fresh) setSelectedComputer(fresh);
-    }, [fetchedComputers]);
-
+    }, [computers]);
 
 
     return (
@@ -64,19 +72,19 @@ export default function SidePanelBuilds() {
             >
                 <div className="p-4 overflow-y-auto flex-1">
                     <h3 className="text-sm font-medium text-midnight-dark mb-2">
-                        Twoje zestawy ({fetchedComputers?.length || 0})
+                        Twoje zestawy ({computers?.length || 0})
                     </h3>
 
-                    {(!fetchedComputers || fetchedComputers.length === 0) ? (
+                    {(!computers || computers.length === 0) ? (
                         <p className="text-xs text-gray-500">
                             Brak zestawów — utwórz nowy w konfiguratorze.
                         </p>
                     ) : (
                         <div className="space-y-1 max-h-32 overflow-y-auto">
-                            {fetchedComputers.map((computer, index) => (
+                            {computers.map((computer, index) => (
                                 <div
                                     key={index}
-                                    onClick={() => handleSelectBuild(computer.id)}
+                                    onClick={() => user ? handleSelectBuild(computer.id) : handleSelectGuestBuild(computer.id)}
                                     className={`flex items-center justify-between p-2 rounded cursor-pointer transition-colors ${
                                         selectedComputer?.id === computer.id
                                             ? "bg-ocean-light-blue bg-opacity-30 border border-ocean-blue"

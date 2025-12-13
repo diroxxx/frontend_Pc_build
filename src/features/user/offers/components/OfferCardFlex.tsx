@@ -8,6 +8,7 @@ import {validateCompatibility} from "../../computers/hooks/validateCompatibility
 import {ImageOff} from "lucide-react";
 import {ShopImageComponent} from "./ShopImageComponent.tsx";
 import {userAtom} from "../../../../atomContext/userAtom.tsx";
+import {guestComputersAtom} from "../../atoms/guestComputersAtom.ts";
 
 interface Props {
     offer: ComponentOffer;
@@ -17,8 +18,8 @@ const OfferCardFlex = ({ offer } : Props) => {
     const selectedComputer = useAtomValue(selectedComputerAtom);
     const updateMutation = useUpdateOffersToComputer();
     const [imgError, setImgError] = useState(false);
-    const [user, setUser] =useAtom(userAtom);
-
+    const user =useAtomValue(userAtom);
+    const [guestcomputers, setGuestComputers] = useAtom(guestComputersAtom);
 
     async function updateComputer() {
 
@@ -40,6 +41,38 @@ const OfferCardFlex = ({ offer } : Props) => {
             });
 
                 showToast.success("Podzespół został dodany do zestawu!");
+    }
+
+
+    const updateComputerGuest = () => {
+        if (!selectedComputer) {
+            showToast.warning("Najpierw wybierz zestaw komputerowy");
+            return;
+        }
+
+        const error = validateCompatibility(selectedComputer, offer);
+        if (error) {
+            showToast.error(error);
+            return;
+        }
+        const updatedComputer = {
+            ...selectedComputer,
+            offers: [
+                ...selectedComputer.offers.filter(o => o.componentType !== offer.componentType),
+                offer
+            ],
+            price: selectedComputer.offers
+                .filter(o => o.componentType !== offer.componentType)
+                .reduce((sum, o) => sum + o.price, offer.price)
+        };
+
+        const updatedGuestComputers = guestcomputers.map(c =>
+            c.id === selectedComputer.id ? updatedComputer : c
+        );
+
+        setGuestComputers(updatedGuestComputers);
+        showToast.success("Podzespół został dodany do zestawu!");
+
     }
 
     const renderSpecTags = () => {
@@ -216,7 +249,7 @@ const OfferCardFlex = ({ offer } : Props) => {
                       </span>
 
                         <button
-                            onClick={updateComputer}
+                            onClick={user ? updateComputer : updateComputerGuest}
                             className="p-2 rounded-md bg-ocean-blue text-white hover:bg-ocean-dark-blue transition-colors"
                             aria-label="Dodaj do zestawu"
                         >

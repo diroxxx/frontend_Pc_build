@@ -1,16 +1,21 @@
 import  {type FormEvent, useState} from "react";
 import {setAuthToken} from "../../../../lib/Auth.tsx";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
-import { useAtom } from 'jotai';
-import { loginUserAtom } from '../../../../atomContext/userAtom.tsx';
+import {useAtom, useAtomValue} from 'jotai';
+import {type CustomJwtPayload, loginUserAtom} from '../../../../atomContext/userAtom.tsx';
 import { AuthRedirect } from "../../../../components/auth/AuthRedirect.tsx";
+import {postMigrateComputersFromGuestToUserApi} from "../../../../api/postMigrateComputersFromGuestToUserApi.ts";
+import {guestComputersAtom} from "../../atoms/guestComputersAtom.ts";
+import {jwtDecode} from "jwt-decode";
+
 function Login() {
     const navigate: NavigateFunction = useNavigate();
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
     const [, loginUser] = useAtom(loginUserAtom);
     const [errorMessage, setErrorMessage] = useState<string[] | null>(null);
-   
+    const guestComputers = useAtomValue(guestComputersAtom);
+
     const onSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setErrorMessage(null);
@@ -28,7 +33,14 @@ function Login() {
             console.log(data);
             if (data?.accessToken) {
                 loginUser(data.accessToken);
-                // loginUser(data["accessToken"]);
+                //to migrate guest computers to user account to prevent data loss
+                const decoded = jwtDecode<CustomJwtPayload>(data.accessToken);
+                const email = decoded.sub;
+                if (email) {
+                    postMigrateComputersFromGuestToUserApi(email, guestComputers)
+                    console.log("Migrated guest computers to user account");
+
+                }
                 navigate("/")
 
             }
@@ -47,9 +59,7 @@ function Login() {
 
 return (
        <AuthRedirect 
-            requiredRole="USER"
             redirectTo="/login"
-            forbiddenRedirectTo="/admin/controlPanel"
         >
             <div className="min-h-screen bg-ocean-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             

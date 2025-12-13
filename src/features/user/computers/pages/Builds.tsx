@@ -11,6 +11,7 @@ import type {ComputerDto} from "../../../../types/ComputerDto.ts";
 import {ComponentTypeEnum} from "../../../../types/BaseItemDto.ts";
 import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
 import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.tsx";
+import {guestComputersAtom} from "../../atoms/guestComputersAtom.ts";
 
 export default function Builds() {
     const navigate = useNavigate();
@@ -28,7 +29,7 @@ export default function Builds() {
     ]
     const [, setSelectedCategory] = useAtom(selectedCategoryAtom);
     const saveMutation = useSaveComputerByUserEmail();
-
+    const [guestcomputers, setGuestComputers] = useAtom(guestComputersAtom);
     const { data: fetchedComputers = [], isLoading } = useFetchComputersByEmail(user?.email);
     const [selectedComputer, setSelectedComputer] = useAtom(selectedComputerAtom);
 
@@ -50,6 +51,12 @@ export default function Builds() {
         const computer = fetchedComputers.find(c => c.id === id) || null;
         setSelectedComputer(computer);
     };
+
+
+    const handleSelectGuestBuild = (id: number) => {
+        const computer = guestcomputers.find(c => c.id === id) || null;
+        setSelectedComputer(computer);
+    }
 
     const handleCreateNewBuild = () => {
 
@@ -75,6 +82,21 @@ export default function Builds() {
 
     };
 
+
+    const handleCreateNewGuestBuild = () => {
+        const nextNumber = guestcomputers.length + 1;
+
+        const newComputer: ComputerDto = {
+            id: Date.now(),
+            name: `Zestaw ${nextNumber}`,
+            isVisible: false,
+            price: 0,
+            offers: [],
+        };
+
+        setGuestComputers([...guestcomputers, newComputer]);
+    }
+
     return (
         <div className="max-w-7xl mx-auto p-5 min-h-screen">
             <div className="text-center mb-8">
@@ -96,34 +118,64 @@ export default function Builds() {
 
                 <div className={"relative"}>
 
-                    <div  className={user ? 'blur-none': 'blur-sm'} >
-                        <BuildList
-                            computers={fetchedComputers}
-                            onSelectBuild={handleSelectBuild}
-                            onCreateNew={handleCreateNewBuild}
-                            isLoading={isLoading}
-                        />
+                    {user && (
+                        <div>
 
-                        <BuildConfiguration
-                            categories={categories}
-                            onAddComponent={handleAddComponent}
-                        />
+                            <BuildList
+                                computers={fetchedComputers}
+                                onSelectBuild={handleSelectBuild}
+                                onCreateNew={handleCreateNewBuild}
+                                isLoading={isLoading}
+                            />
 
-                    </div>
+                            <BuildConfiguration
+                                categories={categories}
+                                onAddComponent={handleAddComponent}
+                            />
 
-                    {!user && (
-                        <div className="absolute inset-0 z-10 flex items-center justify-center ">
-                            <div className="bg-white/80 border-4 border-ocean-dark-blue  rounded px-8 py-7 text-center">
-                                <p className="text-midnight-dark mb-2">Aby korzystać z konfiguratora, musisz być zalogowany.</p>
-                                <button
-                                    className="px-4 py-2 bg-ocean-blue text-white rounded hover:bg-ocean-dark-blue transition-colors cursor-pointer "
-                                    onClick={() => navigate('/login')}
-                                >
-                                    Zaloguj się
-                                </button>
-                            </div>
                         </div>
                     )}
+
+                    {!user && (
+
+                        <div>
+                            <BuildList
+                                computers={guestcomputers}
+                                onSelectBuild={handleSelectGuestBuild}
+                                onCreateNew={handleCreateNewGuestBuild}
+                                isLoading={isLoading}
+                            />
+
+                            <BuildConfiguration
+                                categories={categories}
+                                onAddComponent={handleAddComponent}
+                            />
+
+                        </div>
+
+
+                    )}
+
+
+
+
+
+
+
+
+                    {/*{!user && (*/}
+                    {/*    <div className="absolute inset-0 z-10 flex items-center justify-center ">*/}
+                    {/*        <div className="bg-white/80 border-4 border-ocean-dark-blue  rounded px-8 py-7 text-center">*/}
+                    {/*            <p className="text-midnight-dark mb-2">Aby korzystać z konfiguratora, musisz być zalogowany.</p>*/}
+                    {/*            <button*/}
+                    {/*                className="px-4 py-2 bg-ocean-blue text-white rounded hover:bg-ocean-dark-blue transition-colors cursor-pointer "*/}
+                    {/*                onClick={() => navigate('/login')}*/}
+                    {/*            >*/}
+                    {/*                Zaloguj się*/}
+                    {/*            </button>*/}
+                    {/*        </div>*/}
+                    {/*    </div>*/}
+                    {/*)}*/}
 
 
                 </div>

@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import type {ComputerDto} from "../../../../types/ComputerDto.ts";
 import {showToast} from "../../../../lib/ToastContainer.tsx";
 import {useAtom, useAtomValue} from "jotai";
@@ -25,7 +25,6 @@ const BuildList = ({
     const user = useAtomValue(userAtom)
     const deleteMutation = useDeleteComputer(user?.email);
     const [selectedComputer,] = useAtom(selectedComputerAtom);
-    const disabled = !user?.email;
 
     const updateNameMutation = useUpdateComputerName();
 
@@ -66,16 +65,10 @@ const BuildList = ({
                 <button
                     type="button"
                     onClick={() => {
-                        if (disabled) {
-                            showToast.warning("Musisz być zalogowany, aby utworzyć zestaw");
-                            return;
-                        }
                         onCreateNew();
                     }}
-                    disabled={disabled}
-                    className={`px-4 py-2 rounded-lg font-medium text-white ${
-                        disabled ? "opacity-50 cursor-not-allowed pointer-events-none bg-gray-400" : "bg-gradient-ocean hover:bg-gradient-ocean-hover"
-                    }`}               >
+                    className= "px-4 py-2 rounded-lg font-medium text-white bg-gradient-ocean hover:bg-gradient-ocean-hover"
+                >
                     + Nowy zestaw
                 </button>
             </div>
@@ -102,7 +95,7 @@ const BuildList = ({
                         >
                             <div className="flex justify-between items-center">
                                 <div className="flex flex-col relative">
-                                    {editingId === computer.id ? (
+                                    {user && editingId === computer.id ? (
                                         <input
                                             type="text"
                                             value={newName}
@@ -124,13 +117,13 @@ const BuildList = ({
                                                 className="font-medium text-midnight-dark cursor-text"
                                                 onDoubleClick={(e) => {
                                                     e.stopPropagation();
-                                                    startEditing(computer.id, computer.name);
+                                                    if (user) startEditing(computer.id, computer.name);
                                                 }}
                                             >
                                                 {computer.name}
                                             </h3>
 
-                                            {hoveredId === computer.id && (
+                                            {user && hoveredId === computer.id && (
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
