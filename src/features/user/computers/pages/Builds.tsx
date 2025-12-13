@@ -10,7 +10,7 @@ import {useSaveComputerByUserEmail} from "../../../../hooks/useSaveComputersByUs
 import type {ComputerDto} from "../../../../types/ComputerDto.ts";
 import {ComponentTypeEnum} from "../../../../types/BaseItemDto.ts";
 import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
-
+import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.tsx";
 
 export default function Builds() {
     const navigate = useNavigate();
@@ -79,11 +79,13 @@ export default function Builds() {
         <div className="max-w-7xl mx-auto p-5 min-h-screen">
             <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold text-midnight-dark mb-4">Konfigurator PC</h1>
-                <p className="text-text-midnight-dark">Stwórz swój wymarzony zestaw komputerowy</p>
             </div>
 
             {saveMutation.isPending && (
-                <p className="text-sm text-ocean-blue mt-2">Tworzenie nowego zestawu...</p>
+                <>
+                    <p className="text-sm text-ocean-blue mt-2">Tworzenie nowego zestawu...</p>
+                    <LoadingSpinner/>
+                </>
             )}
 
             {saveMutation.isError && (
@@ -91,17 +93,41 @@ export default function Builds() {
             )}
 
 
-            <BuildList
-                computers={fetchedComputers}
-                onSelectBuild={handleSelectBuild}
-                onCreateNew={handleCreateNewBuild}
-                isLoading={isLoading}
-            />
 
-            <BuildConfiguration
-                categories={categories}
-                onAddComponent={handleAddComponent}
-            />
+                <div className={"relative"}>
+
+                    <div  className={user ? 'blur-none': 'blur-sm'} >
+                        <BuildList
+                            computers={fetchedComputers}
+                            onSelectBuild={handleSelectBuild}
+                            onCreateNew={handleCreateNewBuild}
+                            isLoading={isLoading}
+                        />
+
+                        <BuildConfiguration
+                            categories={categories}
+                            onAddComponent={handleAddComponent}
+                        />
+
+                    </div>
+
+                    {!user && (
+                        <div className="absolute inset-0 z-10 flex items-center justify-center ">
+                            <div className="bg-white/80 border-4 border-ocean-dark-blue  rounded px-8 py-7 text-center">
+                                <p className="text-midnight-dark mb-2">Aby korzystać z konfiguratora, musisz być zalogowany.</p>
+                                <button
+                                    className="px-4 py-2 bg-ocean-blue text-white rounded hover:bg-ocean-dark-blue transition-colors cursor-pointer "
+                                    onClick={() => navigate('/login')}
+                                >
+                                    Zaloguj się
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+
+                </div>
+
         </div>
     );
 }

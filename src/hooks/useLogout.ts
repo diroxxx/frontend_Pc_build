@@ -13,5 +13,9 @@ export const useLogout = () => {
         setUser(null);
         queryClient.clear();
         localStorage.clear();
+        sessionStorage.clear();
+
+        window.location.reload();
+
     };
 }
