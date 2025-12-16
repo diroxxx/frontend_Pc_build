@@ -8,6 +8,7 @@ import {RemoveIcon} from "../../../../assets/icons/removeIcon.tsx";
 import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
 import { Pencil } from "lucide-react";
 import {useUpdateComputerName} from "../hooks/updateComputerNameMutation.ts";
+import {guestComputersAtom} from "../../atoms/guestComputersAtom.ts";
 interface BuildListProps {
     computers: ComputerDto[];
     onSelectBuild: (index: number) => void;
@@ -31,6 +32,7 @@ const BuildList = ({
     const [editingId, setEditingId] = useState<number | null>(null);
     const [newName, setNewName] = useState("");
     const [hoveredId, setHoveredId] = useState<number | null>(null);
+    const [guestComputer, setGuestComputer] = useAtom(guestComputersAtom);
 
     const handleDelete = (id: number) => {
         if (!user?.email) {
@@ -39,6 +41,14 @@ const BuildList = ({
         }
         deleteMutation.mutate(id);
     };
+
+    const handleDeleteGuestComuter = (name: string) => {
+
+        const updatedComputers = guestComputer.filter(computer => computer.name !== name);
+        setGuestComputer(updatedComputers);
+        showToast.success(`Zestaw ${name} został usunięty`);
+    }
+
 
     const startEditing = (id: number, currentName: string) => {
         setEditingId(id);
@@ -147,9 +157,15 @@ const BuildList = ({
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        handleDelete(computer.id);
-                                    }}
-                                    className="hover:text-red-600 p-1 transition-colors duration-200 cursor-pointer"
+                                        if (user) {
+                                            handleDelete(computer.id);
+                                        } else {
+                                            handleDeleteGuestComuter(computer.name)
+                                        }
+
+                                    }
+                                }
+                                    className="hover:text-ocean-red p-1 transition-colors duration-200 cursor-pointer"
                                     title="Usuń zestaw"
                                 >
                                     <RemoveIcon />

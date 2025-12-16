@@ -9,9 +9,6 @@ import { resolutionList, graphicsPresetList, technologyList } from "../types/Gam
 import { useReccommendedVideo } from "../hooks/useReccommendedVideo.ts";
 import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.tsx";
 import {useCpuGpuGame} from "../hooks/useCpuGpuGame.ts";
-import {OfferRecGameCard} from "../components/OfferRecGameCard.tsx";
-import {useAtomValue} from "jotai";
-import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
 import OfferCardFlex from "../../offers/components/OfferCardFlex.tsx";
 
 const GamesPage = () => {
@@ -58,145 +55,151 @@ return (
             <div className="max-w-[1920px] mx-auto px-4 py-6">
                 <div className="grid grid-cols-12 gap-4">
                     <div className="col-span-2">
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 sticky top-6">
-                            <div className="p-3 border-b border-gray-200">
-                                <h2 className="text-sm font-bold">Rekomendacje</h2>
+                        <div className="space-y-3 sticky top-6">
+                            {/* Karta: wyszukiwanie wideo (z polami konfiguracji) */}
+                            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                                <div className="p-3 border-b border-gray-200 flex items-center justify-between">
+                                    <h3 className="text-sm font-semibold">Wyszukaj wideo</h3>
+                                    <span className="text-xs text-gray-500">YouTube</span>
+                                </div>
+
+                                <div className="p-3 space-y-2.5">
+                                    <p className="text-[11px] text-gray-500">Wyszukiwanie wideo wymaga wybrania gry oraz pełnej konfiguracji (CPU, GPU, rozdzielczość, technologia, jakość).</p>
+
+                                    <div>
+                                        <label className="flex items-center gap-1.5 text-[10px] font-semibold text-midnight-dark mb-1">
+                                            <Cpu className="w-3 h-3 text-ocean-blue" />
+                                            Procesor
+                                        </label>
+                                        <select
+                                            value={gameFpsConfig.cpu || ""}
+                                            onChange={(e) => setGameFpsConfig(prev => ({ ...prev, cpu: e.target.value }))}
+                                            className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-300 rounded"
+                                        >
+                                            <option value="">Wybierz</option>
+                                            {processorTypes.map(type => <option key={type} value={type}>{type}</option>)}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="flex items-center gap-1.5 text-[10px] font-semibold text-midnight-dark mb-1">
+                                            <Gpu className="w-3 h-3 text-ocean-blue" />
+                                            GPU
+                                        </label>
+                                        <select
+                                            value={gameFpsConfig.gpu || ""}
+                                            onChange={(e) => setGameFpsConfig(prev => ({ ...prev, gpu: e.target.value }))}
+                                            className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-300 rounded"
+                                        >
+                                            <option value="">Wybierz</option>
+                                            {gpuTypes.map(type => <option key={type} value={type}>{type}</option>)}
+                                        </select>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="text-[10px] font-semibold text-midnight-dark mb-1 block">Rozdzielczość</label>
+                                            <select
+                                                value={gameFpsConfig.resolution || ""}
+                                                onChange={(e) => setGameFpsConfig(prev => ({ ...prev, resolution: e.target.value as typeof resolutionList[number] }))}
+                                                className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-300 rounded"
+                                            >
+                                                <option value="">Wybierz</option>
+                                                {resolutionList.map(r => <option key={r} value={r}>{r}</option>)}
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className="text-[10px] font-semibold text-midnight-dark mb-1 block">Technologia</label>
+                                            <select
+                                                value={gameFpsConfig.technology || ""}
+                                                onChange={(e) => setGameFpsConfig(prev => ({ ...prev, technology: e.target.value as typeof technologyList[number] }))}
+                                                className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-300 rounded"
+                                            >
+                                                <option value="">Wybierz</option>
+                                                {technologyList.map(t => <option key={t} value={t}>{t}</option>)}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[10px] font-semibold text-midnight-dark mb-1 block">Jakość</label>
+                                        <select
+                                            value={gameFpsConfig.graphicsPreset || ""}
+                                            onChange={(e) => setGameFpsConfig(prev => ({ ...prev, graphicsPreset: e.target.value as typeof graphicsPresetList[number] }))}
+                                            className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-300 rounded"
+                                        >
+                                            <option value="">Wybierz</option>
+                                            {graphicsPresetList.map(g => <option key={g} value={g}>{g}</option>)}
+                                        </select>
+                                    </div>
+
+                                    {(() => {
+                                        const canSearchVideo = Boolean(
+                                            selectedGame &&
+                                            gameFpsConfig.cpu &&
+                                            gameFpsConfig.gpu &&
+                                            gameFpsConfig.resolution &&
+                                            gameFpsConfig.technology &&
+                                            gameFpsConfig.graphicsPreset
+                                        );
+                                        return (
+                                            <button
+                                                onClick={() => { if (canSearchVideo) refetch(); }}
+                                                disabled={!canSearchVideo}
+                                                title={!canSearchVideo ? 'Wybierz grę i uzupełnij wszystkie pola konfiguracji' : 'Szukaj rekomendowanego wideo'}
+                                                className={`w-full px-3 py-2 rounded text-[11px] font-semibold flex items-center justify-center gap-2 transition-all
+                ${canSearchVideo ? 'bg-ocean-blue text-white hover:bg-ocean-dark-blue' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+                                            >
+                                                <Search className="w-3 h-3" />
+                                                Znajdź wideo na YouTube
+                                            </button>
+                                        );
+                                    })()}
+                                </div>
                             </div>
-                            <div className="p-3 space-y-2.5">
-                                <div>
-                                    <label className="flex items-center gap-1.5 text-[10px] font-semibold text-midnight-dark mb-1">
-                                        <Cpu className="w-3 h-3 text-ocean-blue" />
-                                        Procesor
-                                    </label>
-                                    <select
-                                        value={gameFpsConfig?.cpu || ""}
-                                        onChange={(e) => setGameFpsConfig(prev => ({ ...prev, cpu: e.target.value }))}
-                                        className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-300 rounded focus:ring-1 focus:ring-ocean-blue focus:border-ocean-blue"
-                                    >
-                                        <option value="">Wybierz</option>
-                                        {processorTypes.map(type => (
-                                            <option key={type} value={type}>{type}</option>
-                                        ))}
-                                    </select>
+
+                            {/* Karta: wyszukiwanie ofert (z polem budżet) */}
+                            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                                <div className="p-3 border-b border-gray-200 flex items-center justify-between">
+                                    <h3 className="text-sm font-semibold">Wyszukaj oferty</h3>
+                                    <span className="text-xs text-gray-500">Sklepy</span>
                                 </div>
 
-                                <div>
-                                    <label className="flex items-center gap-1.5 text-[10px] font-semibold text-midnight-dark mb-1">
-                                        <Gpu className="w-3 h-3 text-ocean-blue" />
-                                        GPU
-                                    </label>
-                                    <select
-                                        value={gameFpsConfig?.gpu || ""}
-                                        onChange={(e) => setGameFpsConfig(prev => ({ ...prev, gpu: e.target.value }))}
-                                        className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-300 rounded focus:ring-1 focus:ring-ocean-blue focus:border-ocean-blue"
-                                    >
-                                        <option value="">Wybierz</option>
-                                        {gpuTypes.map(type => (
-                                            <option key={type} value={type}>{type}</option>
-                                        ))}
-                                    </select>
+                                <div className="p-3 space-y-2">
+                                    <p className="text-[11px] text-gray-500">Wyszukiwanie ofert wymaga wybrania gry oraz ustawienia budżetu (min. 500 zł).</p>
+
+                                    <div>
+                                        <label className="text-[10px] font-semibold text-midnight-dark mb-1 block">Budżet (zł)</label>
+                                        <input
+                                            type="number"
+                                            value={gameFpsConfig.budget || ""}
+                                            min={0}
+                                            onChange={(e) => setGameFpsConfig(prev => ({ ...prev, budget: Number(e.target.value) }))}
+                                            className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-300 rounded"
+                                            placeholder="Budżet (np. 1500)"
+                                        />
+                                    </div>
+
+                                    {(() => {
+                                        const canSearchOffers = Boolean(selectedGame && gameFpsConfig.budget >= 500);
+                                        return (
+                                            <button
+                                                onClick={() => { if (canSearchOffers) refetchRecGame(); }}
+                                                disabled={!canSearchOffers}
+                                                title={!canSearchOffers ? 'Wybierz grę i ustaw budżet (min. 500 zł)' : 'Szukaj ofert zgodnych z wybraną konfiguracją'}
+                                                className={`w-full px-3 py-2 rounded text-[11px] font-semibold flex items-center justify-center gap-2 transition-all
+                ${canSearchOffers ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+                                            >
+                                                <Search className="w-3 h-3" />
+                                                Szukaj ofert (budżet)
+                                            </button>
+                                        );
+                                    })()}
                                 </div>
-
-                                <div>
-                                    <label className="text-[10px] font-semibold text-midnight-dark mb-1 block">
-                                        Rozdzielczość
-                                    </label>
-                                    <select
-                                        value={gameFpsConfig?.resolution || ""}
-                                        onChange={(e) => setGameFpsConfig(prev => ({ ...prev, resolution: e.target.value as typeof resolutionList[number] }))}
-                                        className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-300 rounded focus:ring-1 focus:ring-ocean-blue focus:border-ocean-blue"
-                                    >
-                                        <option value="">Wybierz</option>
-                                        {resolutionList.map(resolution => (
-                                            <option key={resolution} value={resolution}>{resolution}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label className="text-[10px] font-semibold text-midnight-dark mb-1 block">
-                                        Technologia
-                                    </label>
-                                    <select
-                                        value={gameFpsConfig?.technology || ""}
-                                        onChange={(e) => setGameFpsConfig(prev => ({ ...prev, technology: e.target.value as typeof technologyList[number] }))}
-                                        className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-300 rounded focus:ring-1 focus:ring-ocean-blue focus:border-ocean-blue"
-                                    >
-                                        <option value="">Wybierz</option>
-                                        {technologyList.map(technology => (
-                                            <option key={technology} value={technology}>{technology}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label className="text-[10px] font-semibold text-midnight-dark mb-1 block">
-                                        Jakość
-                                    </label>
-                                    <select
-                                        value={gameFpsConfig?.graphicsPreset || ""}
-                                        onChange={(e) => setGameFpsConfig(prev => ({ ...prev, graphicsPreset: e.target.value as typeof graphicsPresetList[number] }))}
-                                        className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-300 rounded focus:ring-1 focus:ring-ocean-blue focus:border-ocean-blue"
-                                    >
-                                        <option value="">Wybierz</option>
-                                        {graphicsPresetList.map(graphicsPreset => (
-                                            <option key={graphicsPreset} value={graphicsPreset}>{graphicsPreset}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-
-
-                                <button
-                                    onClick={() => {
-                                        if (canSearch && gameFpsConfig) {
-                                            refetch();
-                                        }
-                                    }}
-                                    disabled={!canSearch}
-                                    className={`w-full px-2 py-2 rounded text-[11px] font-semibold transition-all flex items-center justify-center gap-1.5 
-                                        ${canSearch
-                                            ? 'bg-ocean-blue text-white hover:bg-ocean-dark-blue'
-                                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                        }`}
-                                >
-                                    <Search className="w-3 h-3" />
-                                    Szukaj wideo
-                                </button>
-
-                                <div>
-                                    <label className="text-[10px] font-semibold text-midnight-dark mb-1 block">
-                                        Budżet (zł)
-                                    </label>
-                                    <input
-                                        type="number"
-                                        value={gameFpsConfig?.budget || ""}
-                                        min={500}
-                                        onChange={(e) => setGameFpsConfig(prev => ({ ...prev, budget: Number(e.target.value) }))}
-                                        className="w-full px-2 py-1.5 text-xs bg-gray-50 border border-gray-300 rounded focus:ring-1 focus:ring-ocean-blue focus:border-ocean-blue"
-                                        placeholder="Budżet"
-                                    />
-                                </div>
-
-                                <button
-                                    onClick={() => refetchRecGame()}
-                                    disabled={!canSearch}
-                                    className={`w-full px-2 py-2 rounded text-[11px] font-semibold transition-all flex items-center justify-center gap-1.5
-                                    ${selectedGame 
-                                        ? 'bg-ocean-blue text-white hover:bg-ocean-dark-blue'
-                                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                    }`}
-                                >
-                                        <>
-                                            <Search className="w-3 h-3" />
-                                            Szukaj ofert
-                                        </>
-                                </button>
                             </div>
                         </div>
-                    </div>
-
-                    <div className="col-span-6 space-y-4">
+                    </div>                    <div className="col-span-6 space-y-4">
                         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                             <div className="mb-3">
                                 <h2 className="text-base font-bold text-midnight-dark">Wybierz grę</h2>

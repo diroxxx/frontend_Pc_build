@@ -1,5 +1,5 @@
 import {useAtom} from 'jotai';
-import {useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import {selectedCategoryAtom} from '../../../../atomContext/offerAtom.tsx';
 import {userAtom} from "../../../../atomContext/userAtom.tsx";
 import {useFetchComputersByEmail} from "../../../../hooks/useFetchComputersByEmail.ts";
@@ -12,6 +12,7 @@ import {ComponentTypeEnum} from "../../../../types/BaseItemDto.ts";
 import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
 import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.tsx";
 import {guestComputersAtom} from "../../atoms/guestComputersAtom.ts";
+import { Info } from "lucide-react";
 
 export default function Builds() {
     const navigate = useNavigate();
@@ -114,8 +115,6 @@ export default function Builds() {
                 <p className="text-sm text-ocean-red mt-2">Nie udało się utworzyć zestawu</p>
             )}
 
-
-
                 <div className={"relative"}>
 
                     {user && (
@@ -138,46 +137,36 @@ export default function Builds() {
 
                     {!user && (
 
-                        <div>
-                            <BuildList
-                                computers={guestcomputers}
-                                onSelectBuild={handleSelectGuestBuild}
-                                onCreateNew={handleCreateNewGuestBuild}
-                                isLoading={isLoading}
-                            />
+                        <div className=" mx-auto mb-6">
+                            <div className="bg-white border border-gray-100 shadow-sm rounded-lg p-6 flex gap-4 items-start">
+                                <div className="flex-shrink-0 bg-ocean-blue/10 text-ocean-blue rounded-full p-3">
+                                    <Info/>
+                                </div>
 
-                            <BuildConfiguration
-                                categories={categories}
-                                onAddComponent={handleAddComponent}
-                            />
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-semibold text-ocean-light-blue">Przypomnienie</h3>
+                                    <p className="mt-2 text-sm text-ocean-blue leading-relaxed">
+                                        Jako gość Twoje konfiguracje są przechowywane tylko lokalnie w przeglądarce. Jeśli wyczyścisz dane przeglądarki lub zmienisz urządzenie, stracisz swoje zestawy. Aby zachować swoje konfiguracje na stałe, zaloguj się lub zarejestruj konto.
+                                    </p>
 
+                                </div>
+                            </div>
+
+                            <div className="mt-6">
+                                <BuildList
+                                    computers={guestcomputers}
+                                    onSelectBuild={handleSelectGuestBuild}
+                                    onCreateNew={handleCreateNewGuestBuild}
+                                    isLoading={isLoading}
+                                />
+
+                                <BuildConfiguration
+                                    categories={categories}
+                                    onAddComponent={handleAddComponent}
+                                />
+                            </div>
                         </div>
-
-
                     )}
-
-
-
-
-
-
-
-
-                    {/*{!user && (*/}
-                    {/*    <div className="absolute inset-0 z-10 flex items-center justify-center ">*/}
-                    {/*        <div className="bg-white/80 border-4 border-ocean-dark-blue  rounded px-8 py-7 text-center">*/}
-                    {/*            <p className="text-midnight-dark mb-2">Aby korzystać z konfiguratora, musisz być zalogowany.</p>*/}
-                    {/*            <button*/}
-                    {/*                className="px-4 py-2 bg-ocean-blue text-white rounded hover:bg-ocean-dark-blue transition-colors cursor-pointer "*/}
-                    {/*                onClick={() => navigate('/login')}*/}
-                    {/*            >*/}
-                    {/*                Zaloguj się*/}
-                    {/*            </button>*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*)}*/}
-
-
                 </div>
 
         </div>
