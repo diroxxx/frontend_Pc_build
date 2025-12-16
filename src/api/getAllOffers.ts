@@ -1,7 +1,7 @@
 import customAxios from "../lib/customAxios.tsx";
 import type {ComponentOffer} from "../types/OfferBase.ts";
 
-import type {OfferFiltersType} from "../shared/components/OffersSideFilters.tsx";
+import type  {OfferFiltersType} from "../shared/atoms/OfferLeftPanelFiltersAtom.ts";
 
 export interface OfferResponse {
     offers: ComponentOffer[];
@@ -26,6 +26,6 @@ export async function getAllOffers(page: number = 0,
     if (filters?.query) params.append('query', filters.query);
     if (filters?.sortBy) params.append('sortBy', filters.sortBy);
 
-    const res = await customAxios.get(`/offers/v2?${params.toString()}`);
+    const res = await customAxios.get(`/offers?${params.toString()}`);
     return res.data;
 }

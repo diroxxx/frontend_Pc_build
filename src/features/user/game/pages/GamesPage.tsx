@@ -56,7 +56,6 @@ return (
                 <div className="grid grid-cols-12 gap-4">
                     <div className="col-span-2">
                         <div className="space-y-3 sticky top-6">
-                            {/* Karta: wyszukiwanie wideo (z polami konfiguracji) */}
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                                 <div className="p-3 border-b border-gray-200 flex items-center justify-between">
                                     <h3 className="text-sm font-semibold">Wyszukaj wideo</h3>

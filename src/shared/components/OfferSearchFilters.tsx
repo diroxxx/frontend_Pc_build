@@ -58,7 +58,6 @@ export const OfferSearchFilters = () => {
                             onChange={handleSortChange}
                             className="w-full px-5 py-3.5 text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ocean-blue/20 focus:border-ocean-blue transition-all cursor-pointer bg-white"
                         >
-                            <option value="">Domyślne sortowanie</option>
                             <option value={SortByOffersEnum.CHEAPEST}>Najtańsze</option>
                             <option value={SortByOffersEnum.EXPENSIVE}>Najdroższe</option>
                             <option value={SortByOffersEnum.NEWEST}>Najnowsze</option>

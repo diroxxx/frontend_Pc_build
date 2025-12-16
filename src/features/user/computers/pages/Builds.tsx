@@ -1,5 +1,5 @@
 import {useAtom} from 'jotai';
-import {Link, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {selectedCategoryAtom} from '../../../../atomContext/offerAtom.tsx';
 import {userAtom} from "../../../../atomContext/userAtom.tsx";
 import {useFetchComputersByEmail} from "../../../../hooks/useFetchComputersByEmail.ts";

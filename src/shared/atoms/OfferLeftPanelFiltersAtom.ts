@@ -1,7 +1,7 @@
 import {atom} from "jotai";
 import type {ComponentTypeEnum} from "../../types/BaseItemDto.ts";
 import type {ItemConditionEnum} from "../../types/ItemConditionEnum.ts";
-import type {SortByOffersEnum} from "../../types/SortByOffersEnum.ts";
+import { SortByOffersEnum} from "../../types/SortByOffersEnum.ts";
 
 export type OfferFiltersType = {
     componentType?: ComponentTypeEnum;
@@ -21,7 +21,7 @@ export const offerLeftPanelFiltersAtom = atom<OfferFiltersType>({
     maxPrize: 99999,
     itemCondition: undefined,
     shopName: "",
-    query: "",
-    sortBy: undefined
+    query: undefined,
+    sortBy: SortByOffersEnum.NEWEST
 
 })
