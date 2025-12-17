@@ -1,10 +1,10 @@
 import {useEffect} from "react";
 import {useFetchOffersSpecs} from "../../../atomContext/componentAtom.tsx";
-import {useFetchComponents} from "../hooks/useFetchComponents.ts";
 import {useOffersCount} from "../../../hooks/useOffersCount.ts";
 import OfferUpdateChart from "../components/OfferUpdateChart.tsx";
 import ShopOffersShareChart from "../components/ShopOffersShareChart.tsx";
 import {useAllUsers} from "../UsersManage/useAllUsers.ts";
+import {useComponentsAmount} from "./hooks/useComponentsAmount.ts";
 
 interface GeneralInfoProps {
     onNavigate: (tab: string) => void;
@@ -13,7 +13,7 @@ interface GeneralInfoProps {
 const GeneralPage = ({ onNavigate }: GeneralInfoProps) => {
     const {data} = useAllUsers();
     const fetchOffersSpecs = useFetchOffersSpecs();
-    const { data: components} = useFetchComponents(0);
+    const { data: components} = useComponentsAmount();
     const {data: offersCount} = useOffersCount();
 
 
@@ -42,7 +42,7 @@ const GeneralPage = ({ onNavigate }: GeneralInfoProps) => {
                               d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                     </svg>
                     <h3 className="text-ocean-white text-sm font-semibold">Komponenty</h3>
-                    <p className="text-ocean-white text-2xl font-bold">{components?.totalElements ?? 0}</p>
+                    <p className="text-ocean-white text-2xl font-bold">{components}</p>
                     <button onClick={() => onNavigate("components")} className="text-ocean-light-blue text-xs mt-1 hover:underline">
                         Zobacz
                     </button>

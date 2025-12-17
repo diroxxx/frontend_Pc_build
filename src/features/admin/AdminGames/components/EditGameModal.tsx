@@ -20,6 +20,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import {updateGameReqCompApi} from "../api/updateGameReqCompApi.ts";
 import {modalSx} from "../../../../types/modalStyle.ts";
+import Alert from "@mui/material/Alert";
 
 interface GameModalProps {
     open: boolean;
@@ -39,8 +40,6 @@ export const EditGameModal = ({
                                   cpus = [],
                                   refetchGames,
                                   gameReqComp,
-
-
                               }: GameModalProps) => {
 
     const [gameInfoToChange, setGameInfoToChange] = useState<GameReqCompDto>({
@@ -49,9 +48,14 @@ export const EditGameModal = ({
         gpuSpecs: gameReqComp?.gpuSpecs ?? [],
     });
 
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewSrc, setPreviewSrc] = useState<string>("");
+
+    const [errorMessage, setErrorMessage] = useState<string>("");
+    const [titleError, setTitleError] = useState<string>("");
+
 
     useEffect(() => {
         let objectUrl: string | undefined;
@@ -66,24 +70,45 @@ export const EditGameModal = ({
         }
     }, [selectedFile, gameInfoToChange.imageUrl]);
 
-
     useEffect(() => {
+        const fallbackCpu = cpus?.[0];
+        const fallbackGpu = gpus?.[0];
+
+        const normalizedCpuSpecs = (gameReqComp?.cpuSpecs ?? []).map((s) => {
+            const valid = cpus.find((c) => c.processorId === s.processorId);
+            if (valid) return s;
+            if (fallbackCpu) return { ...s, processorId: fallbackCpu.processorId, processorModel: fallbackCpu.processorModel };
+            return s;
+        });
+
+        const normalizedGpuSpecs = (gameReqComp?.gpuSpecs ?? []).map((s) => {
+            const valid = gpus.find((g) => g.gpuModelId === s.gpuModelId);
+            if (valid) return s;
+            if (fallbackGpu) return { ...s, gpuModelId: fallbackGpu.gpuModelId, gpuModel: fallbackGpu.gpuModel };
+            return s;
+        });
+
         setGameInfoToChange({
             ...gameReqComp,
-            cpuSpecs: gameReqComp?.cpuSpecs ?? [],
-            gpuSpecs: gameReqComp?.gpuSpecs ?? [],
+            cpuSpecs: normalizedCpuSpecs,
+            gpuSpecs: normalizedGpuSpecs,
         });
         setSelectedFile(null);
-    }, [gameReqComp, open]);
+        if (!open) {
+            setErrorMessage("");
+            setTitleError("");
+        }
+    }, [gameReqComp, open, cpus, gpus]);
 
     const validateTitle = (value?: string) => {
         const v = (value ?? gameInfoToChange.title ?? "").trim();
+        setTitleError("");
         if (v.length <= 1) {
-            showToast.error("Tytuł musi posiadać więcej niż jeden znak");
+            setTitleError("Tytuł musi posiadać więcej niż jeden znak");
             return false;
         }
         if (gamesTitles?.some((t) => t.toLowerCase() === v.toLowerCase() && t !== gameReqComp.title)) {
-            showToast.error("Tytuł gry już istnieje");
+            setTitleError("Tytuł gry już istnieje");
             return false;
         }
         return true;
@@ -96,17 +121,18 @@ export const EditGameModal = ({
 
         const reader = new FileReader();
         reader.onload = () => {
-            setSelectedFile(file)
+            setSelectedFile(file);
         };
         reader.readAsDataURL(file);
     };
 
     const addCpuSpec = () => {
-        const defaultCpuId = cpus?.[0]?.processorId ?? 0;
+        const defaultCpuId = cpus?.[0]?.processorId ?? -1;
+        const modelObj = cpus?.find((c) => c.processorId === defaultCpuId);
         const newSpec: CpuRecDto = {
             processorId: defaultCpuId,
-            processorModel: cpus?.find((c) => c.processorId === defaultCpuId)?.processorModel ?? "",
-            recGameLevel: cpus?.find((c) => c.processorId === defaultCpuId)?.recGameLevel ?? RecGameLevel.MIN,
+            processorModel: modelObj?.processorModel ?? "",
+            recGameLevel: modelObj?.recGameLevel ?? RecGameLevel.MIN,
         };
         setGameInfoToChange((prev) => ({ ...prev, cpuSpecs: [...(prev.cpuSpecs ?? []), newSpec] }));
     };
@@ -128,11 +154,12 @@ export const EditGameModal = ({
     };
 
     const addGpuSpec = () => {
-        const defaultGpuId = gpus?.[0]?.gpuModelId ?? 0;
+        const defaultGpuId = gpus?.[0]?.gpuModelId ?? -1;
+        const modelObj = gpus?.find((g) => g.gpuModelId === defaultGpuId);
         const newSpec: GpuRecDto = {
             gpuModelId: defaultGpuId,
-            gpuModel: gpus?.find((g) => g.gpuModelId === defaultGpuId)?.gpuModel ?? "",
-            recGameLevel: gpus?.find((c) => c.gpuModelId === defaultGpuId)?.recGameLevel ?? RecGameLevel.MIN,
+            gpuModel: modelObj?.gpuModel ?? "",
+            recGameLevel: modelObj?.recGameLevel ?? RecGameLevel.MIN,
         };
         setGameInfoToChange((prev) => ({ ...prev, gpuSpecs: [...(prev.gpuSpecs ?? []), newSpec] }));
     };
@@ -157,10 +184,29 @@ export const EditGameModal = ({
         e.preventDefault();
 
         if (!validateTitle(gameInfoToChange.title)) return;
-        if (gameInfoToChange.imageUrl == null || gameInfoToChange.imageUrl === ''|| gameInfoToChange.imageUrl === '' || gameInfoToChange.cpuSpecs.length == 0 || gameInfoToChange.cpuSpecs.length == 0) {
-            showToast.error("Wprowadź dane")
+
+        if ((gameInfoToChange.cpuSpecs?.length ?? 0) === 0) {
+            setErrorMessage("Musi być przypisany co najmniej jeden procesor");
             return;
         }
+
+
+        if ((gameInfoToChange.gpuSpecs?.length ?? 0) === 0) {
+            // showToast.error("Wprowadź dane");
+            setErrorMessage("Musi być przypisana co najmniej jedna karta graficzna");
+            return;
+        }
+
+        const cpuEqual = JSON.stringify(gameInfoToChange.cpuSpecs ?? []) === JSON.stringify(gameReqComp.cpuSpecs ?? []);
+        const gpuEqual = JSON.stringify(gameInfoToChange.gpuSpecs ?? []) === JSON.stringify(gameReqComp.gpuSpecs ?? []);
+        const titleEqual = (gameInfoToChange.title ?? "") === (gameReqComp.title ?? "");
+
+        if (cpuEqual && gpuEqual && titleEqual) {
+            setErrorMessage("Brak zmian");
+            return;
+        }
+
+
         try {
             const dtoToSend: GameReqCompDto = {
                 ...gameInfoToChange,
@@ -169,7 +215,9 @@ export const EditGameModal = ({
             };
 
             console.log(dtoToSend);
-            await updateGameReqCompApi(dtoToSend, selectedFile).then( () => refetchGames());
+            setErrorMessage("");
+            setTitleError("");
+            await updateGameReqCompApi(dtoToSend, selectedFile).then(() => refetchGames());
             console.log("dtoToSend", dtoToSend);
             showToast.success("Zapisano zmiany");
             handleClose();
@@ -186,9 +234,7 @@ export const EditGameModal = ({
             closeAfterTransition
             disableEnforceFocus
             disableAutoFocus
-
         >
-
             <Box sx={modalSx} component="form" onSubmit={handleSave}>
                 <div className="flex items-start justify-between">
                     <Typography variant="h6" sx={{ fontWeight: 700 }}>
@@ -198,6 +244,7 @@ export const EditGameModal = ({
                         <CloseIcon fontSize="small" />
                     </IconButton>
                 </div>
+                {errorMessage && <Alert severity="error" onClose={() => setErrorMessage("")}>{errorMessage}</Alert>}
 
                 <Stack spacing={2} mt={2}>
                     <TextField
@@ -207,34 +254,40 @@ export const EditGameModal = ({
                         size="small"
                         fullWidth
                         required
+                        error={!!titleError}
+                        helperText={titleError || undefined}
                     />
 
-                    <div>
+                    <Box>
                         <div className="flex items-center justify-between mb-2">
                             <Typography variant="subtitle2">Wymagania CPU</Typography>
                             <Button size="small" onClick={addCpuSpec}>
                                 Dodaj CPU
                             </Button>
                         </div>
-
+                        <Box
+                            sx={{
+                                maxHeight: (gameInfoToChange.cpuSpecs?.length ?? 0) > 3 ? `${5 * 30}px` : "auto",
+                                overflowY: (gameInfoToChange.cpuSpecs?.length ?? 0) > 3 ? "auto" : "visible",
+                                pr: 1,
+                            }}
+                        >
                         {(gameInfoToChange.cpuSpecs ?? []).map((cpu, idx) => (
-                            <div key={`cpu-${cpu.processorId ?? idx}`} className="mb-3">
+                            <div key={`cpu-${idx}`} className="mb-3">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
                                     <FormControl size="small" fullWidth>
                                         <InputLabel id={`cpu-model-label-${idx}`}>Procesor</InputLabel>
                                         <Select
                                             labelId={`cpu-model-label-${idx}`}
-                                            value={cpu.processorId}
+                                            value={cpu.processorId ?? cpus?.[0]?.processorId ?? ''}
                                             label="Procesor"
                                             onChange={(e) => {
                                                 const val = Number(e.target.value);
-                                                const model = cpus?.find((c) => c.processorId === val)?.processorModel ?? "";
+                                                const model = val === -1 ? "" : cpus?.find((c) => c.processorId === val)?.processorModel ?? "";
                                                 updateCpuSpecAt(idx, { processorId: val, processorModel: model });
                                             }}
                                         >
-                                            <MenuItem value="">
-                                                <em>Brak</em>
-                                            </MenuItem>
+
                                             {cpus?.map((p,k) => (
                                                 <MenuItem key={k} value={p.processorId}>
                                                     {p.processorModel}
@@ -249,8 +302,7 @@ export const EditGameModal = ({
                                             labelId={`cpu-level-label-${idx}`}
                                             value={cpu.recGameLevel}
                                             label="Wymagania (CPU)"
-                                            onChange={(e) => updateCpuSpecAt(idx, { recGameLevel: e.target.value})}
-
+                                            onChange={(e) => updateCpuSpecAt(idx, { recGameLevel: e.target.value as RecGameLevel })}
                                         >
                                             {recLevels.map((r,k) => (
                                                 <MenuItem key={k} value={r}>
@@ -268,9 +320,10 @@ export const EditGameModal = ({
                                 </div>
                             </div>
                         ))}
-                    </div>
+                        </Box>
+                    </Box>
 
-                    <div>
+                    <Box mt={2}>
                         <div className="flex items-center justify-between mb-2">
                             <Typography variant="subtitle2">Wymagania GPU</Typography>
                             <Button size="small" onClick={addGpuSpec}>
@@ -278,24 +331,30 @@ export const EditGameModal = ({
                             </Button>
                         </div>
 
+
+                        <Box
+                            sx={{
+                                maxHeight: (gameInfoToChange.gpuSpecs?.length ?? 0) > 3 ? `${5 * 30}px` : "auto",
+                                overflowY: (gameInfoToChange.gpuSpecs?.length ?? 0) > 3 ? "auto" : "visible",
+                                pr: 1
+                            }}
+                        >
                         {(gameInfoToChange.gpuSpecs ?? []).map((gpu, idx) => (
-                            <div key={`gpu-${gpu.gpuModelId ?? idx}`} className="mb-3">
+                            <div key={`gpu-${idx}`} className="mb-3">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
                                     <FormControl size="small" fullWidth>
                                         <InputLabel id={`gpu-model-label-${idx}`}>Karta graficzna</InputLabel>
                                         <Select
                                             labelId={`gpu-model-label-${idx}`}
-                                            value={gpu.gpuModelId }
+                                            value={gpu.gpuModelId ?? gpus?.[0]?.gpuModelId ?? ''}
                                             label="Karta graficzna"
                                             onChange={(e) => {
                                                 const val = Number(e.target.value);
-                                                const model = gpus?.find((g) => g.gpuModelId === val)?.gpuModel ?? "";
+                                                const model = val === -1 ? "" : gpus?.find((g) => g.gpuModelId === val)?.gpuModel ?? "";
                                                 updateGpuSpecAt(idx, { gpuModelId: val, gpuModel: model });
                                             }}
                                         >
-                                            <MenuItem value="">
-                                                <em>Brak</em>
-                                            </MenuItem>
+
                                             {gpus?.map((d, k) => (
                                                 <MenuItem key={k} value={d.gpuModelId}>
                                                     {d.gpuModel}
@@ -310,7 +369,7 @@ export const EditGameModal = ({
                                             labelId={`gpu-level-label-${idx}`}
                                             value={gpu.recGameLevel}
                                             label="Wymagania (GPU)"
-                                            onChange={(e) => updateGpuSpecAt(idx, { recGameLevel: e.target.value })}
+                                            onChange={(e) => updateGpuSpecAt(idx, { recGameLevel: e.target.value as RecGameLevel })}
                                         >
                                             {recLevels.map((r, k) => (
                                                 <MenuItem key={k} value={r}>
@@ -328,7 +387,8 @@ export const EditGameModal = ({
                                 </div>
                             </div>
                         ))}
-                    </div>
+                        </Box>
+                    </Box>
 
                     <div className="flex items-center gap-3">
                         <Button component="label" variant="outlined" size="small">

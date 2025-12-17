@@ -1,5 +1,5 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {UpdateOffersToComputer} from "../../../api/UpdateOffersToComputer.ts";
+import {UpdateOffersToComputer} from "../../user/computers/api/UpdateOffersToComputer.ts";
 import {useAtomValue} from "jotai";
 import {userAtom} from "../../../atomContext/userAtom.tsx";
 

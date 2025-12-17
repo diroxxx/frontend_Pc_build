@@ -2,7 +2,7 @@ import {useAtom} from "jotai";
 import {userAtom} from "../atomContext/userAtom.tsx";
 import {useQueryClient} from "@tanstack/react-query";
 import {useEffect} from "react";
-import {getAllComputersByUserEmail} from "../api/getAllComputersByUserEmail";
+import {getAllComputersByUserEmail} from "../features/user/computers/api/getAllComputersByUserEmail.ts";
 export function usePrefetchComputers() {
     const [user] = useAtom(userAtom);
     const queryClient = useQueryClient();

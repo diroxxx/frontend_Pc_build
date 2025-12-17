@@ -11,6 +11,7 @@ import {showToast} from "../../../lib/ToastContainer.tsx";
 import {modalSx} from "../../../types/modalStyle.ts";
 import {updateUserApi} from "./updateUserApi.ts";
 import type {UserToShowDto} from "./UserToShowDto.ts";
+import Alert from "@mui/material/Alert";
 
 export type EditUserModalProps = {
     open: boolean;
@@ -20,6 +21,10 @@ export type EditUserModalProps = {
 };
 
 export const EditUserModal = ({ open, handleClose, userUpdateDto, userRefetch}: EditUserModalProps) => {
+
+    const [errorMessage, setErrorMessage] = useState<string>("");
+
+
 
     const [userToUpdate, setUserToUpdate] = useState<UserUpdateDto>({
         email: userUpdateDto?.email ?? "",
@@ -43,23 +48,23 @@ export const EditUserModal = ({ open, handleClose, userUpdateDto, userRefetch}: 
 
     const validate = (): boolean => {
         if (!userToUpdate.nickname?.trim() || userToUpdate.nickname.trim().length < 2) {
-            showToast.error("Pseudonim musi mieć co najmniej 2 znaki");
+            setErrorMessage("Pseudonim musi mieć co najmniej 2 znaki");
             return false;
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(userToUpdate.email ?? "")) {
-            showToast.error("Nieprawidłowy adres email");
+            setErrorMessage("Nieprawidłowy adres email");
             return false;
         }
         if (userToUpdate.password && userToUpdate.password.length > 0 && userToUpdate.password.length < 6) {
-            showToast.error("Hasło musi mieć co najmniej 6 znaków");
+            setErrorMessage("Hasło musi mieć co najmniej 6 znaków");
             return false;
         }
         if (
             userToUpdate.nickname === (userUpdateDto?.nickname ?? "") &&
             userToUpdate.email === (userUpdateDto?.email ?? "")
         ) {
-            showToast.error("Brak zmian w danych");
+            setErrorMessage("Brak zmian w danych");
             return false;
         }
         return true;
@@ -77,7 +82,7 @@ export const EditUserModal = ({ open, handleClose, userUpdateDto, userRefetch}: 
             handleClose();
         } catch (err) {
             console.error("Failed saving user", err);
-            showToast.error("Błąd serwera podczas zapisu");
+            setErrorMessage("Błąd serwera podczas zapisu");
         }
     };
 
@@ -88,6 +93,9 @@ export const EditUserModal = ({ open, handleClose, userUpdateDto, userRefetch}: 
                     <Typography variant="h6" sx={{ fontWeight: 700 }}>Edytuj użytkownika</Typography>
                     <IconButton onClick={handleClose}><CloseIcon fontSize="small" /></IconButton>
                 </div>
+
+                {errorMessage && <Alert severity="error" onClose={() => setErrorMessage("")}>{errorMessage}</Alert>}
+
 
                 <div className="modalBody">
                     <Stack spacing={1}>

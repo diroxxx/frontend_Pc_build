@@ -69,4 +69,15 @@ export const modalSx = {
     "& .MuiInputAdornment-root .MuiSvgIcon-root": {
         color: "rgba(255,255,255,0.85)",
     },
+    '&::-webkit-scrollbar': { width: 8, height: 8 },
+    '&::-webkit-scrollbar-track': { background: 'transparent' },
+    '&::-webkit-scrollbar-thumb': {
+        backgroundColor: '#000000',
+        borderRadius: 4,
+        border: '2px solid transparent',
+        backgroundClip: 'padding-box',
+    },
+    '&::-webkit-scrollbar-thumb:hover': { backgroundColor: '#222222' },
+    scrollbarWidth: 'thin',
+    scrollbarColor: '#000000 transparent',
 } as const;

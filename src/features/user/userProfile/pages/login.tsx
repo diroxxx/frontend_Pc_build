@@ -4,7 +4,7 @@ import {type NavigateFunction, useNavigate} from "react-router-dom";
 import {useAtom, useAtomValue} from 'jotai';
 import {type CustomJwtPayload, loginUserAtom} from '../../../../atomContext/userAtom.tsx';
 import { AuthRedirect } from "../../../../components/auth/AuthRedirect.tsx";
-import {postMigrateComputersFromGuestToUserApi} from "../../../../api/postMigrateComputersFromGuestToUserApi.ts";
+import {postMigrateComputersFromGuestToUserApi} from "../../computers/api/postMigrateComputersFromGuestToUserApi.ts";
 import {guestComputersAtom} from "../../atoms/guestComputersAtom.ts";
 import {jwtDecode} from "jwt-decode";
 

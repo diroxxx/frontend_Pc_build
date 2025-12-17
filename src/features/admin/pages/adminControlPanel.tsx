@@ -6,7 +6,7 @@ import { userAtom } from "../../../atomContext/userAtom.tsx";
 import { useAtom } from "jotai";
 import { showToast } from "../../../lib/ToastContainer.tsx";
 import OffersComponent from "../offersUpdates/offersUpdatePage.tsx";
-import GeneralPage from "./generalPage.tsx";
+import GeneralPage from "../AdminGeneralPage/generalPage.tsx";
 import ComponentsPage from "./componentsPage.tsx";
 import OffersAdminPage from "./OffersAdminPage.tsx";
 import {useQueryClient} from "@tanstack/react-query";

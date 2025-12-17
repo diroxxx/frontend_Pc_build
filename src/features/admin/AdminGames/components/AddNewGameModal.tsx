@@ -19,8 +19,8 @@ import {
     recLevels
 } from "../../types/GameReqCompDto.ts";
 import {createNewGameReqCompApi} from "../api/createNewGameReqCompApi.ts";
-import {showToast} from "../../../../lib/ToastContainer.tsx";
 import {modalSx} from "../../../../types/modalStyle.ts";
+import Alert from "@mui/material/Alert";
 
 
 interface GameModalProps {
@@ -52,20 +52,22 @@ export function AddNewGameModal({ open, handleClose, gamesTitles, gpus, cpus, re
     const [selectedGameImage, setSelectedGameImage] = useState<string>("");
     const [selectedGameFile, setSelectedGameFile] = useState<File | null>(null);
 
+    const [errorMessage, setErrorMessage] = useState<string>("");
+    const [titleError, setTitleError] = useState<string>("");
 
 
 
     const handleSave = (e?: React.FormEvent) => {
         e?.preventDefault();
         if (!newGameInfo.title?.trim()) {
-            showToast.error("Wpisz tytuł gry");
+            setErrorMessage("Wpisz tytuł gry");
             return;
         }
 
         if (!validateTitle()) return;
 
         if (!selectedGameImage || selectedGameImage.trim().length === 0) {
-            showToast.error("Wybierz obrazek gry");
+            setErrorMessage("Wybierz obrazek gry");
             return;
         }
 
@@ -116,11 +118,11 @@ export function AddNewGameModal({ open, handleClose, gamesTitles, gpus, cpus, re
 
 
         if (result.cpuSpecs.length === 0) {
-            showToast.error("Podaj co najmniej jeden procesor");
+            setErrorMessage("Podaj co najmniej jeden procesor");
             return;
         }
         if (result.gpuSpecs.length === 0) {
-            showToast.error("Podaj co najmiej jedną karte graficzne")
+            setErrorMessage("Podaj co najmiej jedną karte graficzne")
             return;
         }
         createNewGameReqCompApi(result, selectedGameFile ?? null).then(() => { refetchGames()})
@@ -133,6 +135,9 @@ export function AddNewGameModal({ open, handleClose, gamesTitles, gpus, cpus, re
         setSelectedCpuLevel(RecGameLevel.MIN);
         setSelectedGpuId(0);
         setSelectedGpuLevel(RecGameLevel.MIN);
+
+        setErrorMessage("");
+        setTitleError("");
 
         handleClose();
     };
@@ -157,13 +162,14 @@ export function AddNewGameModal({ open, handleClose, gamesTitles, gpus, cpus, re
 
     const validateTitle = (value?: string) => {
         const v = (value ?? newGameInfo.title ?? "").trim();
+        setTitleError("");
         if (v.length <= 1) {
-            showToast.error("Tytuł musi posiadać więcej niż jeden znak");
+            setTitleError("Tytuł musi posiadać więcej niż jeden znak");
             return false;
         }
 
         if (gamesTitles?.some((t) => t.toLowerCase() === v.toLowerCase())) {
-            showToast.error("Tytuł gry już istnieje");
+            setTitleError("Tytuł gry już istnieje");
             return false;
         }
         return true;
@@ -178,7 +184,6 @@ export function AddNewGameModal({ open, handleClose, gamesTitles, gpus, cpus, re
             BackdropProps={{ sx: { bgcolor: "rgba(0,0,0,0.45)" } }}
         >
             <Box sx={modalSx} component="form" onSubmit={handleSave}>
-                {/* Header */}
                 <div className="flex items-start justify-between">
                     <Typography id="game-modal-title" variant="h6" component="h2" sx={{ fontWeight: 700 }}>
                         Dodaj wymagania
@@ -193,6 +198,8 @@ export function AddNewGameModal({ open, handleClose, gamesTitles, gpus, cpus, re
                         <CloseIcon fontSize="small" />
                     </IconButton>
                 </div>
+                {errorMessage && <Alert severity="error" onClose={() => setErrorMessage("")}>{errorMessage}</Alert>}
+
                 <Stack spacing={2}>
                     <TextField
                         label="Tytuł gry"
@@ -201,6 +208,8 @@ export function AddNewGameModal({ open, handleClose, gamesTitles, gpus, cpus, re
                         size="small"
                         fullWidth
                         required
+                        error={!!titleError}
+                        helperText={titleError || undefined}
                         sx={{
                             "& .MuiInputBase-root": {
                                 bgcolor: "rgba(255,255,255,0.02)",
@@ -227,9 +236,6 @@ export function AddNewGameModal({ open, handleClose, gamesTitles, gpus, cpus, re
                                     color: "var(--color-ocean-white)",
                                 }}
                             >
-                                <MenuItem value="">
-                                    <em>Brak</em>
-                                </MenuItem>
                                 {cpus?.map((p,k) => (
                                     <MenuItem key={k} value={String(p.processorId)}>
                                         {p.processorModel}
@@ -253,9 +259,6 @@ export function AddNewGameModal({ open, handleClose, gamesTitles, gpus, cpus, re
                                     color: "var(--color-ocean-white)",
                                 }}
                             >
-                                <MenuItem value="">
-                                    <em>Brak</em>
-                                </MenuItem>
                                 {recLevels.map((r,k) => (
                                     <MenuItem key={k} value={r}>
                                         {r}
