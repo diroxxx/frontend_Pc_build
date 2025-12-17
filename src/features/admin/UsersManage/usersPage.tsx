@@ -7,11 +7,16 @@ import {deleteUserByEmailApi} from "./deleteUserByEmailApi.ts";
 import {showToast} from "../../../lib/ToastContainer.tsx";
 import {useAllUsers} from "./useAllUsers.ts";
 import type {UserToShowDto} from "./UserToShowDto.ts";
+import {NewUserModal} from "./NewUserModal.tsx";
 
 const UsersPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterRole, setFilterRole] = useState<string>('all');
+
     const[openUserModal, setOpenUserModal] = useState<boolean>(false);
+    const[openNewUserModal, setNewOpenUserModal] = useState<boolean>(false);
+
+
     const {data:users, isError,isLoading,isFetching, refetch} = useAllUsers();
 
     const usersList = users != null ? users : [];
@@ -29,26 +34,39 @@ const UsersPage = () => {
     const handleOpenUSerModal = () => setOpenUserModal(true);
     const handleCloseUserModal = () => setOpenUserModal(false);
 
+    const handleOpenNewUserModal = () => setNewOpenUserModal(true);
+    const handleCloseNewUserModal = () => setNewOpenUserModal(false);
 
     const [userToUpdate, setUserToUpdate] = useState<UserToShowDto>({
+        id : 0,
         email: "",
         nickname: "",
         role: UserRole.USER
     });
 
-    function handleDeleteUserByEmail(email:string) {
-        deleteUserByEmailApi(email).then(r => showToast.success(r.message));
-        refetch();
+    async function handleDeleteUserByEmail(email: string) {
+        try {
+            const res = await deleteUserByEmailApi(email);
+            showToast.success(res?.message ?? "Usunięto");
+            await refetch();
+        } catch (err: any) {
+            showToast.error(err?.response?.data?.message ?? "Błąd podczas usuwania");
+            console.error(err);
+        }
     }
 
     return (
         <div className="space-y-4">
             <EditUserModal open={openUserModal} handleClose={handleCloseUserModal} userUpdateDto={userToUpdate} userRefetch={refetch} />
+            <NewUserModal open={openNewUserModal} handleClose={handleCloseNewUserModal} userRefetch={refetch} />
             <div className=" rounded-lg shadow-sm border border-gray-200 p-4">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold text-midnight-dark">Lista użytkowników</h2>
-                    <button className="px-3 py-1.5 bg-ocean-dark-blue text-ocean-white rounded hover:bg-ocean-blue text-sm font-medium transition-colors flex items-center gap-1">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button className="px-3 py-1.5 bg-ocean-dark-blue text-ocean-white rounded hover:bg-ocean-blue text-sm font-medium transition-colors flex items-center gap-1"
+                            onClick={handleOpenNewUserModal}
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        >
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
                         Dodaj użytkownika
@@ -110,7 +128,7 @@ const UsersPage = () => {
                             </td>
                         </tr>
                     ) : (
-                        filteredUsers.map(({ role, nickname, email}) => (
+                        filteredUsers.map(({ role, nickname, email, id}) => (
                             <tr key={email} className="hover:bg-ocean-light-blue/20">
                                 <td className="px-3 py-2 font-medium text-midnight-dark">{nickname}</td>
                                 <td className="px-3 py-2 text-midnight-dark">{email}</td>
@@ -131,6 +149,7 @@ const UsersPage = () => {
                                                 className={"w-5 h-5 text-ocean-dark-blue  cursor-pointer"}
                                                 onClick={() => {
                                                     setUserToUpdate({
+                                                        id: id,
                                                         email: email,
                                                         nickname: nickname,
                                                         role: UserRole.USER

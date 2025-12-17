@@ -9,18 +9,22 @@ import {IconButton, Stack} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import type {UserToShowDto} from "./UserToShowDto.ts";
 import {saveNewUserApi} from "./saveNewUserApi.ts";
+import Alert from "@mui/material/Alert";
+import {checkUserInfo} from "./api/checkUserInfoApi.ts";
 
 export type NewUserModalProps = {
     open: boolean;
     handleClose: () => void;
-    userUpdateDto: UserToShowDto;
     userRefetch: () => void;
 };
 
 
-export const NewUserModal = ({open,handleClose,userUpdateDto,userRefetch}:NewUserModalProps ) => {
+export const NewUserModal = ({open,handleClose,userRefetch}:NewUserModalProps ) => {
+
+    const [errorMessage, setErrorMessage] = useState<string>("");
+
+
     const [userToUpdate, setUserToUpdate] = useState<UserUpdateDto>({
         email:  "",
         nickname:  "",
@@ -31,25 +35,19 @@ export const NewUserModal = ({open,handleClose,userUpdateDto,userRefetch}:NewUse
 
     const validate = (): boolean => {
         if (!userToUpdate.nickname?.trim() || userToUpdate.nickname.trim().length < 2) {
-            showToast.error("Pseudonim musi mieć co najmniej 2 znaki");
+            setErrorMessage("Pseudonim musi mieć co najmniej 2 znaki");
             return false;
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(userToUpdate.email ?? "")) {
-            showToast.error("Nieprawidłowy adres email");
+            setErrorMessage("Nieprawidłowy adres email");
             return false;
         }
         if (userToUpdate.password && userToUpdate.password.length > 0 && userToUpdate.password.length < 6) {
-            showToast.error("Hasło musi mieć co najmniej 6 znaków");
+            setErrorMessage("Hasło musi mieć co najmniej 6 znaków");
             return false;
         }
-        if (
-            userToUpdate.nickname === (userUpdateDto?.nickname ?? "") &&
-            userToUpdate.email === (userUpdateDto?.email ?? "")
-        ) {
-            showToast.error("Brak zmian w danych");
-            return false;
-        }
+
         return true;
     };
 
@@ -57,10 +55,25 @@ export const NewUserModal = ({open,handleClose,userUpdateDto,userRefetch}:NewUse
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
         if (!validate()) return;
+
+        try{
+            await checkUserInfo(userToUpdate.nickname, userToUpdate.email)
+
+            }catch(err:any){
+            const backendMessage = err?.response?.data?.message ?? err?.message ?? "Błąd podczas sprawdzania danych";
+            if (err?.response?.status === 409) {
+                setErrorMessage(backendMessage);
+                return;
+            }
+            setErrorMessage(backendMessage);
+            return;
+        }
+
+
         try {
             console.log(userToUpdate);
             const result = await saveNewUserApi(userToUpdate);
-            showToast.success(result.data. ?? "Zapisano");
+            showToast.success(result.data.email ?? "Zapisano");
             userRefetch();
             handleClose();
         } catch (err) {
@@ -73,9 +86,11 @@ export const NewUserModal = ({open,handleClose,userUpdateDto,userRefetch}:NewUse
         <Modal open={open} onClose={handleClose} closeAfterTransition disableEnforceFocus disableAutoFocus>
             <Box component="form" onSubmit={handleSubmit} sx={modalSx}>
                 <div className="modalHeader">
-                    <Typography variant="h6" sx={{ fontWeight: 700 }}>Edytuj użytkownika</Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 700 }}>Nowy użytkownik</Typography>
                     <IconButton onClick={handleClose}><CloseIcon fontSize="small" /></IconButton>
                 </div>
+
+                {errorMessage && <Alert severity="error" onClose={() => setErrorMessage("")}>{errorMessage}</Alert>}
 
                 <div className="modalBody">
                     <Stack spacing={1}>
@@ -86,7 +101,7 @@ export const NewUserModal = ({open,handleClose,userUpdateDto,userRefetch}:NewUse
                             size="small"
                             fullWidth
                             required
-                            helperText={errors.nickname}
+                            // helperText={errors.nickname}
                         />
 
                         <TextField
@@ -96,7 +111,7 @@ export const NewUserModal = ({open,handleClose,userUpdateDto,userRefetch}:NewUse
                             size="small"
                             fullWidth
                             required
-                            helperText={errors.email}
+                            // helperText={errors.email}
                         />
 
                         <TextField
@@ -106,7 +121,7 @@ export const NewUserModal = ({open,handleClose,userUpdateDto,userRefetch}:NewUse
                             size="small"
                             fullWidth
                             type="password"
-                            helperText={errors.password ?? "Pozostaw puste, aby nie zmieniać hasła"}
+                            // helperText={errors.password ?? "Pozostaw puste, aby nie zmieniać hasła"}
                         />
                     </Stack>
                 </div>

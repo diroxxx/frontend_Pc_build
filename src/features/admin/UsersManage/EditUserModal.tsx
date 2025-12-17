@@ -27,6 +27,7 @@ export const EditUserModal = ({ open, handleClose, userUpdateDto, userRefetch}: 
 
 
     const [userToUpdate, setUserToUpdate] = useState<UserUpdateDto>({
+        id: userUpdateDto?.id ?? 0,
         email: userUpdateDto?.email ?? "",
         nickname: userUpdateDto?.nickname ?? "",
         password: "",
@@ -35,6 +36,7 @@ export const EditUserModal = ({ open, handleClose, userUpdateDto, userRefetch}: 
 
     useEffect(() => {
         setUserToUpdate({
+            id: userUpdateDto?.id ?? 0,
             email: userUpdateDto?.email ?? "",
             nickname: userUpdateDto?.nickname ?? "",
             password: "",
@@ -47,29 +49,35 @@ export const EditUserModal = ({ open, handleClose, userUpdateDto, userRefetch}: 
 
 
     const validate = (): boolean => {
-        if (!userToUpdate.nickname?.trim() || userToUpdate.nickname.trim().length < 2) {
+        const trimmedNick = (userToUpdate.nickname ?? "").trim();
+        if (!trimmedNick || trimmedNick.length < 2) {
             setErrorMessage("Pseudonim musi mieć co najmniej 2 znaki");
             return false;
         }
+
+        const email = (userToUpdate.email ?? "").trim();
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(userToUpdate.email ?? "")) {
+        if (!emailRegex.test(email)) {
             setErrorMessage("Nieprawidłowy adres email");
             return false;
         }
+
         if (userToUpdate.password && userToUpdate.password.length > 0 && userToUpdate.password.length < 6) {
             setErrorMessage("Hasło musi mieć co najmniej 6 znaków");
             return false;
         }
-        if (
-            userToUpdate.nickname === (userUpdateDto?.nickname ?? "") &&
-            userToUpdate.email === (userUpdateDto?.email ?? "")
-        ) {
+
+        const sameNickname = trimmedNick === (userUpdateDto?.nickname ?? "").trim();
+        const sameEmail = email.toLowerCase() === (userUpdateDto?.email ?? "").trim().toLowerCase();
+        const passwordChanged = !!(userToUpdate.password && userToUpdate.password.length > 0);
+
+        if (sameNickname && sameEmail && !passwordChanged) {
             setErrorMessage("Brak zmian w danych");
             return false;
         }
+
         return true;
     };
-
 
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
