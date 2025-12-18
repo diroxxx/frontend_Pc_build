@@ -1,4 +1,4 @@
-import type {ComponentOffer} from "../../../../types/OfferBase.ts";
+import type {ComponentOffer} from "../../../../shared/dtos/OfferBase.ts";
 import OfferCardFlex from "./OfferCardFlex.tsx";
 import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.tsx";
 import {useAtomValue} from "jotai";

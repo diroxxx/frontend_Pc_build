@@ -1,13 +1,13 @@
-import type {ComponentOffer} from "../../../../types/OfferBase.ts";
+import type {ComponentOffer} from "../../../../shared/dtos/OfferBase.ts";
 import {useState} from "react";
 import {useAtom, useAtomValue} from "jotai";
 import {showToast} from "../../../../lib/ToastContainer.tsx";
-import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
-import {useUpdateOffersToComputer} from "../../../admin/hooks/useUpdateOffersToComputer.ts";
+import {selectedComputerAtom} from "../../../computers/atoms/computerAtom.tsx";
+import {useUpdateOffersToComputer} from "../../../offersUpdates/admin/hooks/useUpdateOffersToComputer.ts";
 import {validateCompatibility} from "../../../computers/hooks/validateCompatibility.ts";
 import {ImageOff} from "lucide-react";
 import {ShopImageComponent} from "./ShopImageComponent.tsx";
-import {userAtom} from "../../../../atomContext/userAtom.tsx";
+import {userAtom} from "../../../auth/atoms/userAtom.tsx";
 import {guestComputersAtom} from "../../../computers/atoms/guestComputersAtom.ts";
 
 interface Props {

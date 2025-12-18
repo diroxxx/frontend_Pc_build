@@ -7,7 +7,7 @@ import {
   clearAuthErrorAtom,
   type LoginData,
   type RegisterData
-} from '../../../../atomContext/authAtom.tsx';
+} from '../../atoms/authAtom.tsx';
 
 const useAuth = () => {
   const [authState] = useAtom(authStateAtom);

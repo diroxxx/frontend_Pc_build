@@ -1,6 +1,6 @@
-import { ComponentTypeEnum } from "../../../types/BaseItemDto.ts"
-import type { ComputerDto } from "../../../types/ComputerDto.ts"
-import type { ComponentOffer } from "../../../types/OfferBase.ts";
+import { ComponentTypeEnum } from "../../../shared/dtos/BaseItemDto.ts"
+import type { ComputerDto } from "../../../shared/dtos/ComputerDto.ts"
+import type { ComponentOffer } from "../../../shared/dtos/OfferBase.ts";
 
 export function validateCompatibility(computer: ComputerDto, offer: ComponentOffer): string | null {
     const existingOffers = computer.offers;

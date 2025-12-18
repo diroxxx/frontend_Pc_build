@@ -1,8 +1,8 @@
 import  {type FormEvent, useState} from "react";
-import {setAuthToken} from "../../../lib/Auth.tsx";
+import {setAuthToken} from "../hooks/Auth.tsx";
 import {type NavigateFunction, useNavigate} from "react-router-dom";
 import {useAtom, useAtomValue} from 'jotai';
-import {type CustomJwtPayload, loginUserAtom} from '../../../atomContext/userAtom.tsx';
+import {type CustomJwtPayload, loginUserAtom} from '../atoms/userAtom.tsx';
 import { AuthRedirect } from "../../../components/auth/AuthRedirect.tsx";
 import {postMigrateComputersFromGuestToUserApi} from "../../computers/user/api/postMigrateComputersFromGuestToUserApi.ts";
 import {guestComputersAtom} from "../../computers/atoms/guestComputersAtom.ts";

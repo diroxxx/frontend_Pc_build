@@ -1,11 +1,11 @@
-import {ComponentTypeEnum} from "../../types/BaseItemDto.ts";
-import  {ItemConditionEnum} from "../../types/ItemConditionEnum.ts";
+import {ComponentTypeEnum} from "../dtos/BaseItemDto.ts";
+import  {ItemConditionEnum} from "../dtos/ItemConditionEnum.ts";
 import {offerLeftPanelFiltersAtom} from "../atoms/OfferLeftPanelFiltersAtom.ts";
 import {useAtom} from "jotai";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import type {OfferFiltersType} from "../atoms/OfferLeftPanelFiltersAtom.ts";
-import {useFetchBrands} from "../../features/admin/hooks/useFetchBrands.ts";
-import {useShopsNames} from "../../hooks/useShopsNames.ts";
+import {useFetchBrands} from "../hooks/useFetchBrands.ts";
+import {useShopsNames} from "../hooks/useShopsNames.ts";
 import {offerPageAtom} from "../atoms/OfferPageAtom.ts";
 
 type OffersFiltersProps = {

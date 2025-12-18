@@ -1,4 +1,4 @@
-import type {ComponentOffer} from "../../../types/OfferBase.ts";
+import type {ComponentOffer} from "../../../shared/dtos/OfferBase.ts";
 
 export type CpuGpuRecGameDto = {
     minRec: ComponentOffer[],

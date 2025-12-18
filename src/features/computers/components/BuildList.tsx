@@ -1,11 +1,11 @@
 import {useState} from "react";
-import type {ComputerDto} from "../../../types/ComputerDto.ts";
+import type {ComputerDto} from "../../../shared/dtos/ComputerDto.ts";
 import {showToast} from "../../../lib/ToastContainer.tsx";
 import {useAtom, useAtomValue} from "jotai";
-import {userAtom} from "../../../atomContext/userAtom.tsx";
+import {userAtom} from "../../auth/atoms/userAtom.tsx";
 import {useDeleteComputer} from "../user/hooks/useDeleteComputer.ts";
 import {RemoveIcon} from "../../../assets/icons/removeIcon.tsx";
-import {selectedComputerAtom} from "../../../atomContext/computerAtom.tsx";
+import {selectedComputerAtom} from "../atoms/computerAtom.tsx";
 import { Pencil } from "lucide-react";
 import {useUpdateComputerName} from "../user/hooks/updateComputerNameMutation.ts";
 import {guestComputersAtom} from "../atoms/guestComputersAtom.ts";

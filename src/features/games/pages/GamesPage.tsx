@@ -36,7 +36,6 @@ const isConfigComplete = (config: GameFpsConfigDto | null): config is GameFpsCon
 const completeConfig = isConfigComplete(gameFpsConfig) ? gameFpsConfig : null;
 
 const {data: recommendedVideoData, refetch, isError:videoError,isLoading:videoLoading, isFetching:videoFetching} = useReccommendedVideo(completeConfig || undefined);
-const canSearch = isConfigComplete(gameFpsConfig);
 
 const {data: recOffersGame, refetch: refetchRecGame, isFetching: isFetchingRec, isLoading: isLoadingRec } = useCpuGpuGame(gameFpsConfig.gameTitle, gameFpsConfig.budget)
 

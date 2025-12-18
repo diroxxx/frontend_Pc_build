@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import SidePanelBuilds from '../../../computers/components/SidePanelBuilds.tsx';
-import {useFetchOffers} from "../../../../shared/useFetchOffers.ts";
-import {ComponentTypeEnum} from "../../../../types/BaseItemDto.ts";
+import {useFetchOffers} from "../../../../shared/hooks/useFetchOffers.ts";
+import {ComponentTypeEnum} from "../../../../shared/dtos/BaseItemDto.ts";
 import OfferUserList from "../components/OfferUserList.tsx";
 import ReactPaginate from "react-paginate";
 import {RightArrow} from "../../../../assets/icons/rightArrow.tsx";

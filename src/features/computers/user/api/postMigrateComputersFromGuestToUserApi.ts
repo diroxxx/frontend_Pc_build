@@ -1,4 +1,4 @@
-import type {ComputerDto} from "../../../../types/ComputerDto.ts";
+import type {ComputerDto} from "../../../../shared/dtos/ComputerDto.ts";
 import customAxios from "../../../../lib/customAxios.tsx";
 
 export const postMigrateComputersFromGuestToUserApi = async (email: string, computers: ComputerDto[])=> {

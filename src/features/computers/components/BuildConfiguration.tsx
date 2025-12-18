@@ -1,6 +1,6 @@
-import {ComponentTypeEnum} from "../../../types/BaseItemDto.ts";
+import {ComponentTypeEnum} from "../../../shared/dtos/BaseItemDto.ts";
 import {useAtomValue} from "jotai";
-import {selectedComputerAtom} from "../../../atomContext/computerAtom.tsx";
+import {selectedComputerAtom} from "../atoms/computerAtom.tsx";
 
 interface BuildConfigurationProps {
     categories: ComponentTypeEnum[];

@@ -1,5 +1,5 @@
-import OfferComponent from "../../../admin/AdminComponents/components/OfferComponent.tsx";
-import type {ComponentOffer} from "../../../../types/OfferBase.ts";
+import OfferComponent from "../../../pcParts/admin/components/OfferComponent.tsx";
+import type {ComponentOffer} from "../../../../shared/dtos/OfferBase.ts";
 import {type FC, useState} from "react";
 import OfferEditCard from "./OfferEditCard.tsx";
 import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.tsx";

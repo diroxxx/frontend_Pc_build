@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type {ComponentOffer} from "../../../../types/OfferBase.ts";
+import type {ComponentOffer} from "../../../../shared/dtos/OfferBase.ts";
 
 interface OfferEditModalProps {
     offer: ComponentOffer;

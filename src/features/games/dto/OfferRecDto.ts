@@ -1,4 +1,4 @@
-import type {ComponentTypeEnum} from "../../../types/BaseItemDto.ts";
+import type {ComponentTypeEnum} from "../../../shared/dtos/BaseItemDto.ts";
 
 export type OfferRecDto = {
     title: string,

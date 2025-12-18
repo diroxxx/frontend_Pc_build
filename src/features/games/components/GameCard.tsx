@@ -1,5 +1,5 @@
 import type { GameDto } from "../dto/GameDto.ts";
-import {baseUrl} from "../../../types/baseUrl.ts";
+import {baseUrl} from "../../../shared/dtos/baseUrl.ts";
 
 const GameCard = ({ game }: { game: GameDto }) => {
     return (

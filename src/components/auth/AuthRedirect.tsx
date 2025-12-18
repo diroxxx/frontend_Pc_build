@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAtomValue } from 'jotai';
-import { userAtom } from '../../atomContext/userAtom';
+import { userAtom } from '../../features/auth/atoms/userAtom.tsx';
 import { LoadingSpinner } from '../../assets/components/ui/LoadingSpinner';
 
 interface AuthRedirectProps {

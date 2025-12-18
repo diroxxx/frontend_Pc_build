@@ -1,8 +1,8 @@
 import {useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {setAuthToken} from "../../../lib/Auth.tsx";
+import {setAuthToken} from "../hooks/Auth.tsx";
 import { useAtom} from 'jotai';
-import { loginAdminAtom} from '../../../atomContext/userAtom.tsx';
+import { loginAdminAtom} from '../atoms/userAtom.tsx';
 import { LoadingSpinner } from '../../../assets/components/ui/LoadingSpinner.tsx';
 import { AuthRedirect } from '../../../components/auth/AuthRedirect.tsx';
 

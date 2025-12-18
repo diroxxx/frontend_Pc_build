@@ -1,9 +1,9 @@
 import axios, {type AxiosError, type InternalAxiosRequestConfig} from "axios";
-import { getAuthToken, setAuthToken } from "./Auth.tsx";
+import { getAuthToken, setAuthToken } from "../features/auth/hooks/Auth.tsx";
 
 import { showToast } from './ToastContainer.tsx';
-import {userAtom} from "../atomContext/userAtom.tsx";
-import {store} from "../atomContext/store.ts";
+import {userAtom} from "../features/auth/atoms/userAtom.tsx";
+import {store} from "./store.ts";
 
 const customAxios = axios.create({
     baseURL: "http://localhost:8080",

@@ -1,5 +1,5 @@
 import customAxios from "../../lib/customAxios.tsx";
-import type {ComponentOffer} from "../../types/OfferBase.ts";
+import type {ComponentOffer} from "../dtos/OfferBase.ts";
 
 import type  {OfferFiltersType} from "../atoms/OfferLeftPanelFiltersAtom.ts";
 

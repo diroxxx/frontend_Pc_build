@@ -1,16 +1,16 @@
 import Login from "../features/auth/guest/login.tsx";
-import MainPage from "../pageComponents/MainPage.tsx";
+import MainPage from "./layouts/MainPage.tsx";
 import {RoleProtectedRoute} from "./router/RoleProtectedRoute.tsx";
 import {Routes, Route, Navigate} from "react-router-dom";
 import Register from "../features/auth/guest/Register.tsx";
-import Layout from "../pageComponents/Layout.tsx";
+import Layout from "./layouts/Layout.tsx";
 import OffersUserPage from "../features/offers/guest/pages/OffersUserPage.tsx";
-import UserPage from "../features/userProfile/pages/UserPage.tsx";
-import Community from "../pages/UserPage/Community/community.tsx";
+import UserPage from "../features/userProfile/UserPage.tsx";
+import Community from "../features/Community/community.tsx";
 import ConfiguratorPcPage from "../features/computers/user/pages/ConfiguratorPcPage.tsx";
 
 import AdminLoginPage from "../features/auth/admin/adminLoginPage.tsx";
-import AdminControlPanel from "../features/admin/pages/adminControlPanel.tsx";
+import AdminControlPanel from "../features/adminGeneralInfo/adminControlPanel.tsx";
 import {ToastProvider} from "../lib/ToastContainer.tsx";
 import {queryClient} from "./store/queryClient.ts";
 import {QueryClientProvider} from "@tanstack/react-query";

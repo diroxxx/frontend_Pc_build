@@ -1,7 +1,7 @@
 import {useAtom} from "jotai";
 import {offerLeftPanelFiltersAtom} from "../atoms/OfferLeftPanelFiltersAtom.ts";
 import React, {useState} from "react";
-import {SortByOffersEnum} from "../../types/SortByOffersEnum.ts";
+import {SortByOffersEnum} from "../dtos/SortByOffersEnum.ts";
 import {offerPageAtom} from "../atoms/OfferPageAtom.ts";
 import {ArrowRight, SearchIcon} from "lucide-react";
 

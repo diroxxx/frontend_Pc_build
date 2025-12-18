@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import customAxios from '../../../lib/customAxios.tsx';
 import { useAtom } from 'jotai';
-import { userAtom } from '../../../atomContext/userAtom.tsx';
+import { userAtom } from '../../auth/atoms/userAtom.tsx';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import {useLogout} from "../../../hooks/useLogout.ts";
+import {useLogout} from "../../auth/user/hooks/useLogout.ts";
 
 function UserProfile(){
     const [user,] = useAtom(userAtom);

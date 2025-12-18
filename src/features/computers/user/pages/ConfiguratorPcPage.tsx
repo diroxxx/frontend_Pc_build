@@ -1,18 +1,18 @@
 import {useAtom} from 'jotai';
 import {useNavigate} from 'react-router-dom';
-import {selectedCategoryAtom} from '../../../../atomContext/offerAtom.tsx';
-import {userAtom} from "../../../../atomContext/userAtom.tsx";
+import {userAtom} from "../../../auth/atoms/userAtom.tsx";
 import {useFetchComputersByEmail} from "../hooks/useFetchComputersByEmail.ts";
 import {useEffect} from "react";
 import BuildList from "../../components/BuildList.tsx";
 import BuildConfiguration from "../../components/BuildConfiguration.tsx";
-import {useSaveComputerByUserEmail} from "../../../../hooks/useSaveComputersByUserEmail.ts";
-import type {ComputerDto} from "../../../../types/ComputerDto.ts";
-import {ComponentTypeEnum} from "../../../../types/BaseItemDto.ts";
-import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
+import {useSaveComputerByUserEmail} from "../hooks/useSaveComputersByUserEmail.ts";
+import type {ComputerDto} from "../../../../shared/dtos/ComputerDto.ts";
+import {ComponentTypeEnum} from "../../../../shared/dtos/BaseItemDto.ts";
+import {selectedComputerAtom} from "../../atoms/computerAtom.tsx";
 import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.tsx";
 import {guestComputersAtom} from "../../atoms/guestComputersAtom.ts";
 import { Info } from "lucide-react";
+import {selectedCategoryAtom} from "../../atoms/selectedCategoryAtom.ts";
 
 export default function ConfiguratorPcPage() {
     const navigate = useNavigate();

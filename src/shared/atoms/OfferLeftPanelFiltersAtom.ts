@@ -1,7 +1,7 @@
 import {atom} from "jotai";
-import type {ComponentTypeEnum} from "../../types/BaseItemDto.ts";
-import type {ItemConditionEnum} from "../../types/ItemConditionEnum.ts";
-import { SortByOffersEnum} from "../../types/SortByOffersEnum.ts";
+import type {ComponentTypeEnum} from "../dtos/BaseItemDto.ts";
+import type {ItemConditionEnum} from "../dtos/ItemConditionEnum.ts";
+import { SortByOffersEnum} from "../dtos/SortByOffersEnum.ts";
 
 export type OfferFiltersType = {
     componentType?: ComponentTypeEnum;

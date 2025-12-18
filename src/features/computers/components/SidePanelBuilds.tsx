@@ -1,10 +1,10 @@
 import {useEffect, useState} from "react";
-import type {ComponentOffer} from "../../../types/OfferBase.ts";
+import type {ComponentOffer} from "../../../shared/dtos/OfferBase.ts";
 
 import {useAtom} from "jotai";
 import {useFetchComputersByEmail} from "../user/hooks/useFetchComputersByEmail.ts";
-import {userAtom} from "../../../atomContext/userAtom.tsx";
-import {selectedComputerAtom} from "../../../atomContext/computerAtom.tsx";
+import {userAtom} from "../../auth/atoms/userAtom.tsx";
+import {selectedComputerAtom} from "../atoms/computerAtom.tsx";
 import {guestComputersAtom} from "../atoms/guestComputersAtom.ts";
 
 export default function SidePanelBuilds() {

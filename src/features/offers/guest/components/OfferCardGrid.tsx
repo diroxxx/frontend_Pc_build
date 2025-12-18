@@ -1,14 +1,14 @@
 import {ImageOff, Plus} from "lucide-react";
-import type {ComponentOffer} from "../../../../types/OfferBase.ts";
+import type {ComponentOffer} from "../../../../shared/dtos/OfferBase.ts";
 import {showToast} from "../../../../lib/ToastContainer.tsx";
 import {validateCompatibility} from "../../../computers/hooks/validateCompatibility.ts";
 import {useAtom, useAtomValue} from "jotai";
-import {selectedComputerAtom} from "../../../../atomContext/computerAtom.tsx";
-import {useUpdateOffersToComputer} from "../../../admin/hooks/useUpdateOffersToComputer.ts";
+import {selectedComputerAtom} from "../../../computers/atoms/computerAtom.tsx";
+import {useUpdateOffersToComputer} from "../../../offersUpdates/admin/hooks/useUpdateOffersToComputer.ts";
 import {useState} from "react";
 import {ShopImageComponent} from "./ShopImageComponent.tsx";
 import {guestComputersAtom} from "../../../computers/atoms/guestComputersAtom.ts";
-import {userAtom} from "../../../../atomContext/userAtom.tsx";
+import {userAtom} from "../../../auth/atoms/userAtom.tsx";
 
 interface OfferCardGridProps {
     offer: ComponentOffer;
