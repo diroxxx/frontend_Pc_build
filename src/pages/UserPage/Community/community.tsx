@@ -3,7 +3,14 @@ import { useAtom } from "jotai";
 import { userAtom } from "../../../atomContext/userAtom.tsx";
 import customAxios from "../../../lib/customAxios.tsx";
 import PostDetails from "./PostDetails.tsx";
-import { FaArrowLeft, FaUserCircle, FaPaperclip, FaTimes } from 'react-icons/fa';
+import {
+    FaArrowLeft,
+    FaUserCircle,
+    FaPaperclip,
+    FaTimes,
+    FaThumbsUp,
+    FaThumbsDown
+} from 'react-icons/fa';
 import PaginatedList from "./PaginatedPosts.tsx";
 import { parseDateArray, formatDate, timeAgo } from "./PostTime.tsx";
 import { getCategoryColor } from "./categoryUtils.tsx";
@@ -31,6 +38,7 @@ interface Post {
     authorName?: string;
     createdAt: number[];
     category?: Category;
+    categoryName?: string;
     images: PostImageDTO[];
     thumbnailImageId?: number
 }
@@ -39,6 +47,146 @@ interface Category {
     id: number;
     name: string;
 }
+
+interface PostListItemProps {
+    post: Post;
+    onClick: () => void;
+    currentUser: User | null;
+}
+
+const PostListItem: React.FC<PostListItemProps> = ({ post, onClick, currentUser }) => {
+    const [netScore, setNetScore] = useState<number>(0);
+    const [userVoteStatus, setUserVoteStatus] = useState<'upvote' | 'downvote' | null>(null);
+    const date = parseDateArray(post.createdAt);
+    const categoryName = post.categoryName || post.category?.name || 'Brak kategorii';
+
+    const thumbnailUrl = post.thumbnailImageId
+        ? `http://localhost:8080/community/image/${post.thumbnailImageId}`
+        : null;
+
+    useEffect(() => {
+        const fetchVoteStatus = async () => {
+            try {
+                const scoreResponse = await customAxios.get<number>(`community/posts/${post.id}/vote`);
+                setNetScore(scoreResponse.data);
+
+                if (currentUser) {
+                    const statusResponse = await customAxios.get<string | null>(`community/posts/${post.id}/vote/status`);
+                    if (statusResponse.data) {
+                        setUserVoteStatus(statusResponse.data as 'upvote' | 'downvote');
+                    } else {
+                        setUserVoteStatus(null);
+                    }
+                }
+            } catch (err) {
+                console.error(`Błąd głosowania dla posta ${post.id}`, err);
+            }
+        };
+        fetchVoteStatus();
+    }, [post.id, currentUser]);
+
+    const handleVote = async (e: React.MouseEvent, voteType: 'upvote' | 'downvote') => {
+        e.stopPropagation();
+
+        if (!currentUser) {
+            alert("Musisz być zalogowany, aby głosować!");
+            return;
+        }
+
+        try {
+            const response = await customAxios.post<number>(`community/posts/${post.id}/vote?type=${voteType}`);
+            setNetScore(response.data);
+            setUserVoteStatus(prev => prev === voteType ? null : voteType);
+        } catch (err: any) {
+            console.error("Błąd głosowania:", err);
+            if (err.response?.status === 401) {
+                alert("Sesja wygasła.");
+            }
+        }
+    };
+
+    return (
+        <li
+            onClick={onClick}
+            className="cursor-pointer bg-white rounded-lg shadow-md hover:shadow-lg transition duration-200 mb-4 border border-gray-200 overflow-hidden"
+        >
+            <div className="p-4">
+                <div className="flex items-start">
+                    {thumbnailUrl ? (
+                        <div className="mr-4 flex-shrink-0">
+                            <img
+                                src={thumbnailUrl}
+                                alt="Miniatura"
+                                className="w-24 h-24 object-cover rounded-md border border-gray-200"
+                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                            />
+                        </div>
+                    ) : (
+                        <div className="mr-4 flex-shrink-0 w-24 h-24 bg-gray-100 rounded-md flex items-center justify-center border border-gray-200 text-gray-400 text-xs text-center p-1">
+                            Brak zdjęcia
+                        </div>
+                    )}
+
+                    <div className="flex-1 min-w-0 flex flex-col justify-between">
+
+                        <div className="flex justify-between items-start mb-1">
+                            <div className="flex items-center overflow-hidden mr-2">
+                                <span className={`flex-shrink-0 text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-2 shadow-sm ${getCategoryColor(categoryName)}`}>
+                                    {categoryName}
+                                </span>
+                                <h3 className="text-lg font-bold text-gray-800 truncate">{post.title}</h3>
+                            </div>
+
+                            <div className="text-right text-gray-400 text-xs flex-shrink-0">
+                                <span className="block">{formatDate(date)}</span>
+                                <span className="block text-[10px] mt-0.5">({timeAgo(date)})</span>
+                            </div>
+                        </div>
+
+                        <p className="text-gray-600 text-sm line-clamp-2 mb-3">{post.content}</p>
+
+                        <div className="flex justify-between items-end mt-auto">
+
+                            <div className="flex items-center text-gray-500 text-xs pb-1">
+                                <span className="mr-1">Autor:</span>
+                                <div className="flex items-center text-gray-700 font-semibold">
+                                    <FaUserCircle className="w-3 h-3 mr-1 text-gray-400"/>
+                                    {post.authorName || post.user?.username || 'Nieznany'}
+                                </div>
+                            </div>
+
+                            <div
+                                className="flex items-center space-x-2 bg-gray-50 px-3 py-1 rounded-full border border-gray-200 shadow-sm"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <button
+                                    onClick={(e) => handleVote(e, 'upvote')}
+                                    className={`p-1 hover:scale-110 transition ${userVoteStatus === 'upvote' ? 'text-blue-600' : 'text-gray-400 hover:text-blue-500'}`}
+                                >
+                                    <FaThumbsUp className="w-4 h-4" />
+                                </button>
+
+                                <span className={`font-bold text-sm min-w-[1.5rem] text-center ${netScore > 0 ? 'text-blue-600' : netScore < 0 ? 'text-red-600' : 'text-gray-600'}`}>
+                                    {netScore}
+                                </span>
+
+                                <button
+                                    onClick={(e) => handleVote(e, 'downvote')}
+                                    className={`p-1 hover:scale-110 transition ${userVoteStatus === 'downvote' ? 'text-red-600' : 'text-gray-400 hover:text-red-500'}`}
+                                >
+                                    <FaThumbsDown className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </li>
+    );
+};
+
+// --- GŁÓWNY KOMPONENT ---
 
 const Community: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]);
@@ -349,62 +497,14 @@ const Community: React.FC = () => {
                 <PaginatedList
                     items={sortedPosts}
                     itemsPerPage={12}
-                    renderItem={(post) => {
-                        const date = parseDateArray(post.createdAt);
-                        const categoryName = post.category?.name || 'Brak kategorii';
-
-
-                        const thumbnailUrl = post.thumbnailImageId
-                            ? `http://localhost:8080/community/image/${post.thumbnailImageId}`
-                            : null;
-
-                        return (
-                            <li
-                                key={post.id}
-                                onClick={() => setSelectedPost(post)}
-                                className="cursor-pointer bg-white p-4 rounded shadow-lg hover:shadow-xl transition duration-200 flex justify-between items-start border-l-4 border-blue-500"
-                            >
-                                <div className="flex flex-1 min-w-0 pr-4">
-
-                                    {thumbnailUrl ? (
-                                        <div className="mr-4 flex-shrink-0">
-                                            <img
-                                                src={thumbnailUrl}
-                                                alt="Miniatura"
-                                                className="w-24 h-24 object-cover rounded-md border border-gray-200"
-                                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className="mr-4 flex-shrink-0 w-24 h-24 bg-gray-100 rounded-md flex items-center justify-center border border-gray-200 text-gray-400 text-xs text-center p-1">
-                                            Brak zdjęcia
-                                        </div>
-                                    )}
-
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center mb-2">
-                            <span className={`inline-block text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md ${getCategoryColor(post.category?.name)}`}>
-                                {categoryName}
-                            </span>
-                                            <h3 className="text-xl font-bold text-gray-800 truncate">{post.title}</h3>
-                                        </div>
-                                        <p className="text-gray-600 mt-1 line-clamp-2">{post.content}</p>
-                                        <div className="text-gray-500 text-sm mt-2 flex items-center">
-                                            <span className="mr-1">Autor:</span>
-                                            <div className="flex items-center text-gray-900 font-bold">
-                                                <FaUserCircle className="w-4 h-4 mr-1 text-gray-400"/>
-                                                {post.authorName || post.user?.username || 'Nieznany'}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="text-gray-400 text-sm text-right flex-shrink-0 pt-1 pl-2">
-                                    <span className="block">{formatDate(date)}</span>
-                                    <span className="block text-xs">({timeAgo(date)})</span>
-                                </div>
-                            </li>
-                        );
-                    }}
+                    renderItem={(post) => (
+                        <PostListItem
+                            key={post.id}
+                            post={post}
+                            onClick={() => setSelectedPost(post)}
+                            currentUser={user as unknown as User}
+                        />
+                    )}
                 />
             )}
         </div>
@@ -412,4 +512,3 @@ const Community: React.FC = () => {
 }
 
 export default Community;
-
