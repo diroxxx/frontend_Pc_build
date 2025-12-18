@@ -20,7 +20,7 @@ export const formatDate = (date: Date): string => {
 export const timeAgo = (date: Date): string => {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
-    const diffMinutes = Math.floor(diffMs / 60000); // 1 minuta = 60000 ms
+    const diffMinutes = Math.floor(diffMs / 60000);
 
     if (diffMinutes < 1) return "przed chwilą";
     if (diffMinutes < 60) return `${diffMinutes} min. temu`;

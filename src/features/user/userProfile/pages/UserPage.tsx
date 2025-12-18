@@ -6,11 +6,18 @@ import UserComputers from "../components/UserComputers.tsx";
 import customAxios from "../../../../lib/customAxios.tsx";
 import PostDetails from "../../../../pages/UserPage/Community/PostDetails.tsx";
 import PaginatedList from "../../../../pages/UserPage/Community/PaginatedPosts.tsx";
-import {FaDesktop, FaMicrochip, FaMoneyBillWave, FaUserCircle} from "react-icons/fa";
+import {
+    FaDesktop,
+    FaMicrochip,
+    FaMoneyBillWave,
+    FaUserCircle,
+    FaThumbsUp,
+    FaThumbsDown
+} from "react-icons/fa";
 import {useNavigate} from "react-router-dom";
 import { getCategoryColor } from "../../../../pages/UserPage/Community/categoryUtils";
+import { parseDateArray, formatDate } from "../../../../pages/UserPage/Community/PostTime.tsx";
 
-// --- INTERFEJSY ---
 
 interface User {
     id: number;
@@ -26,12 +33,14 @@ interface Category {
 
 interface Post {
     id: number;
-    postId: number;
+    postId?: number;
     title: string;
     content: string;
     user: User;
+    authorName?: string;
     createdAt: number[];
     category?: Category;
+    categoryName?: string;
     thumbnailImageId?: number;
     imageId?: number;
 }
@@ -42,6 +51,148 @@ interface Computer {
     totalPrice: number;
     offers: any[];
 }
+
+interface PostListItemProps {
+    post: Post;
+    onClick: () => void;
+    currentUser: User | null;
+}
+
+const PostListItem: React.FC<PostListItemProps> = ({ post, onClick, currentUser }) => {
+    const realPostId = post.postId && post.postId !== 0 ? post.postId : post.id;
+
+    const [netScore, setNetScore] = useState<number>(0);
+    const [userVoteStatus, setUserVoteStatus] = useState<'upvote' | 'downvote' | null>(null);
+    const date = parseDateArray(post.createdAt);
+
+    const categoryName = post.categoryName || post.category?.name || 'Brak kategorii';
+    const imageIdToUse = post.thumbnailImageId || post.imageId;
+    const thumbnailUrl = imageIdToUse
+        ? `http://localhost:8080/community/image/${imageIdToUse}`
+        : null;
+
+    useEffect(() => {
+        const fetchVoteStatus = async () => {
+            try {
+                const scoreResponse = await customAxios.get<number>(`community/posts/${realPostId}/vote`);
+                setNetScore(scoreResponse.data);
+
+                if (currentUser) {
+                    const statusResponse = await customAxios.get<string | null>(`community/posts/${realPostId}/vote/status`);
+                    if (statusResponse.data) {
+                        setUserVoteStatus(statusResponse.data as 'upvote' | 'downvote');
+                    } else {
+                        setUserVoteStatus(null);
+                    }
+                }
+            } catch (err) {
+                console.error(`Błąd głosowania dla posta ${realPostId}`, err);
+            }
+        };
+        fetchVoteStatus();
+    }, [realPostId, currentUser]);
+
+    const handleVote = async (e: React.MouseEvent, voteType: 'upvote' | 'downvote') => {
+        e.stopPropagation();
+
+        if (!currentUser) {
+            alert("Musisz być zalogowany, aby głosować!");
+            return;
+        }
+
+        try {
+            const response = await customAxios.post<number>(`community/posts/${realPostId}/vote?type=${voteType}`);
+            setNetScore(response.data);
+            setUserVoteStatus(prev => prev === voteType ? null : voteType);
+        } catch (err: any) {
+            console.error("Błąd głosowania:", err);
+            if (err.response?.status === 401) {
+                alert("Sesja wygasła.");
+            }
+        }
+    };
+
+    return (
+        <div
+            onClick={onClick}
+            className="cursor-pointer bg-white rounded-lg shadow-md hover:shadow-lg transition duration-200 mb-4 border border-gray-200 overflow-hidden"
+        >
+            <div className="p-4">
+                <div className="flex items-start">
+                    {thumbnailUrl ? (
+                        <div className="mr-4 flex-shrink-0">
+                            <img
+                                src={thumbnailUrl}
+                                alt="Miniatura"
+                                className="w-24 h-24 object-cover rounded-md border border-gray-200"
+                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                            />
+                        </div>
+                    ) : (
+                        <div className="mr-4 flex-shrink-0 w-24 h-24 bg-gray-100 rounded-md flex items-center justify-center border border-gray-200 text-gray-400 text-xs text-center p-1">
+                            Brak zdjęcia
+                        </div>
+                    )}
+
+                    <div className="flex-1 min-w-0 flex flex-col justify-between">
+
+                        <div className="flex justify-between items-start mb-1">
+                            <div className="flex items-center overflow-hidden mr-2">
+                                <span className={`flex-shrink-0 text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-2 shadow-sm ${getCategoryColor(categoryName)}`}>
+                                    {categoryName}
+                                </span>
+                                <h3 className="text-lg font-bold text-gray-800 truncate">{post.title}</h3>
+                            </div>
+
+                            <div className="text-right text-gray-400 text-xs flex-shrink-0">
+                                <span className="block">{formatDate(date)}</span>
+                                {/*<span className="block text-[10px] mt-0.5">({timeAgo(date)})</span>*/}
+                            </div>
+                        </div>
+
+                        <p className="text-gray-600 text-sm line-clamp-2 mb-3">{post.content}</p>
+
+                        <div className="flex justify-between items-end mt-auto">
+
+                            <div className="flex items-center text-gray-500 text-xs pb-1">
+                                <span className="mr-1">Autor:</span>
+                                <div className="flex items-center text-gray-700 font-semibold">
+                                    <FaUserCircle className="w-3 h-3 mr-1 text-gray-400"/>
+                                    {post.authorName || post.user?.username || 'Nieznany'}
+                                </div>
+                            </div>
+
+                            <div
+                                className="flex items-center space-x-2 bg-gray-50 px-3 py-1 rounded-full border border-gray-200 shadow-sm"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <button
+                                    onClick={(e) => handleVote(e, 'upvote')}
+                                    className={`p-1 hover:scale-110 transition ${userVoteStatus === 'upvote' ? 'text-blue-600' : 'text-gray-400 hover:text-blue-500'}`}
+                                >
+                                    <FaThumbsUp className="w-4 h-4" />
+                                </button>
+
+                                <span className={`font-bold text-sm min-w-[1.5rem] text-center ${netScore > 0 ? 'text-blue-600' : netScore < 0 ? 'text-red-600' : 'text-gray-600'}`}>
+                                    {netScore}
+                                </span>
+
+                                <button
+                                    onClick={(e) => handleVote(e, 'downvote')}
+                                    className={`p-1 hover:scale-110 transition ${userVoteStatus === 'downvote' ? 'text-red-600' : 'text-gray-400 hover:text-red-500'}`}
+                                >
+                                    <FaThumbsDown className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 
 function UserPage() {
     const [activeTab, setActiveTab] = useState("profile");
@@ -210,53 +361,14 @@ function UserPage() {
                             <PaginatedList
                                 items={posts}
                                 itemsPerPage={5}
-                                renderItem={(post) => {
-                                    const thumbnailUrl = post.imageId
-                                        ? `http://localhost:8080/community/image/${post.imageId}`
-                                        : null;
-
-                                    return (
-                                        <div
-                                            key={post.id}
-                                            onClick={() => handlePostClick(post)}
-                                            className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition border border-gray-100 cursor-pointer group flex items-start"
-                                        >
-                                            {/* Sekcja zdjęcia */}
-                                            {thumbnailUrl ? (
-                                                <div className="mr-4 flex-shrink-0">
-                                                    <img
-                                                        src={thumbnailUrl}
-                                                        alt="Miniatura"
-                                                        className="w-24 h-24 object-cover rounded-md border border-gray-200"
-                                                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                                    />
-                                                </div>
-                                            ) : (
-                                                <div className="mr-4 flex-shrink-0 w-24 h-24 bg-gray-100 rounded-md flex items-center justify-center border border-gray-200 text-gray-400 text-xs text-center p-1">
-                                                    Brak zdjęcia
-                                                </div>
-                                            )}
-
-                                            {/* Sekcja treści po prawej */}
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center mb-2">
-                                                    <span className={`inline-block text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md ${getCategoryColor(post.category?.name)}`}>
-                                                        {post.category?.name || 'Inne'}
-                                                    </span>
-                                                    <h4 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors truncate">
-                                                        {post.title}
-                                                    </h4>
-                                                </div>
-
-                                                <p className="text-gray-600 mt-1 line-clamp-2 text-sm">{post.content}</p>
-
-                                                <div className="mt-2 text-xs text-gray-400">
-                                                    Kliknij, aby zobaczyć szczegóły
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                }}
+                                renderItem={(post) => (
+                                    <PostListItem
+                                        key={post.id}
+                                        post={post}
+                                        onClick={() => handlePostClick(post)}
+                                        currentUser={user as unknown as User}
+                                    />
+                                )}
                             />
                         )}
                     </div>
@@ -330,13 +442,15 @@ function UserPage() {
                                 items={savedPosts}
                                 itemsPerPage={5}
                                 renderItem={(savedItem) => {
-                                    const thumbnailUrl = savedItem.imageId
-                                        ? `http://localhost:8080/community/image/${savedItem.imageId}`
-                                        : null;
+                                    const postForList = {
+                                        ...savedItem,
+                                        id: savedItem.postId || savedItem.id
+                                    };
 
                                     return (
-                                        <div
+                                        <PostListItem
                                             key={savedItem.id}
+                                            post={postForList}
                                             onClick={() => {
                                                 const correctPostObject = {
                                                     ...savedItem,
@@ -346,48 +460,8 @@ function UserPage() {
                                                     handlePostClick(correctPostObject);
                                                 }
                                             }}
-                                            className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition border border-gray-100 cursor-pointer group flex items-start"
-                                        >
-                                            {/* Sekcja zdjęcia */}
-                                            {thumbnailUrl ? (
-                                                <div className="mr-4 flex-shrink-0">
-                                                    <img
-                                                        src={thumbnailUrl}
-                                                        alt="Miniatura"
-                                                        className="w-24 h-24 object-cover rounded-md border border-gray-200"
-                                                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                                    />
-                                                </div>
-                                            ) : (
-                                                <div className="mr-4 flex-shrink-0 w-24 h-24 bg-gray-100 rounded-md flex items-center justify-center border border-gray-200 text-gray-400 text-xs text-center p-1">
-                                                    Brak zdjęcia
-                                                </div>
-                                            )}
-
-                                            {/* Sekcja treści po prawej */}
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center mb-2">
-                                                    <span className={`inline-block text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md ${getCategoryColor(savedItem.category?.name)}`}>
-                                                        {savedItem.category?.name || 'Inne'}
-                                                    </span>
-                                                    <h4 className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors truncate">
-                                                        {savedItem.title}
-                                                    </h4>
-                                                </div>
-
-                                                <p className="text-gray-600 mt-1 line-clamp-2 text-sm">{savedItem.content}</p>
-
-                                                <div className="mt-3 flex justify-between items-center text-xs text-gray-500">
-                                                    <div className="flex items-center">
-                                                        <span className="mr-1">Autor:</span>
-                                                        <div className="flex items-center font-bold text-gray-700">
-                                                            <FaUserCircle className="w-4 h-4 mr-1 text-gray-400"/>
-                                                            {savedItem.user?.username || "Nieznany"}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                            currentUser={user as unknown as User}
+                                        />
                                     );
                                 }}
                             />
