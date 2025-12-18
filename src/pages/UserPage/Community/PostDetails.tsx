@@ -34,7 +34,8 @@ interface Post {
     id: number;
     title: string;
     content: string;
-    user: User;
+    user?: User;
+    authorName?:string;
     createdAt: number[];
     category?: { id: number, name: string };
 }
@@ -109,12 +110,12 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
     }, [postId]);
 
     const prevImage = (e?: React.MouseEvent) => {
-        e?.stopPropagation(); // Zapobiega zamykaniu modala przy kliknięciu strzałki
+        e?.stopPropagation();
         setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
     };
 
     const nextImage = (e?: React.MouseEvent) => {
-        e?.stopPropagation(); // Zapobiega zamykaniu modala przy kliknięciu strzałki
+        e?.stopPropagation();
         setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
     };
 
@@ -125,18 +126,16 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
     return (
         <div className="mt-6">
             <div className="relative w-full max-w-3xl mx-auto">
-                {/* Duże zdjęcie - dodano onClick i cursor-pointer */}
                 <img
                     src={images[currentIndex].imageUrl}
                     alt={images[currentIndex].filename}
-                    onClick={handleOpen} // <-- KLIKNIĘCIE OTWIERA MODAL
-                    className="w-full aspect-square object-cover rounded-lg shadow-md cursor-pointer hover:opacity-95 transition" // <-- DODANO cursor-pointer
+                    onClick={handleOpen}
+                    className="w-full aspect-square object-cover rounded-lg shadow-md cursor-pointer hover:opacity-95 transition"
                     onError={(e) => {
                         e.currentTarget.src = "https://placehold.co/600x338?text=Błąd+ładowania";
                     }}
                 />
 
-                {/* Strzałki do przewijania (widok standardowy) */}
                 {images.length > 1 && (
                     <>
                         <button
@@ -193,7 +192,6 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
                 }}
             >
                 <div className="relative flex items-center justify-center outline-none">
-                    {/* Przycisk zamknięcia */}
                     <button
                         onClick={handleClose}
                         className="absolute -top-10 right-0 text-white hover:text-gray-300 z-50 text-3xl"
@@ -201,7 +199,6 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
                         <FaTimes />
                     </button>
 
-                    {/* Strzałka Lewa w Modalu */}
                     {images.length > 1 && (
                         <button
                             onClick={prevImage}
@@ -211,14 +208,12 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
                         </button>
                     )}
 
-                    {/* Zdjęcie w pełnym rozmiarze */}
                     <img
                         src={images[currentIndex].imageUrl}
                         alt={images[currentIndex].filename}
                         className="max-h-[90vh] max-w-[90vw] object-contain rounded"
                     />
 
-                    {/* Strzałka Prawa w Modalu */}
                     {images.length > 1 && (
                         <button
                             onClick={nextImage}
@@ -253,12 +248,14 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     const [commentUserVote, setCommentUserVote] = useState<{ [key: number]: "upvote" | "downvote" | null }>({});
 
     const [user] = useAtom(userAtom);
-    // const isAuthor = user && user.nickname === post.user.username;
-    const isAuthor = user && post.user && user.nickname === post.user.username;
+    // const isAuthor = user && post.user && user.nickname === post.user.username;
+    const isAuthor = user && (
+        (post.user && user.nickname === post.user.username) ||
+        (post.authorName && user.nickname === post.authorName)
+    );
     const [isSaved, setIsSaved] = useState(false);
     const [saveLoading, setSaveLoading] = useState(false);
 
-    // FUNKCJA POBIERAJĄCA KOMENTARZE
     const fetchComments = async () => {
         setLoadingComments(true);
         setCommentsError(null);
@@ -288,10 +285,8 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         };
     }, [showDeleteModal]);
 
-    // 1. Sprawdź przy załadowaniu, czy post jest już zapisany
     useEffect(() => {
         const checkSavedStatus = async () => {
-            // Sprawdzamy tylko jeśli użytkownik jest zalogowany
             if (user) {
                 try {
                     const response = await customAxios.get<boolean>(`/community/posts/${post.id}/isSaved`);
@@ -304,7 +299,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         checkSavedStatus();
     }, [post.id, user]);
 
-// 2. Funkcja obsługująca kliknięcie w zakładkę
     const handleToggleSave = async () => {
         if (!user) {
             setToastMessage({ message: "Musisz być zalogowany, aby zapisać post.", type: 'error' });
@@ -319,30 +313,24 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
         try {
             if (!previousState) {
-                // Jeśli nie był zapisany -> ZAPISZ
                 await customAxios.post(`/community/posts/${post.id}/save`);
                 setToastMessage({ message: "Post został zapisany!", type: 'success' });
             } else {
-                // Jeśli był zapisany -> USUŃ Z ZAPISANYCH
                 await customAxios.delete(`/community/posts/${post.id}/unsave`);
                 setToastMessage({ message: "Post usunięty z zapisanych.", type: 'success' });
             }
         } catch (error: any) {
             console.error("Błąd zapisu:", error);
-            setIsSaved(previousState); // Cofnij zmianę ikonki w razie błędu
+            setIsSaved(previousState);
 
-            // --- NAPRAWA: Bezpieczne wyciąganie treści błędu ---
             let errMsg = "Wystąpił błąd podczas zapisywania.";
 
-            // Sprawdzamy co dokładnie przyszło z backendu
             if (error.response && error.response.data) {
                 const data = error.response.data;
 
-                // Jeśli backend zwrócił obiekt { message: "...", status: ... }
                 if (typeof data === 'object' && data.message) {
                     errMsg = data.message;
                 }
-                // Jeśli backend zwrócił czysty tekst
                 else if (typeof data === 'string') {
                     errMsg = data;
                 }
@@ -378,13 +366,11 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
             const newUserVotes: Record<number, 'upvote' | 'downvote' | null> = {};
 
             for (const comment of comments) {
-                // NET SCORE komentarza
                 const scoreRes = await customAxios.get<number>(
                     `/community/comments/${comment.id}/vote`
                 );
                 newNetScores[comment.id] = scoreRes.data;
 
-                // STATUS użytkownika
                 const statusRes = await customAxios.get<string | null>(
                     `/community/comments/${comment.id}/vote/status`
                 );
@@ -405,7 +391,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
     const VoteSection = () => (
         <div className="inline-flex items-center space-x-4 border p-3 rounded-lg bg-gray-50 mb-6">
-            {/* PRZYCISK LIKE */}
             <button
                 className={`flex items-center p-2 rounded-full transition ${
                     !user ? 'opacity-50 cursor-not-allowed' : ''
@@ -420,7 +405,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                 <FaThumbsUp className="w-5 h-5"/>
             </button>
 
-            {/* WYNIK PUNKTOWY */}
             <span
                 className={`text-xl font-bold ${
                     netScore > 0 ? 'text-gray-700' : netScore < 0 ? 'text-red-700' : 'text-gray-700'
@@ -429,7 +413,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                 {netScore}
             </span>
 
-            {/* PRZYCISK DISLIKE */}
             <button
                 className={`flex items-center p-2 rounded-full transition ${
                     !user ? 'opacity-50 cursor-not-allowed' : ''
@@ -492,13 +475,13 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                 return;
             }
             if (content === currentContent) {
-                setIsEditing(false); // Nic się nie zmieniło
+                setIsEditing(false);
                 return;
             }
 
             setLoading(true);
             setError(null);
-            await handleUpdateContent(content); // Wywołaj funkcję aktualizującą
+            await handleUpdateContent(content);
             setLoading(false);
         };
 
@@ -576,10 +559,8 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
         return (
             <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                {/* ⭐ OKNO MODALA ⭐ */}
                 <div className="bg-gray-800 text-white rounded-xl shadow-2xl max-w-sm w-full p-6 relative">
 
-                    {/* Ikona X do zamknięcia */}
                     <button
                         onClick={() => setShowDeleteModal(false)}
                         className="absolute top-4 right-4 text-gray-400 hover:text-white transition"
@@ -588,15 +569,12 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                         <FaTimes className="w-5 h-5"/>
                     </button>
 
-                    {/* Nagłówek modala */}
                     <h3 className="text-2xl font-bold mb-2">Usunąć post?</h3>
 
-                    {/* Treść / Wiadomość */}
                     <p className="text-gray-400 mb-8">
                         Czy na pewno chcesz usunąć post?
                     </p>
 
-                    {/* Kontener przycisków */}
                     <div className="flex justify-end space-x-4">
                         <button
                             onClick={() => setShowDeleteModal(false)}
@@ -620,13 +598,11 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     const ToastNotification: React.FC = () => {
         if (!toastMessage) return null;
 
-        // Używamy setTimeout do automatycznego ukrycia po 4 sekundach
         useEffect(() => {
             const timer = setTimeout(closeToast, 4000);
             return () => clearTimeout(timer);
         }, [toastMessage]);
 
-        // const bgColor = toastMessage.type === 'success' ? 'bg-green-600' : 'bg-red-600';
         const Icon = toastMessage.type === 'success' ? FaThumbsUp : FaTimes;
 
 
@@ -663,7 +639,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
         } catch (err: any) {
             console.error("Błąd głosowania:", err);
-            // Tutaj też możemy użyć Toast zamiast małego tekstu erroru, jeśli wolisz
             if (err.response?.status === 401) {
                 setToastMessage({ message: "Sesja wygasła. Zaloguj się ponownie.", type: 'error' });
             } else {
@@ -689,13 +664,11 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
             const newScore = response.data;
 
-            // aktualizacja wyniku
             setCommentVotes(prev => ({
                 ...prev,
                 [commentId]: newScore,
             }));
 
-            // toggle ikon
             setCommentUserVote(prev => ({
                 ...prev,
                 [commentId]: prev[commentId] === vote ? null : vote,
@@ -727,16 +700,13 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
             for (const c of comments) {
 
-                // pobranie net score
                 try {
-                    // const scoreRes = await customAxios.get(`/community/comments/${c.id}/vote`);
                     const scoreRes = await customAxios.get(`/community/comments/${c.id}/vote`);
                     scoreMap[c.id] = scoreRes.data;
                 } catch {
                     scoreMap[c.id] = 0;
                 }
 
-                // pobranie statusu użytkownika
                 try {
                     const statusRes = await customAxios.get(`/community/comments/${c.id}/vote/status`);
                     statusMap[c.id] = statusRes.data; // null | "upvote" | "downvote"
@@ -775,13 +745,9 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                 ← Powrót
             </button>
 
-            {/* ⭐ GŁÓWNY KONTENER POSTA - POZYCJONOWANIE IKON ⭐ */}
             <div className="relative max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-2xl border-t-4 border-blue-600">
-                {/* ⭐ IKONY W PRAWYM GÓRNYM ROGU (ZAPIS + EDYCJA/USUWANIE) ⭐ */}
                 {!isEditing && (
                     <div className="absolute top-4 right-4 flex items-center space-x-2">
-
-                        {/* Przycisk ZAPISZ (Widoczny dla zalogowanych) */}
                         {user && !isAuthor && (
                             <button
                                 onClick={handleToggleSave}
@@ -797,12 +763,9 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                             </button>
                         )}
 
-                        {/* Przyciski AUTORA (Edycja i Usuwanie) */}
                         {isAuthor && (
                             <>
                                 <div className="h-6 w-px bg-gray-300 mx-2"></div>
-                                {/* Separator */}
-
                                 <button
                                     onClick={() => setIsEditing(true)}
                                     className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition duration-150"
@@ -837,8 +800,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                         <span>Autor:</span>
                         <span className="flex items-center space-x-1 text-gray-700 font-bold">
                             <FaUserCircle className="w-4 h-4 text-gray-500"/>
-                            {/*<span>{post.user.username}</span>*/}
-                            <span>{post.user?.username || "Nieznany"}</span>
+                            <span>{post.authorName || post.user?.username || "Nieznany"}</span>
                         </span>
                     </span>
                     <span>|</span>
@@ -855,7 +817,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
                 <hr className="my-4 border-black"/>
 
-                {/* ⭐ WARUNKOWE RENDEROWANIE TREŚCI LUB FORMULARZA EDYCJI ⭐ */}
                 {isEditing ? (
                     <EditForm/>
                 ) : (
@@ -866,7 +827,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
                 <hr className="my-8 border-black"/>
 
-                {/* ⭐ SEKCJA KOMENTARZY I SORTOWANIA ⭐ */}
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-2xl font-bold text-gray-800">Komentarze ({comments.length})</h2>
 
@@ -892,13 +852,10 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                         ) : (
                             sortedComments.map(comment => {
                                 const commentDate = parseDateArray(comment.createdAt);
-                                // const isCommentAuthor = user && user.nickname === comment.userId; // Sprawdzenie autora komentarza
 
                                 return (
                                     <div key={comment.id}
                                          className="bg-gray-50 p-4 rounded border border-gray-200 relative">
-
-                                        {/* Ikony edycji/usuwania komentarzy (jeśli są zaimplementowane) */}
 
                                         <div className="flex justify-between items-start text-sm mb-1">
                                             <div className="flex items-center space-x-2">
@@ -915,42 +872,8 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                                         </div>
                                         <p className="text-gray-700 whitespace-pre-wrap">{comment.content}</p>
 
-                                        {/*<div className="flex items-center space-x-4 mt-3">*/}
-
-                                        {/*    <button*/}
-                                        {/*        className={`p-1 rounded transition-colors ${*/}
-                                        {/*            !user ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'*/}
-                                        {/*        } ${*/}
-                                        {/*            commentUserVote[comment.id] === 'upvote'*/}
-                                        {/*                ? 'text-white bg-blue-600 hover:bg-blue-700'*/}
-                                        {/*                : 'text-gray-600 bg-gray-200'*/}
-                                        {/*        }`}*/}
-                                        {/*        onClick={() => handleCommentVote(comment.id, 'upvote')}*/}
-                                        {/*    >*/}
-                                        {/*        <FaThumbsUp/>*/}
-                                        {/*    </button>*/}
-
-                                        {/*    <span className="font-bold text-gray-800">*/}
-                                        {/*         {commentVotes[comment.id] ?? 0}*/}
-                                        {/*    </span>*/}
-
-                                        {/*    <button*/}
-                                        {/*        className={`p-1 rounded transition-colors ${*/}
-                                        {/*            !user ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'*/}
-                                        {/*        } ${*/}
-                                        {/*            commentUserVote[comment.id] === 'downvote'*/}
-                                        {/*                ? 'text-white bg-red-600 hover:bg-red-700'*/}
-                                        {/*                : 'text-gray-600 bg-gray-200'*/}
-                                        {/*        }`}*/}
-                                        {/*        onClick={() => handleCommentVote(comment.id, 'downvote')}*/}
-                                        {/*    >*/}
-                                        {/*        <FaThumbsDown/>*/}
-                                        {/*    </button>*/}
-
-                                        {/*</div>*/}
                                         <div className="flex items-center space-x-4 mt-3">
 
-                                            {/* UPVOTE */}
                                             <button
                                                 className={`p-1 rounded transition-colors ${
                                                     !user ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
@@ -965,10 +888,9 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                                             </button>
 
                                             <span className="font-bold text-gray-800">
-        {commentVotes[comment.id] ?? 0}
-    </span>
+                                                 {commentVotes[comment.id] ?? 0}
+                                            </span>
 
-                                            {/* DOWNVOTE */}
                                             <button
                                                 className={`p-1 rounded transition-colors ${
                                                     !user ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
