@@ -1,5 +1,5 @@
 import {keepPreviousData, useQuery, useQueryClient} from "@tanstack/react-query";
-import {getComponentsApi} from "../api/getComponentsApi.ts";
+import {getComponentsApi} from "../AdminComponents/api/getComponentsApi.ts";
 import {useEffect} from "react";
 import type { ComponentTypeEnum } from "../../../types/BaseItemDto.ts";
 

@@ -1,5 +1,5 @@
 import {useFetchOffers} from "../../../shared/useFetchOffers.ts";
-import OffersTable from "../components/OffersTable.tsx";
+import OffersTable from "../../offers/Admin/components/OffersTable.tsx";
 import ReactPaginate from "react-paginate";
 import {RightArrow} from "../../../assets/icons/rightArrow.tsx";
 import {LeftArrow} from "../../../assets/icons/leftArrow.tsx";

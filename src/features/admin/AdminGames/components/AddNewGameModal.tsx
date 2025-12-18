@@ -17,7 +17,7 @@ import {
     type GpuRecDto,
     RecGameLevel,
     recLevels
-} from "../../types/GameReqCompDto.ts";
+} from "../../../games/dto/GameReqCompDto.ts";
 import {createNewGameReqCompApi} from "../api/createNewGameReqCompApi.ts";
 import {modalSx} from "../../../../types/modalStyle.ts";
 import Alert from "@mui/material/Alert";

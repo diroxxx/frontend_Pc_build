@@ -4,7 +4,7 @@ import {
     type GpuRecDto,
     RecGameLevel,
     recLevels
-} from "../../types/GameReqCompDto.ts";
+} from "../../../games/dto/GameReqCompDto.ts";
 import React, {useEffect, useState} from "react";
 import {showToast} from "../../../../lib/ToastContainer.tsx";
 import Modal from "@mui/material/Modal";

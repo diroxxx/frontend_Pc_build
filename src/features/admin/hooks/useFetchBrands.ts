@@ -1,4 +1,4 @@
-import { getBrandsApi } from "../api/getComponentsBrandsApi";
+import { getBrandsApi } from "../../pcParts/api/getComponentsBrandsApi.ts";
 import { useQuery } from "@tanstack/react-query";
 export const useFetchBrands = () => {
     return useQuery({

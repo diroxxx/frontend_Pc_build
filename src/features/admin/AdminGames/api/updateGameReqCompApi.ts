@@ -1,5 +1,5 @@
 import customAxios from "../../../../lib/customAxios.tsx";
-import type {GameReqCompDto} from "../../types/GameReqCompDto.ts";
+import type {GameReqCompDto} from "../../../games/dto/GameReqCompDto.ts";
 
 export const updateGameReqCompApi = async (dto:GameReqCompDto, file:File | null) => {
 

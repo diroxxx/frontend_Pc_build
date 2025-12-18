@@ -3,12 +3,12 @@ import { useAtom } from 'jotai';
 import { fetchShopsAtom, shopsAtom } from '../atoms/shopAtom.tsx';
 import { showToast } from "../../../lib/ToastContainer.tsx";
 import {useOfferUpdates} from "../hooks/useOffersUpdates.ts";
-import OffersUpdatesView from "../components/OffersUpdatesView.tsx";
+import OffersUpdatesView from "./components/OffersUpdatesView.tsx";
 import {LoadingSpinner} from "../../../assets/components/ui/LoadingSpinner.tsx";
-import ComponentsStatsPanel from "../components/ComponentsStatsPanel.tsx";
+import ComponentsStatsPanel from "./components/ComponentsStatsPanel.tsx";
 import { putOfferUpdateConfig } from './api/putOfferUpdateConfig.ts';
-import type {OfferUpdateConfigDto, OfferUpdateType} from "../types/OfferUpdateConfigDto.ts";
-import {IntervalsMap} from "../types/intervalsMap.ts";
+import type {OfferUpdateConfigDto, OfferUpdateType} from "./dto/OfferUpdateConfigDto.ts";
+import {IntervalsMap} from "./dto/intervalsMap.ts";
 import {useGetLastUpdateType} from "./hooks/useGetLastUpdateType.ts";
 
 interface Shop {

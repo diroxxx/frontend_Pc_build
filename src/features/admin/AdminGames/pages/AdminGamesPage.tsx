@@ -6,7 +6,7 @@ import {AddNewGameModal} from "../components/AddNewGameModal.tsx";
 import {useAllGpus} from "../hooks/useAllGpus.ts";
 import {useAllCpus} from "../hooks/useAllCpus.ts";
 import {EditGameModal} from "../components/EditGameModal.tsx";
-import type {GameReqCompDto} from "../../types/GameReqCompDto.ts";
+import type {GameReqCompDto} from "../../../games/dto/GameReqCompDto.ts";
 
 function AdminGamesPage() {
 

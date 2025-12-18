@@ -1,4 +1,4 @@
-import {type GameReqCompDto, RecGameLevel} from "../../types/GameReqCompDto.ts";
+import {type GameReqCompDto, RecGameLevel} from "../../../games/dto/GameReqCompDto.ts";
 import {RemoveIcon} from "../../../../assets/icons/removeIcon.tsx";
 import {EditIcon} from "lucide-react";
 import {showToast} from "../../../../lib/ToastContainer.tsx";

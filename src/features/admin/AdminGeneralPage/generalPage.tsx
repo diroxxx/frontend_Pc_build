@@ -1,8 +1,8 @@
 import {useEffect} from "react";
 import {useFetchOffersSpecs} from "../../../atomContext/componentAtom.tsx";
 import {useOffersCount} from "../../../hooks/useOffersCount.ts";
-import OfferUpdateChart from "../components/OfferUpdateChart.tsx";
-import ShopOffersShareChart from "../components/ShopOffersShareChart.tsx";
+import OfferUpdateChart from "../offersUpdates/components/OfferUpdateChart.tsx";
+import ShopOffersShareChart from "../offersUpdates/components/ShopOffersShareChart.tsx";
 import {useAllUsers} from "../UsersManage/useAllUsers.ts";
 import {useComponentsAmount} from "./hooks/useComponentsAmount.ts";
 

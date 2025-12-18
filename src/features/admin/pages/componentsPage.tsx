@@ -1,6 +1,6 @@
 
 import {useState} from "react";
-import Components from "../components/ComponentsList.tsx";
+import Components from "../AdminComponents/components/ComponentsList.tsx";
 import {useFetchComponents} from "../hooks/useFetchComponents.ts";
 import ReactPaginate from "react-paginate";
 import {type ComponentItem, ComponentTypeEnum} from "../../../types/BaseItemDto.ts";
@@ -8,12 +8,12 @@ import { useFetchBrands } from "../hooks/useFetchBrands.ts";
 import {LeftArrow} from "../../../assets/icons/leftArrow.tsx";
 import {RightArrow} from "../../../assets/icons/rightArrow.tsx";
 import {PlusIcon, Search} from "lucide-react";
-import AddComponentForm from "../components/AddComponentForm.tsx";
+import AddComponentForm from "../AdminComponents/components/AddComponentForm.tsx";
 
-import ImportCsvButton from "../components/ImportCsvButton";
-import {saveComponentApi} from "../api/saveComponentApi.ts";
+import ImportCsvButton from "../AdminComponents/components/ImportCsvButton.tsx";
+import {saveComponentApi} from "../AdminComponents/api/saveComponentApi.ts";
 import {showToast} from "../../../lib/ToastContainer.tsx";
-import DownloadCsvTemplateButton from "../components/DownloadCsvTemplateButton.tsx";
+import DownloadCsvTemplateButton from "../AdminComponents/components/DownloadCsvTemplateButton.tsx";
 
 const ComponentsPage = () => {
     const [searchTerm, setSearchTerm] = useState('');

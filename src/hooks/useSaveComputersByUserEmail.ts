@@ -1,6 +1,6 @@
 import type {ComputerDto} from "../types/ComputerDto.ts";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {saveComputerByUserEmail} from "../features/user/computers/api/saveComputerByUserEmail.ts";
+import {saveComputerByUserEmail} from "../features/computers/user/api/saveComputerByUserEmail.ts";
 
 export const useSaveComputerByUserEmail = () => {
     const queryClient = useQueryClient();

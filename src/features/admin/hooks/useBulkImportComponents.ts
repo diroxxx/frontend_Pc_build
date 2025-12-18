@@ -1,11 +1,11 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {bulkImportComponents} from "../api/bulkImportComponents.ts";
+import {bulkImportComponentsApi} from "../AdminComponents/api/bulkImportComponentsApi.ts";
 import {showToast} from "../../../lib/ToastContainer.tsx";
 
 export function useBulkImportComponents() {
     const qc = useQueryClient();
     return useMutation({
-        mutationFn: bulkImportComponents,
+        mutationFn: bulkImportComponentsApi,
         onSuccess: async (result) => {
             showToast.success("Zaimportowano komponenty.");
             await qc.invalidateQueries({ queryKey: ["components"] });

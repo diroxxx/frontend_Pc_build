@@ -1,5 +1,5 @@
 import {useQuery} from "@tanstack/react-query";
-import {getComponentsStatsApi} from "../api/GetComponentsStatsApi.ts";
+import {getComponentsStatsApi} from "../AdminComponents/api/GetComponentsStatsApi.ts";
 
 export const useGetComponentsStats = () => {
     return useQuery({
