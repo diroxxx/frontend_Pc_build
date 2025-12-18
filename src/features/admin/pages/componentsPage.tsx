@@ -55,7 +55,7 @@ const ComponentsPage = () => {
  return (
         <div className="space-y-4">
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-midnight-dark">Komponenty PC</h2>
+                <h2 className="text-xl font-bold text-midnight-dark">Podzespoły PC</h2>
 
                 <div className="flex gap-2">
                     <button
@@ -169,11 +169,11 @@ const ComponentsPage = () => {
                             <ImportCsvButton 
                                 componentType={selectedType as ComponentTypeEnum}
                                 onImportSuccess={(count) => {
-                                    setImportMessage(`✓ Zaimportowano ${count} komponentów`);
+                                    setImportMessage(`+ Zaimportowano ${count} komponentów`);
                                     setTimeout(() => setImportMessage(null), 5000);
                                 }}
                                 onImportError={(err) => {
-                                    setImportMessage(`✗ ${err}`);
+                                    setImportMessage(`X ${err}`);
                                     setTimeout(() => setImportMessage(null), 5000);
                                 }}
                                 className={`w-full ${selectedType ? "" : "opacity-50 pointer-events-none"}`}
@@ -183,7 +183,7 @@ const ComponentsPage = () => {
 
                         {importMessage && (
                             <div className={`p-2 rounded-lg text-xs ${
-                                importMessage.startsWith('✓') 
+                                importMessage.startsWith('+') 
                                     ? 'bg-green-50 border border-green-200 text-green-700' 
                                     : 'bg-ocean-red/10 border border-ocean-red/30 text-ocean-red'
                             }`}>
