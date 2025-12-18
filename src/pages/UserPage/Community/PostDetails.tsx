@@ -247,6 +247,11 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     const [commentVotes, setCommentVotes] = useState<{ [key: number]: number }>({});
     const [commentUserVote, setCommentUserVote] = useState<{ [key: number]: "upvote" | "downvote" | null }>({});
 
+    const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+    const [editCommentText, setEditCommentText] = useState("");
+    const [commentToDeleteId, setCommentToDeleteId] = useState<number | null>(null);
+    const [deleteCommentLoading, setDeleteCommentLoading] = useState(false);
+
     const [user] = useAtom(userAtom);
     // const isAuthor = user && post.user && user.nickname === post.user.username;
     const isAuthor = user && (
@@ -444,6 +449,93 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         });
 
         return sortedComments;
+    };
+
+
+    // --- OBSŁUGA EDYCJI KOMENTARZA ---
+    const startEditingComment = (commentId: number, currentContent: string) => {
+        setEditingCommentId(commentId);
+        setEditCommentText(currentContent);
+    };
+
+    const cancelEditingComment = () => {
+        setEditingCommentId(null);
+        setEditCommentText("");
+    };
+
+    const saveEditedComment = async (commentId: number) => {
+        if (!editCommentText.trim()) {
+            setToastMessage({ message: "Komentarz nie może być pusty.", type: 'error' });
+            return;
+        }
+
+        try {
+            await customAxios.put(`/community/comments/${commentId}`, {
+                content: editCommentText
+            });
+
+            // Aktualizuj lokalnie listę komentarzy
+            setComments(prev => prev.map(c =>
+                c.id === commentId ? { ...c, content: editCommentText } : c
+            ));
+
+            setEditingCommentId(null);
+            setToastMessage({ message: "Komentarz zaktualizowany!", type: 'success' });
+        } catch (error) {
+            console.error("Błąd edycji komentarza:", error);
+            setToastMessage({ message: "Nie udało się edytować komentarza.", type: 'error' });
+        }
+    };
+
+    // --- OBSŁUGA USUWANIA KOMENTARZA ---
+    const confirmDeleteComment = async () => {
+        if (!commentToDeleteId) return;
+        setDeleteCommentLoading(true);
+
+        try {
+            await customAxios.delete(`/community/comments/${commentToDeleteId}`);
+
+            // Usuń lokalnie z listy
+            setComments(prev => prev.filter(c => c.id !== commentToDeleteId));
+
+            setToastMessage({ message: "Komentarz usunięty.", type: 'success' });
+            setCommentToDeleteId(null);
+        } catch (error) {
+            console.error("Błąd usuwania komentarza:", error);
+            setToastMessage({ message: "Nie udało się usunąć komentarza.", type: 'error' });
+        } finally {
+            setDeleteCommentLoading(false);
+        }
+    };
+
+    const DeleteCommentModal = () => {
+        if (!commentToDeleteId) return null;
+
+        return (
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 relative">
+                    <h3 className="text-xl font-bold mb-4 text-gray-800">Usunąć komentarz?</h3>
+                    <p className="text-gray-600 mb-6">Tej operacji nie można cofnąć.</p>
+
+                    <div className="flex justify-end space-x-3">
+                        <button
+                            onClick={() => setCommentToDeleteId(null)}
+                            className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+                            disabled={deleteCommentLoading}
+                        >
+                            Anuluj
+                        </button>
+                        <button
+                            onClick={confirmDeleteComment}
+                            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                            disabled={deleteCommentLoading}
+                        >
+                            {deleteCommentLoading ? "Usuwanie..." : "Usuń"}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     const handleUpdateContent = async (updatedContent: string) => {
@@ -853,56 +945,113 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                             sortedComments.map(comment => {
                                 const commentDate = parseDateArray(comment.createdAt);
 
+
+                                const isNameMatch = user?.nickname && comment.username && user.nickname === comment.username;
+                                const isCommentAuthor = user &&  isNameMatch;
+
+                                const canEdit = isCommentAuthor;
+                                const canDelete = isCommentAuthor;
+
                                 return (
                                     <div key={comment.id}
-                                         className="bg-gray-50 p-4 rounded border border-gray-200 relative">
+                                         className="bg-gray-50 p-4 rounded border border-gray-200 relative group">
 
-                                        <div className="flex justify-between items-start text-sm mb-1">
+                                        <div className="flex justify-between items-start text-sm mb-2 pr-16">
                                             <div className="flex items-center space-x-2">
                                                 <FaUserCircle className="w-4 h-4 text-gray-500"/>
                                                 <span className="font-bold text-gray-800">{comment.username}</span>
                                             </div>
-
-                                            <div className="text-right text-gray-500 text-xs">
-                                                <span className="block">{formatDate(commentDate)}</span>
-                                                <span className="block font-medium text-gray-600">
-                                                    ({timeAgo(commentDate)})
-                                                </span>
-                                            </div>
                                         </div>
-                                        <p className="text-gray-700 whitespace-pre-wrap">{comment.content}</p>
 
-                                        <div className="flex items-center space-x-4 mt-3">
+                                        {!editingCommentId && (canEdit || canDelete) && (
+                                            <div className="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                {canEdit && (
+                                                    <button
+                                                        onClick={() => startEditingComment(comment.id, comment.content)}
+                                                        className="p-1.5 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition"
+                                                        title="Edytuj komentarz"
+                                                    >
+                                                        <FaEdit className="w-3 h-3"/>
+                                                    </button>
+                                                )}
+                                                {canDelete && (
+                                                    <button
+                                                        onClick={() => setCommentToDeleteId(comment.id)}
+                                                        className="p-1.5 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition"
+                                                        title="Usuń komentarz"
+                                                    >
+                                                        <FaTimes className="w-3 h-3"/>
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )}
 
-                                            <button
-                                                className={`p-1 rounded transition-colors ${
-                                                    !user ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
-                                                } ${
-                                                    commentUserVote[comment.id] === "upvote"
-                                                        ? "text-white bg-blue-600 hover:bg-blue-700"
-                                                        : "text-gray-600 bg-gray-200"
-                                                }`}
-                                                onClick={() => handleCommentVote(comment.id, "upvote")}
-                                            >
-                                                <FaThumbsUp/>
-                                            </button>
+                                        {/* TREŚĆ */}
+                                        {editingCommentId === comment.id ? (
+                                            <div className="mt-2">
+                                        <textarea
+                                             value={editCommentText}
+                                            onChange={(e) => setEditCommentText(e.target.value)}
+                                            className="w-full p-2 border border-blue-300 rounded focus:ring-1 focus:ring-blue-500 text-sm"
+                                            rows={3}
+                                        />
+                                                <div className="flex justify-end space-x-2 mt-2">
+                                                    <button
+                                                        onClick={cancelEditingComment}
+                                                        className="text-xs px-3 py-1 bg-gray-300 rounded hover:bg-gray-400 text-gray-800"
+                                                    >
+                                                        Anuluj
+                                                    </button>
+                                                    <button
+                                                        onClick={() => saveEditedComment(comment.id)}
+                                                        className="text-xs px-3 py-1 bg-blue-600 rounded hover:bg-blue-700 text-white"
+                                                    >
+                                                        Zapisz
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <p className="text-gray-700 whitespace-pre-wrap">{comment.content}</p>
+                                        )}
 
-                                            <span className="font-bold text-gray-800">
-                                                 {commentVotes[comment.id] ?? 0}
-                                            </span>
+                                        <div className="flex justify-between items-end mt-3">
 
-                                            <button
-                                                className={`p-1 rounded transition-colors ${
-                                                    !user ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
-                                                } ${
-                                                    commentUserVote[comment.id] === "downvote"
-                                                        ? "text-white bg-red-600 hover:bg-red-700"
-                                                        : "text-gray-600 bg-gray-200"
-                                                }`}
-                                                onClick={() => handleCommentVote(comment.id, "downvote")}
-                                            >
-                                                <FaThumbsDown/>
-                                            </button>
+                                            <div className="flex items-center space-x-4">
+                                                <button
+                                                    className={`p-1 rounded transition-colors ${
+                                                        !user ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
+                                                    } ${
+                                                        commentUserVote[comment.id] === "upvote"
+                                                            ? "text-white bg-blue-600 hover:bg-blue-700"
+                                                            : "text-gray-600 bg-gray-200"
+                                                    }`}
+                                                    onClick={() => handleCommentVote(comment.id, "upvote")}
+                                                >
+                                                    <FaThumbsUp/>
+                                                </button>
+
+                                                <span className="font-bold text-gray-800">
+                                                    {commentVotes[comment.id] ?? 0}
+                                                </span>
+
+                                                <button
+                                                    className={`p-1 rounded transition-colors ${
+                                                        !user ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
+                                                    } ${
+                                                        commentUserVote[comment.id] === "downvote"
+                                                            ? "text-white bg-red-600 hover:bg-red-700"
+                                                            : "text-gray-600 bg-gray-200"
+                                                    }`}
+                                                    onClick={() => handleCommentVote(comment.id, "downvote")}
+                                                >
+                                                    <FaThumbsDown/>
+                                                </button>
+                                            </div>
+
+                                            <div className="text-right text-gray-400 text-xs">
+                                                <span className="mr-2">{formatDate(commentDate)}</span>
+                                                <span className="font-medium">({timeAgo(commentDate)})</span>
+                                            </div>
 
                                         </div>
                                     </div>
@@ -918,7 +1067,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                     />
                 </div>
             </div>
-
+            <DeleteCommentModal />
             <DeleteConfirmationModal/>
             <ToastNotification/>
         </div>
