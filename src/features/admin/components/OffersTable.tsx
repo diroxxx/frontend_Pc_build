@@ -2,14 +2,16 @@ import OfferComponent from "./OfferComponent.tsx";
 import type {ComponentOffer} from "../../../types/OfferBase.ts";
 import {type FC, useState} from "react";
 import OfferEditCard from "./OfferEditCard.tsx";
+import {LoadingSpinner} from "../../../assets/components/ui/LoadingSpinner.tsx";
 
 interface OffersTableProps {
     offers: ComponentOffer[];
     isFetching: boolean;
     isLoading: boolean;
+    isError: boolean;
 }
 
-const OffersTable: FC<OffersTableProps> = ({ offers, isFetching, isLoading }) => {
+const OffersTable: FC<OffersTableProps> = ({ offers, isFetching, isLoading, isError }) => {
     const [selectedOffer, setSelectedOffer] = useState<ComponentOffer | null>(null);
     const [isEditCardOpen, setIsEditCardOpen] = useState(false);
 
@@ -23,11 +25,34 @@ const OffersTable: FC<OffersTableProps> = ({ offers, isFetching, isLoading }) =>
         setIsEditCardOpen(false);
     };
 
+    if (isLoading) {
+        return (
+            <div className="rounded-lg shadow-sm border border-gray-200 overflow-hidden relative">
+                <div className="flex min-h-[60vh] items-center justify-center p-6">
+                    <LoadingSpinner />
+                </div>
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <div className="rounded-lg shadow-sm border border-gray-200 overflow-hidden relative">
+                <div className="flex min-h-[60vh] items-center justify-center">
+                    <p className="p-4 text-ocean-red">Błąd podczas pobierania danych.</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="rounded-lg shadow-sm border border-gray-200 overflow-hidden relative">
-            {isFetching && isLoading && (
+
+            {isFetching && (
                 <div className="absolute top-2 right-2">
-                    <div className="w-4 h-4 border-2 border-t-transparent border-ocean-dark-blue rounded-full animate-spin"></div>
+                    <div className="w-4 h-4 border-2 border-t-transparent border-ocean-dark-blue rounded-full animate-spin">
+                        <LoadingSpinner />
+                    </div>
                 </div>
             )}
 

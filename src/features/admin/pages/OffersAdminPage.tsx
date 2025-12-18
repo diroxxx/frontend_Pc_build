@@ -3,7 +3,6 @@ import OffersTable from "../components/OffersTable.tsx";
 import ReactPaginate from "react-paginate";
 import {RightArrow} from "../../../assets/icons/rightArrow.tsx";
 import {LeftArrow} from "../../../assets/icons/leftArrow.tsx";
-import {LoadingSpinner} from "../../../assets/components/ui/LoadingSpinner.tsx";
 import {useAtom, useAtomValue} from "jotai";
 import {offerPageAtom} from "../../../shared/atoms/OfferPageAtom.ts";
 import {offerLeftPanelFiltersAtom} from "../../../shared/atoms/OfferLeftPanelFiltersAtom.ts";
@@ -13,24 +12,9 @@ import {OffersSideFilters} from "../../../shared/components/OffersSideFilters.ts
 const OffersAdminPage = () => {
     const [page, setPage] = useAtom(offerPageAtom);
     const filters = useAtomValue(offerLeftPanelFiltersAtom);
-    const { data, isLoading, error, isFetching } = useFetchOffers(page, filters);
+    const { data, isLoading, isError, isFetching} = useFetchOffers(page, filters);
     const offers = data?.offers ?? [];
 
-    if (isLoading) {
-        return (
-            <div className="flex min-h-[60vh] items-center justify-center">
-                <LoadingSpinner />
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="flex min-h-[60vh] items-center justify-center">
-                <p className="p-4 text-ocean-red">Błąd podczas pobierania danych.</p>
-            </div>
-        );
-    }
 
     return (
         <div className="flex flex-row gap-6 p-4">
@@ -46,6 +30,7 @@ const OffersAdminPage = () => {
                     offers={offers}
                     isFetching={isFetching}
                     isLoading={isLoading}
+                    isError={isError}
                 />
 
                 <div className="flex justify-center py-2">
