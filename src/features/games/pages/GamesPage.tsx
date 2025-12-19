@@ -3,18 +3,24 @@ import GameCard from "../components/GameCard.tsx";
 import { useGetAllGamesApi } from "../hooks/useAllGames.ts";
 import type { GameDto } from "../dto/GameDto.ts";
 import { Cpu, Gpu, Search } from "lucide-react";
-import { useFpsComponents } from "../hooks/useFpsComponents.ts";
+import { useFpsComponents } from "../../../shared/hooks/useFpsComponents.ts";
 import type { GameFpsConfigDto } from "../dto/GameFpsConfigDto.ts";
 import { resolutionList, graphicsPresetList, technologyList } from "../dto/GameFpsConfigDto.ts";
 import { useReccommendedVideo } from "../hooks/useReccommendedVideo.ts";
 import {LoadingSpinner} from "../../../assets/components/ui/LoadingSpinner.tsx";
 import {useCpuGpuGame} from "../hooks/useCpuGpuGame.ts";
 import OfferCardFlex from "../../offers/guest/components/OfferCardFlex.tsx";
+import {useCpus} from "../../../shared/hooks/useCpus.ts";
+import {useGpuModels} from "../../../shared/hooks/useGpuModels.ts";
 
 const GamesPage = () => {
     const { data: games, isLoading, isError } = useGetAllGamesApi();
     const [selectedGame, setSelectedGame] = useState<GameDto | null>(null);
-    const { data: fpsComponentsData } = useFpsComponents();
+    // const { data: fpsComponentsData } = useFpsComponents();
+
+    const {data:cpus} = useCpus();
+    const {data:gpuModels} = useGpuModels()
+
     const [gameFpsConfig, setGameFpsConfig] = useState<GameFpsConfigDto>({
         cpu: "",
         gpu: "",
@@ -25,8 +31,8 @@ const GamesPage = () => {
         budget: 0
     });    
     
-    const processorTypes = fpsComponentsData?.cpusModels || [];
-    const gpuTypes = fpsComponentsData?.gpusModels || [];
+    const processorTypes = cpus || [];
+    const gpuTypes = gpuModels || [];
 
 const isConfigComplete = (config: GameFpsConfigDto | null): config is GameFpsConfigDto => {
     return config !== null && 

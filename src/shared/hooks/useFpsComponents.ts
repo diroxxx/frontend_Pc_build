@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import type { GameFpsComponentsDto } from "../dto/GameFpsComponentsDto.ts"
+import type { GameFpsComponentsDto } from "../../features/games/dto/GameFpsComponentsDto.ts"
 import { getAllFpsComponentsApi } from "../api/getAllFpsComponentsApi.ts"
 
 export const useFpsComponents = () => {
