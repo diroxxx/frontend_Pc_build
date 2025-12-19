@@ -2,6 +2,6 @@ import customAxios from "../../../../lib/customAxios.tsx"
 
 export const putOfferUpdateConfig = async (interval: string) => {
 
-    const result = await customAxios.put(`/admin/update/automatic?interval=${interval}`);
+    const result = await customAxios.put(`/api/offersUpdates/automatic?interval=${interval}`);
     return result.data;
 } 

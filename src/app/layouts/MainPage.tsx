@@ -9,8 +9,7 @@ function MainPage() {
     const partnerStores = [
         { name: "Allegro", logo: "/allegro.png", website: "https://allegro.pl" },
         { name: "Allegro Lokalnie", logo: "/Allegro-Lokalnie.png", website: "https://allegrolokalnie.pl" },
-        { name: "OLX", logo: "/olx.png", website: "https://olx.pl" },
-        { name: "X-kom", logo: "/x-kom.png", website: "https://x-kom.pl" },
+        { name: "OLX", logo: "/olx.png", website: "https://olx.pl" }
     ];
 
     return (

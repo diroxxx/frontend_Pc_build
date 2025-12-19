@@ -9,6 +9,6 @@ export const postComponentsCsvFile = async (
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await customAxios.post(`/admin/import/components?${params.toString()}`, formData);
+    const response = await customAxios.post(`/api/components/import?${params.toString()}`, formData);
     return response.data;
 }
