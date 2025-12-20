@@ -10,6 +10,8 @@ export const useFetchComponents = (page: number, filters?: {itemType?: Component
         queryKey: ["components", page, filters],
         queryFn: () => getComponentsApi(page, filters),
         placeholderData: keepPreviousData,
+        // keepPreviousData: true,
+
     });
 
     useEffect(() => {

@@ -1,18 +1,20 @@
-import {useFetchComponents} from "../hooks/useFetchComponents.ts";
 import {Component} from "./component.tsx";
-// import type {ComponentItem} from "../../../types/BaseItemDto.ts";
-import { ComponentTypeEnum } from "../../../../shared/dtos/BaseItemDto.ts";
+import {type ComponentItem, ComponentTypeEnum} from "../../../../shared/dtos/BaseItemDto.ts";
 import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.tsx";
+
 
 interface ComponentsProps {
     page: number;
     filters: { itemType: ComponentTypeEnum | undefined; brand: string; searchTerm: string };
+    data?: { items: ComponentItem[]; totalPages?: number };
+    isLoading?: boolean;
+    isFetching?: boolean;
+    isPlaceholderData?: boolean;
+    error?: unknown;
 }
 
-const Components = ({ page, filters }: ComponentsProps) => {
-    const { data, isLoading, error, isFetching, isPlaceholderData } = useFetchComponents(page, filters);
-
-     if (isLoading) {
+const Components = ({data, isLoading, isFetching, isPlaceholderData, error }: ComponentsProps) => {
+    if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
                 <div className="text-center">
@@ -22,7 +24,7 @@ const Components = ({ page, filters }: ComponentsProps) => {
             </div>
         );
     }
-    
+
     if (isFetching && isPlaceholderData) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
@@ -33,7 +35,7 @@ const Components = ({ page, filters }: ComponentsProps) => {
             </div>
         );
     }
-    
+
     if (error) return <p className="p-4 text-ocean-red">Błąd podczas pobierania danych.</p>;
 
     const components = data?.items ?? [];

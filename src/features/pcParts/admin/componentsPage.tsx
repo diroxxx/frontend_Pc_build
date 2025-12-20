@@ -7,7 +7,7 @@ import {type ComponentItem, ComponentTypeEnum} from "../../../shared/dtos/BaseIt
 import { useFetchBrands } from "../../../shared/hooks/useFetchBrands.ts";
 import {LeftArrow} from "../../../assets/icons/leftArrow.tsx";
 import {RightArrow} from "../../../assets/icons/rightArrow.tsx";
-import {PlusIcon, Search} from "lucide-react";
+import {PlusIcon} from "lucide-react";
 import AddComponentForm from "./components/AddComponentForm.tsx";
 
 import ImportCsvButton from "./components/ImportCsvButton.tsx";
@@ -16,13 +16,15 @@ import {showToast} from "../../../lib/ToastContainer.tsx";
 import DownloadCsvTemplateButton from "./components/DownloadCsvTemplateButton.tsx";
 
 const ComponentsPage = () => {
-    const [searchTerm, setSearchTerm] = useState('');
     const { data: brandsData, isLoading: isLoadingBrands } = useFetchBrands();
     const brands = brandsData || [];
     const [page, setPage] = useState<number>(0);
     const [filters, setFilters] = useState<{ itemType: ComponentTypeEnum | undefined; brand: string; searchTerm: string }>({ itemType: undefined, brand: "", searchTerm: "" });
+    const [tmpFilters, setTmpFilters] = useState<{ itemType: ComponentTypeEnum | undefined; brand: string; searchTerm: string }>({ itemType: undefined, brand: "", searchTerm: "" });
+
+
     const componentsTypeList = Object.values(ComponentTypeEnum);
-    const {data} = useFetchComponents(page, filters);
+    const {data: components,isLoading:loadingComponents, isFetching:fetchingComponents,error:errorComponents,isPlaceholderData:placeHolderComponents} = useFetchComponents(page, filters);
     const [showForm, setShowForm] = useState(false);
     const [selectedType, setSelectedType] = useState<ComponentTypeEnum | "">("");
     const [importMessage, setImportMessage] = useState<string | null>(null);
@@ -37,20 +39,12 @@ const ComponentsPage = () => {
 
     const removeFilter = () => {
         setFilters({ itemType: undefined, brand: "", searchTerm: "" });
-        setSearchTerm('');
+        setTmpFilters({ itemType: undefined, brand: "", searchTerm: "" });
     }
 
-    const handleSearchFiltrAdd = () => {
-        setFilters((prev) => ({ ...prev, searchTerm: searchTerm }));
+    const refetchComponents = () => {
+        setFilters(tmpFilters);
     }
-
-    const [isClicked, setIsClicked] = useState(false);
-
-    const handleSearchClick = () => {
-        handleSearchFiltrAdd();
-        setIsClicked(true);
-        setTimeout(() => setIsClicked(false), 200);
-    };
 
  return (
         <div className="space-y-4">
@@ -83,25 +77,17 @@ const ComponentsPage = () => {
                             <input
                                 type="text"
                                 placeholder="Szukaj..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") handleSearchFiltrAdd();
-                                }}
+                                value={tmpFilters.searchTerm }
+                                onChange={(e) => setTmpFilters(prev => ({...prev, searchTerm: e.target.value}))}
+
                                 className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-ocean-blue"
-                            />
-                            <Search
-                                onClick={handleSearchClick}
-                                className={`absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 cursor-pointer transition-all duration-200 ${
-                                    isClicked ? "text-ocean-blue scale-90" : "text-gray-400 hover:text-ocean-dark-blue hover:scale-110"
-                                }`}
                             />
                         </div>
 
                         <select
                             value={filters.itemType}
                             onChange={(e) =>
-                                setFilters((prev) => ({
+                                setTmpFilters((prev) => ({
                                     ...prev,
                                     itemType: e.target.value as ComponentTypeEnum | undefined,
                                 }))
@@ -118,7 +104,7 @@ const ComponentsPage = () => {
 
                         <select
                             value={filters.brand}
-                            onChange={(e) => setFilters((prev) => ({ ...prev, brand: e.target.value }))}
+                            onChange={(e) => setTmpFilters((prev) => ({ ...prev, brand: e.target.value }))}
                             className="border border-gray-300 rounded px-3 py-1.5 text-sm min-w-[150px]"
                             disabled={isLoadingBrands}
                         >
@@ -135,8 +121,15 @@ const ComponentsPage = () => {
                     
                     <div className="flex justify-end">
                         <button
+                            onClick={refetchComponents}
+                            className="px-4 mr-1.5 py-1.5 bg-text-ocean-blue text-white rounded hover:bg-ocean-blue/80 text-sm font-medium transition-colors cursor-pointer "
+                        >
+                            Szukaj komponentów
+                        </button>
+
+                        <button
                             onClick={removeFilter}
-                            className="px-4 py-1.5 bg-ocean-dark-blue text-white rounded hover:bg-ocean-blue text-sm font-medium transition-colors"
+                            className="px-4 py-1.5 bg-text-ocean-red text-white rounded hover:bg-text-ocean-red/80 text-sm font-medium transition-colors cursor-pointer"
                         >
                             Wyczyść filtry
                         </button>
@@ -194,16 +187,23 @@ const ComponentsPage = () => {
                 </div>
             </div>
 
-            <Components page={page} filters={filters} />
-            
+            <Components
+                page={page}
+                filters={filters}
+                data={components}
+                isLoading={loadingComponents}
+                error={errorComponents}
+                isFetching={fetchingComponents}
+                isPlaceholderData={placeHolderComponents}
+            />
             <ReactPaginate
                 breakLabel="..."
                 nextLabel={<RightArrow/>}
                 previousLabel={<LeftArrow/>}
-                onPageChange={(e) => setPage(e.selected + 1)}
+                onPageChange={(e) => setPage(e.selected + 0)}
                 pageRangeDisplayed={3}
                 marginPagesDisplayed={1}
-                pageCount={data?.totalPages ?? 1}
+                pageCount={components?.totalPages ?? 1}
                 containerClassName="flex justify-center gap-1 py-4"
                 pageClassName=""
                 pageLinkClassName="px-3 py-1 block rounded bg-gray-100 cursor-pointer"

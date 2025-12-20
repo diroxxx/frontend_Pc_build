@@ -38,7 +38,7 @@ const OffersAdminPage = () => {
                         breakLabel="..."
                         nextLabel={<RightArrow />}
                         previousLabel={<LeftArrow />}
-                        onPageChange={(e) => setPage(e.selected + 1)}
+                        onPageChange={(e) => setPage(e.selected)}
                         pageRangeDisplayed={3}
                         marginPagesDisplayed={1}
                         pageCount={data?.totalPages ?? 1}
