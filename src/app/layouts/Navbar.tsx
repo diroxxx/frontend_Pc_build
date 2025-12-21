@@ -158,7 +158,7 @@ return (
                                         : "text-white hover:bg-ocean-light-blue hover:bg-opacity-25 hover:shadow-md hover:backdrop-blur-sm"
                                 }`}
                             >
-                                Sprawdz gry
+                                Sprawdź gry
                             </button>
                         </div>
                     </nav>
