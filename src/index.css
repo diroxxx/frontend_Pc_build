@@ -3,28 +3,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Source+Code+Pro:wght@300;400;500;600&display=swap');
 
+
 @import "tailwindcss";
 
-
-/* dla tailwind */
 @theme {
   --color-ocean-red: #e63946;
   --color-ocean-light-blue: #A8DADC;
   --color-ocean-blue: #457B9D;
   --color-ocean-dark-blue: #1D3557;
   --color-ocean-white: #F1FAEE;
-
   --color-midnight-dark: #30343f;
-  
-  /* text color */
+
   --color-text-ocean-red: #e63946;
   --color-text-ocean-blue: #457B9D;
   --color-text-ocean-white: #F1FAEE;
-    --color-text-midnight-dark: #30343f;
-
-
-
-    /* testowe */
+  --color-text-midnight-dark: #30343f;
 
   --color-text-green-v1: #84a98c;
       /* gradient */
@@ -49,10 +42,8 @@
   --background-image-gradient-ocean-dark: linear-gradient(90deg, #457B9D 0%, #1D3557 100%);
   --background-image-gradient-ocean-dark-hover: linear-gradient(90deg, #5288ab 0%, #2a4467 100%);
 
-
 }
  /* css */
-
 
  @keyframes wave {
   0%, 100% {

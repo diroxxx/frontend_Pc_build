@@ -138,7 +138,6 @@ function OffersUserPage() {
                         nextLinkClassName="px-3 py-1 block rounded hover:bg-gray-200 cursor-pointer"
                         onClick={scrollToTop}
                     />
-
                 </div>
             </div>
         </div>

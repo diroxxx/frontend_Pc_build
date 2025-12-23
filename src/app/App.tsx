@@ -16,6 +16,7 @@ import {queryClient} from "./store/queryClient.ts";
 import {QueryClientProvider} from "@tanstack/react-query";
 import GamesPage from "../features/games/pages/GamesPage.tsx";
 import {AuthRedirect} from "../components/auth/AuthRedirect.tsx";
+import Unauthorized from "./router/Unauthorized.tsx";
 
 function App() {
     return (
@@ -73,7 +74,7 @@ function App() {
                                 </RoleProtectedRoute>
                             }
                         />
-
+                        <Route path="/unauthorized" element={<Unauthorized />} />
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                 </ToastProvider>

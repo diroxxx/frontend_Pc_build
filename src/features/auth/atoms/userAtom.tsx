@@ -3,12 +3,6 @@ import { atomWithStorage } from 'jotai/utils';
 import { jwtDecode } from 'jwt-decode';
 import {setAuthToken} from '../hooks/Auth.tsx';
 
-export interface User {
-    // id: number;
-  email: string;
-  role: string;
-  nickname: string;
-}
 
 export interface CustomJwtPayload {
   sub: string;
@@ -17,7 +11,16 @@ export interface CustomJwtPayload {
   exp: number;
 }
 
+export interface User {
+    email: string;
+    role: string;
+    nickname: string;
+}
+
 export const userAtom = atomWithStorage<User | null>('user', null);
+
+
+
 
 export const loginUserAtom = atom(
   null,

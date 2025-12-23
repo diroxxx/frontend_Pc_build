@@ -10,6 +10,17 @@ const customAxios = axios.create({
     headers: { "Content-Type": "application/json" },
     withCredentials: true, 
 });
+
+customAxios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+    const token = getAuthToken();
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+
+
 type AxiosRequestWithRetry = InternalAxiosRequestConfig & { _retry?: boolean };
 
 interface ApiErrorResponse {
@@ -17,7 +28,6 @@ interface ApiErrorResponse {
     error?: string;
     status?: number;
 }
-
 customAxios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     if (config.data instanceof FormData) {
         if (config.headers) {
@@ -34,14 +44,6 @@ customAxios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 });
 
 
-
-customAxios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-    const token = getAuthToken();
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
 
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
@@ -114,7 +116,6 @@ customAxios.interceptors.response.use(
             return Promise.reject(error);
         }
 
-        // === 500 SERVER ERROR ===
         if (error.response?.status === 500) {
             const axiosError = error as AxiosError<ApiErrorResponse>;
             const msg = axiosError.response?.data?.message || "Wystąpił błąd po stronie serwera.";

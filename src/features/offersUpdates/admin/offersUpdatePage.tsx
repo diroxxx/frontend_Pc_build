@@ -70,6 +70,7 @@ const OffersComponent = () => {
     const { data: updates, isLoading, error, handleManualFetchOffers } = useOfferUpdates();
     const {data: lastOferUpdateType} = useGetLastUpdateType();
     const lastType = lastOferUpdateType || "MANUAL";
+
     useEffect(() => {
         fetchShops();
     }, [fetchShops]);

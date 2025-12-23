@@ -9,12 +9,11 @@ export const useFetchOffers = (page: number,
                                filters?: OfferFiltersType) => {
     const queryClient = useQueryClient();
 
-
     const query = useQuery<OfferResponse>({
         queryKey: ["offers", page, filters],
         queryFn: () => getAllOffers(page,filters),
         placeholderData: keepPreviousData,
-        staleTime: 60_000
+        staleTime: 5 * 60_000
     });
     
     useEffect(() => {
@@ -24,8 +23,7 @@ export const useFetchOffers = (page: number,
                 queryFn: () => getAllOffers(page + 1, filters),
             });
         }
-    },[filters, page, query.data?.hasMore, queryClient, JSON.stringify(filters)])
+    },[filters, page, query.data?.hasMore, queryClient])
 
     return query;
 }
-
