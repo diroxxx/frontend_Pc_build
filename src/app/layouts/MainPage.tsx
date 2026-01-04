@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import SidePanelBuilds from "../../features/computers/components/SidePanelBuilds.tsx";
 import { usePrefetchComputers } from "../../features/computers/user/hooks/usePrefetchComputers.ts";
-import {useComponentsPcStats} from "../../shared/hooks/useComponentsPcStats.ts";
 import CompoenentsPcStats from "../../shared/components/CompoenentsPcStats.tsx";
 
 function MainPage() {
@@ -13,7 +12,6 @@ function MainPage() {
         { name: "Allegro Lokalnie", logo: "/Allegro-Lokalnie.png", website: "https://allegrolokalnie.pl" },
         { name: "OLX", logo: "/olx.png", website: "https://olx.pl" }
     ];
-
 
     return (
         <div className="min-h-screen bg-ocean-white">
@@ -32,7 +30,7 @@ function MainPage() {
 
                             <p className="text-xl text-gray-700 mb-10 max-w-xl">
                                 Oferty aktualizowane co chwilę.
-                                Konfigurator, społeczność, testy w grach
+                                Konfigurator, społeczność, rekomendacja podzespołów na podstawie gier komputerowych.
                             </p>
 
                             <div className="flex flex-col sm:flex-row gap-5">
@@ -53,19 +51,11 @@ function MainPage() {
                         </div>
 
                         <div className="order-1 md:order-2">
-                            <div className="relative">
-                                <img
-                                    src="/pc_photo_mainPage.png"
-                                    alt="Składanie peceta"
-                                    className="relative z-10 rounded-2xl shadow-2xl border-8 border-white"
-                                />
-                            </div>
+                            <CompoenentsPcStats />
                         </div>
                     </div>
                 </div>
             </div>
-
-            <CompoenentsPcStats/>
 
             <div className="bg-ocean-dark-blue py-20">
                 <div className="min-h-96 flex flex-col items-center justify-center px-6">
@@ -94,8 +84,8 @@ function MainPage() {
                                     />
                                 </div>
                                 <span className="mt-4 text-ocean-light-blue font-medium group-hover:text-white transition-colors">
-            {store.name}
-          </span>
+                                    {store.name}
+                                </span>
                             </a>
                         ))}
                     </div>
