@@ -15,7 +15,7 @@ export default function CompoenentsPcStats() {
     const items = (data ?? []) as ComponentsAmountPcDto[];
 
     return (
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 ">
             <div className="px-6 md:px-12 lg:px-20 max-w-5xl mx-auto">
 
                 <h2 className="text-3xl font-bold text-ocean-dark-blue mb-8 text-center">
