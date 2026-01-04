@@ -1,9 +1,9 @@
 import { useComponentsPcStats } from "../hooks/useComponentsPcStats";
 import type { ComponentsAmountPcDto } from "../dtos/ComponentsAmountPcDto";
+import {ComponentTypeEnum, PolishComponentTypeEnum} from "../dtos/BaseItemDto.ts";
 
 export default function CompoenentsPcStats() {
     const { data, isLoading, isError } = useComponentsPcStats();
-
     if (isLoading) {
         return <div className="py-8 text-center text-gray-600">Ładowanie statystyk…</div>;
     }
@@ -14,20 +14,17 @@ export default function CompoenentsPcStats() {
 
     const items = (data ?? []) as ComponentsAmountPcDto[];
 
-    if (items.length === 0) {
-        return <div className="py-8 text-center text-gray-600">Brak danych do wyświetlenia</div>;
-    }
-
     return (
         <section className="py-16 bg-gray-50">
             <div className="px-6 md:px-12 lg:px-20 max-w-5xl mx-auto">
 
                 <h2 className="text-3xl font-bold text-ocean-dark-blue mb-8 text-center">
-                    Najpopularniejsze podzespoły
+                   Najpopularniejsze komponenty PC:
                 </h2>
 
                 <div className="bg-white rounded-xl shadow-md p-6">
                     <ul className="space-y-4">
+
                         {items.map((component) => (
                             <li
                                 key={component.componentType}
@@ -35,7 +32,9 @@ export default function CompoenentsPcStats() {
                             >
                                 <div className="flex-1">
                                     <div className="text-sm text-gray-500 mb-1">
-                                        {component.componentType}
+                                        {PolishComponentTypeEnum[
+                                            component.componentType as ComponentTypeEnum
+                                            ] ?? component.componentType}
                                     </div>
                                     <div className="font-semibold text-ocean-dark-blue">
                                         {component.model}

@@ -10,6 +10,17 @@ export enum ComponentTypeEnum {
     CASE_PC = "CASE_PC",
     CPU_COOLER = "CPU_COOLER",
 }
+
+export const PolishComponentTypeEnum: Record<ComponentTypeEnum, string> = {
+    [ComponentTypeEnum.PROCESSOR]: "Procesor",
+    [ComponentTypeEnum.GRAPHICS_CARD]: "Karta graficzna",
+    [ComponentTypeEnum.MEMORY]: "Pamięć RAM",
+    [ComponentTypeEnum.MOTHERBOARD]: "Płyta główna",
+    [ComponentTypeEnum.POWER_SUPPLY]: "Zasilacz",
+    [ComponentTypeEnum.STORAGE]: "Dysk",
+    [ComponentTypeEnum.CASE_PC]: "Obudowa",
+    [ComponentTypeEnum.CPU_COOLER]: "Chłodzenie CPU",
+};
 export interface NewComponentRow {
     componentType: ComponentTypeEnum;
     brand: string;
