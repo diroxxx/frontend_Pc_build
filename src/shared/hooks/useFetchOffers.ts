@@ -13,7 +13,6 @@ export const useFetchOffers = (page: number,
         queryKey: ["offers", page, filters],
         queryFn: () => getAllOffers(page,filters),
         placeholderData: keepPreviousData,
-        staleTime: 5 * 60_000
     });
     
     useEffect(() => {

@@ -10,7 +10,7 @@ import {guestComputersAtom} from "../atoms/guestComputersAtom.ts";
 export default function SidePanelBuilds() {
     const [hovered, setHovered] = useState(false);
     const [user] = useAtom(userAtom);
-    const { data: fetchedComputers = [], isLoading } = useFetchComputersByEmail(user?.email);
+    const { data: fetchedComputers = []} = useFetchComputersByEmail(user?.email);
     const [selectedComputer, setSelectedComputer] = useAtom(selectedComputerAtom);
     const [guestcomputers,] = useAtom(guestComputersAtom);
 

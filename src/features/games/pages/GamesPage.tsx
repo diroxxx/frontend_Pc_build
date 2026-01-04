@@ -3,7 +3,6 @@ import GameCard from "../components/GameCard.tsx";
 import { useGetAllGamesApi } from "../hooks/useAllGames.ts";
 import type { GameDto } from "../dto/GameDto.ts";
 import { Cpu, Gpu, Search } from "lucide-react";
-import { useFpsComponents } from "../../../shared/hooks/useFpsComponents.ts";
 import type { GameFpsConfigDto } from "../dto/GameFpsConfigDto.ts";
 import { resolutionList, graphicsPresetList, technologyList } from "../dto/GameFpsConfigDto.ts";
 import { useReccommendedVideo } from "../hooks/useReccommendedVideo.ts";
@@ -12,11 +11,13 @@ import {useCpuGpuGame} from "../hooks/useCpuGpuGame.ts";
 import OfferCardFlex from "../../offers/guest/components/OfferCardFlex.tsx";
 import {useCpus} from "../../../shared/hooks/useCpus.ts";
 import {useGpuModels} from "../../../shared/hooks/useGpuModels.ts";
+import {useAtom} from "jotai/index";
+import {selectedComputerAtom} from "../../computers/atoms/computerAtom.tsx";
 
 const GamesPage = () => {
     const { data: games, isLoading, isError } = useGetAllGamesApi();
     const [selectedGame, setSelectedGame] = useState<GameDto | null>(null);
-    // const { data: fpsComponentsData } = useFpsComponents();
+    const [selectedComputer] = useAtom(selectedComputerAtom);
 
     const {data:cpus} = useCpus();
     const {data:gpuModels} = useGpuModels()
@@ -45,7 +46,7 @@ const {data: recommendedVideoData, refetch, isError:videoError,isLoading:videoLo
 
 const {data: recOffersGame, refetch: refetchRecGame, isFetching: isFetchingRec, isLoading: isLoadingRec } = useCpuGpuGame(gameFpsConfig.gameTitle, gameFpsConfig.budget)
 
-
+// const compareModels = (modelInComp: )
 
     if (isError) {
         return (

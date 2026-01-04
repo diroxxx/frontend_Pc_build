@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import SidePanelBuilds from "../../features/computers/components/SidePanelBuilds.tsx";
 import { usePrefetchComputers } from "../../features/computers/user/hooks/usePrefetchComputers.ts";
+import {useComponentsPcStats} from "../../shared/hooks/useComponentsPcStats.ts";
+import CompoenentsPcStats from "../../shared/components/CompoenentsPcStats.tsx";
 
 function MainPage() {
     const navigate = useNavigate();
@@ -12,6 +14,7 @@ function MainPage() {
         { name: "OLX", logo: "/olx.png", website: "https://olx.pl" }
     ];
 
+
     return (
         <div className="min-h-screen bg-ocean-white">
             <SidePanelBuilds />
@@ -22,14 +25,14 @@ function MainPage() {
                         <div className="order-2 md:order-1">
 
                             <h1 className="text-5xl md:text-6xl font-black text-ocean-dark-blue leading-tight mb-8">
-                                Składasz peceta?
+                                Składasz komputer?
                                 <br />
                                 <span className="text-ocean-blue">Masz tu wszystko.</span>
                             </h1>
 
                             <p className="text-xl text-gray-700 mb-10 max-w-xl">
                                 Oferty aktualizowane co chwilę.
-                                Konfigurator, społeczność, testy w grach.s
+                                Konfigurator, społeczność, testy w grach
                             </p>
 
                             <div className="flex flex-col sm:flex-row gap-5">
@@ -61,6 +64,8 @@ function MainPage() {
                     </div>
                 </div>
             </div>
+
+            <CompoenentsPcStats/>
 
             <div className="bg-ocean-dark-blue py-20">
                 <div className="min-h-96 flex flex-col items-center justify-center px-6">
