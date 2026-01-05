@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useAtom } from 'jotai';
-import { userAtom } from '../auth/atoms/userAtom.tsx'; // Upewnij się, że ścieżka jest poprawna
-import customAxios from '../../lib/customAxios.tsx'; // Upewnij się, że ścieżka jest poprawna
+import { userAtom } from '../auth/atoms/userAtom.tsx';
+import customAxios from '../../lib/customAxios.tsx';
 
 interface AddCommentFormProps {
     postId: number;
-    onCommentAdded: () => void; // Callback do odświeżenia listy komentarzy po dodaniu
+    onCommentAdded: () => void;
 }
 
 const AddCommentForm: React.FC<AddCommentFormProps> = ({ postId, onCommentAdded }) => {
@@ -34,16 +34,12 @@ const AddCommentForm: React.FC<AddCommentFormProps> = ({ postId, onCommentAdded 
 
         const newCommentData = {
             content: commentContent,
-            // ID użytkownika i posta są przekazywane przez kontekst Security/PathVariable
         };
 
         try {
-            // Wysłanie żądania POST do Twojego endpointu
             await customAxios.post(`community/posts/${postId}/comments`, newCommentData);
 
-            setCommentContent(''); // Wyczyść pole po sukcesie
-
-            // Wywołaj callback, aby PostDetails odświeżył listę komentarzy
+            setCommentContent('');
             onCommentAdded();
 
         } catch (err: any) {

@@ -10,8 +10,8 @@ interface Post {
 
 interface EditPostContentFormProps {
     initialPost: Post;
-    onSuccess: () => void; // Wywoływany po pomyślnym zapisie, aby odświeżyć listę
-    onCancel: () => void; // Wywoływany po anulowaniu
+    onSuccess: () => void;
+    onCancel: () => void;
 }
 
 const EditPostContentForm: React.FC<EditPostContentFormProps> = ({ initialPost, onSuccess, onCancel }) => {
@@ -31,17 +31,15 @@ const EditPostContentForm: React.FC<EditPostContentFormProps> = ({ initialPost, 
 
         setLoading(true);
 
-        // ⭐ DTO WYCHODZĄCE: Aktualizujemy TYLKO treść ⭐
         const updatedData = {
             content: content,
         };
 
         try {
-            // ⭐ WYŚLIJ ŻĄDANIE PUT DO ENDPOINTU EDYCJI ⭐
             await customAxios.put(`community/posts/${initialPost.id}`, updatedData);
 
             alert(`Post "${initialPost.title}" został zaktualizowany!`);
-            onSuccess(); // Zamknij formularz i odśwież listę
+            onSuccess();
 
         } catch (err: any) {
             const errorMessage = err.response?.data?.message
@@ -74,7 +72,6 @@ const EditPostContentForm: React.FC<EditPostContentFormProps> = ({ initialPost, 
                 <h2 className="text-2xl font-bold mb-4">Edytuj Treść Posta: {initialPost.title}</h2>
 
                 <form onSubmit={handleSubmit}>
-                    {/* Pole Treści */}
                     <div>
                         <label htmlFor="content"
                                className="block text-sm font-medium text-gray-700 mb-1">Treść:</label>

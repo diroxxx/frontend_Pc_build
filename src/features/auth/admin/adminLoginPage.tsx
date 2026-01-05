@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {setAuthToken} from "../hooks/Auth.tsx";
 import { useAtom} from 'jotai';
 import { loginAdminAtom} from '../atoms/userAtom.tsx';
-import { LoadingSpinner } from '../../../assets/components/ui/LoadingSpinner.tsx';
 import { AuthRedirect } from '../../../components/auth/AuthRedirect.tsx';
 
 const AdminLoginPage = () => {
@@ -48,9 +47,7 @@ const AdminLoginPage = () => {
     return (
 
         <AuthRedirect 
-            requiredRole="ADMIN"
             redirectTo="/admin/controlPanel"
-            forbiddenRedirectTo="/login"
         >
             <div className="min-h-screen bg-ocean-white font-sans">
              <div className="bg-ocean-dark-blue text-white py-12 mb-8">

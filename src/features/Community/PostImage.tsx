@@ -2,23 +2,21 @@ import React, { useState } from 'react';
 import customAxios from "../../lib/customAxios.tsx";
 import { FaFileUpload } from 'react-icons/fa';
 
-// --- INTERFEJSY ---
 interface PostImageDTO {
     id: number;
-    imageUrl: string; // URL do pobrania zdjęcia z backendu (np. /api/forum/posts/image/{id})
+    imageUrl: string;
     filename: string;
     mimeType: string;
 }
 
 interface PostImageUploaderProps {
     postId: number;
-    initialImages: PostImageDTO[]; // Aktualnie załadowane zdjęcia (stan z PostDetails)
-    MAX_IMAGES?: number; // Opcjonalny limit (domyślnie 5)
-    onUploadSuccess: (newImages: PostImageDTO[]) => void; // Callback po udanym przesłaniu
+    initialImages: PostImageDTO[];
+    MAX_IMAGES?: number;
+    onUploadSuccess: (newImages: PostImageDTO[]) => void;
 
 }
 
-// --- KOMPONENT ---
 const PostImage: React.FC<PostImageUploaderProps> = ({
                                                                  postId,
                                                                  initialImages,
@@ -26,7 +24,6 @@ const PostImage: React.FC<PostImageUploaderProps> = ({
                                                                  onUploadSuccess
                                                              }) => {
 
-    // Stany wewnętrzne do zarządzania procesem ładowania
     const [filesToUpload, setFilesToUpload] = useState<File[]>([]);
     const [uploadingImages, setUploadingImages] = useState(false);
     const [imageUploadError, setImageUploadError] = useState<string | null>(null);
@@ -35,7 +32,6 @@ const PostImage: React.FC<PostImageUploaderProps> = ({
     const filesToUploadCount = filesToUpload.length;
     const canUploadMore = currentImageCount < MAX_IMAGES;
 
-    // 1. Obsługa wyboru plików i walidacja limitu
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
             const newFiles = Array.from(event.target.files);
@@ -51,7 +47,6 @@ const PostImage: React.FC<PostImageUploaderProps> = ({
         }
     };
 
-    // 2. Obsługa przesyłania plików do Spring Boot
     const handleImageUpload = async () => {
         if (filesToUpload.length === 0) {
             setImageUploadError("Wybierz pliki do przesłania.");
@@ -92,12 +87,10 @@ const PostImage: React.FC<PostImageUploaderProps> = ({
 
         if (!hasError) {
             setFilesToUpload([]);
-            // Wywołanie callbacka, aby poinformować komponent nadrzędny o sukcesie
             onUploadSuccess(successfulUploads);
         }
     };
 
-    // Usuwanie pliku z listy przed przesłaniem
     const handleRemoveFile = (fileName: string) => {
         setFilesToUpload(filesToUpload.filter(file => file.name !== fileName));
     };
@@ -109,7 +102,6 @@ const PostImage: React.FC<PostImageUploaderProps> = ({
                 <FaFileUpload className="mr-2 text-blue-600" /> Dodaj zdjęcia ({currentImageCount}/{MAX_IMAGES})
             </h3>
 
-            {/* --- WYŚWIETLANIE ISTNIEJĄCYCH ZDJĘĆ --- */}
             {currentImageCount > 0 && (
                 <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {initialImages.map((img) => (
@@ -119,13 +111,11 @@ const PostImage: React.FC<PostImageUploaderProps> = ({
                                 alt={img.filename}
                                 className="w-full h-24 object-cover"
                             />
-                            {/* Opcjonalnie: Przycisk podglądu lub usuwania */}
                         </div>
                     ))}
                 </div>
             )}
 
-            {/* --- FORMULARZ ŁADOWANIA --- */}
             {!canUploadMore ? (
                 <p className="text-orange-600 font-medium">Osiągnięto limit {MAX_IMAGES} zdjęć dla tego postu.</p>
             ) : (

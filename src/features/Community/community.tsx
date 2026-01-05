@@ -15,8 +15,6 @@ import PaginatedList from "./PaginatedPosts.tsx";
 import { parseDateArray, formatDate, timeAgo } from "./PostTime.tsx";
 import { getCategoryColor } from "./categoryUtils.tsx";
 
-// --- INTERFEJSY ---
-
 interface User {
     id: number;
     username: string;
@@ -186,8 +184,6 @@ const PostListItem: React.FC<PostListItemProps> = ({ post, onClick, currentUser 
     );
 };
 
-// --- GŁÓWNY KOMPONENT ---
-
 const Community: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]);
     const [selectedPost, setSelectedPost] = useState<Post | null>(null);
@@ -208,7 +204,6 @@ const Community: React.FC = () => {
     const [formLoading, setFormLoading] = useState(true);
     const [postStatus, setPostStatus] = useState<string | null>(null);
 
-    // --- POBIERANIE DANYCH ---
     const fetchPosts = async () => {
         try {
             let endpoint = 'community/';
@@ -239,7 +234,6 @@ const Community: React.FC = () => {
         fetchCategories();
     }, [selectedFilterCategoryId]);
 
-    // --- OBSŁUGA PLIKÓW ---
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const filesArray = Array.from(e.target.files);
@@ -251,7 +245,6 @@ const Community: React.FC = () => {
         setSelectedFiles(prev => prev.filter((_, index) => index !== indexToRemove));
     };
 
-    // --- GŁÓWNA FUNKCJA WYSYŁANIA
     const handleCreatePostSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -329,7 +322,6 @@ const Community: React.FC = () => {
         return <PostDetails post={selectedPost} onBack={handleBackToList} />;
     }
 
-    // --- WIDOK FORMULARZA ---
     if (isCreatingPost) {
         if (!isAuthenticated) return <div className="p-6 text-center text-red-600">Zaloguj się!</div>;
         if (formLoading) return <div className="p-6 text-center">Ładowanie formularza...</div>;

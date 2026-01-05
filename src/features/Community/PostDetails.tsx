@@ -452,7 +452,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     };
 
 
-    // --- OBSŁUGA EDYCJI KOMENTARZA ---
     const startEditingComment = (commentId: number, currentContent: string) => {
         setEditingCommentId(commentId);
         setEditCommentText(currentContent);
@@ -474,7 +473,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                 content: editCommentText
             });
 
-            // Aktualizuj lokalnie listę komentarzy
             setComments(prev => prev.map(c =>
                 c.id === commentId ? { ...c, content: editCommentText } : c
             ));
@@ -487,7 +485,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         }
     };
 
-    // --- OBSŁUGA USUWANIA KOMENTARZA ---
     const confirmDeleteComment = async () => {
         if (!commentToDeleteId) return;
         setDeleteCommentLoading(true);
@@ -495,7 +492,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         try {
             await customAxios.delete(`/community/comments/${commentToDeleteId}`);
 
-            // Usuń lokalnie z listy
             setComments(prev => prev.filter(c => c.id !== commentToDeleteId));
 
             setToastMessage({ message: "Komentarz usunięty.", type: 'success' });
@@ -986,7 +982,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                                             </div>
                                         )}
 
-                                        {/* TREŚĆ */}
                                         {editingCommentId === comment.id ? (
                                             <div className="mt-2">
                                         <textarea
