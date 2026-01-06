@@ -96,6 +96,8 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
             maxPrize: tempFilters.maxPrize ?? 99999,
         };
         setOfferLeftPanelFilters(sanitized);
+        sessionStorage.removeItem('compatibilityFilter');
+
     }, [setPage, setOfferLeftPanelFilters, tempFilters]);
 
     const clearFilters = useCallback(() => {
@@ -112,6 +114,7 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
         };
         setOfferLeftPanelFilters(empty);
         setTempFilters(empty);
+        sessionStorage.removeItem('compatibilityFilter');
     }, [setPage, setOfferLeftPanelFilters]);
 
     return (

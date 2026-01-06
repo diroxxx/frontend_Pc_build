@@ -14,6 +14,7 @@ import { OffersSideFilters} from "../../../../shared/components/OffersSideFilter
 import {offerLeftPanelFiltersAtom} from "../../../../shared/atoms/OfferLeftPanelFiltersAtom.ts";
 import {OfferSearchFilters} from "../../../../shared/components/OfferSearchFilters.tsx";
 import {offerPageAtom} from "../../../../shared/atoms/OfferPageAtom.ts";
+import { useCompatibleOffers } from "../../../../shared/hooks/useComatibleOffers.ts";
 
 function OffersUserPage() {
 
@@ -31,8 +32,9 @@ function OffersUserPage() {
     }, []);
 
     const {data: offersData, isLoading: isLoadingOffers, error,isError, isFetching, isRefetching} = useFetchOffers(page, offerLeftPanelFilters);
-    const offers = offersData?.offers ?? [];
-
+    const compatibleOffers = useCompatibleOffers(offersData?.offers);
+    
+    const offers = compatibleOffers ?? [];
     const [viewMode, setViewMode] = useAtom(viewModeAtom);
 
     useEffect(() => {

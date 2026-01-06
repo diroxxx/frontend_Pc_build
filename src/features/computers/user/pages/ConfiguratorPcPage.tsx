@@ -13,6 +13,8 @@ import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.ts
 import {guestComputersAtom} from "../../atoms/guestComputersAtom.ts";
 import { Info } from "lucide-react";
 import {selectedCategoryAtom} from "../../atoms/selectedCategoryAtom.ts";
+import { offerLeftPanelFiltersAtom } from '../../../../shared/atoms/OfferLeftPanelFiltersAtom.ts';
+import { SortByOffersEnum } from '../../../../shared/dtos/SortByOffersEnum.ts';
 
 export default function ConfiguratorPcPage() {
     const navigate = useNavigate();
@@ -33,6 +35,8 @@ export default function ConfiguratorPcPage() {
     const [guestcomputers, setGuestComputers] = useAtom(guestComputersAtom);
     const { data: fetchedComputers = [], isLoading } = useFetchComputersByEmail(user?.email);
     const [selectedComputer, setSelectedComputer] = useAtom(selectedComputerAtom);
+    const [offerLeftPanelFilters, setOfferLeftPanelFilters] = useAtom(offerLeftPanelFiltersAtom);
+    
 
     useEffect(() => {
         if (!selectedComputer || fetchedComputers.length === 0) return;
@@ -43,10 +47,92 @@ export default function ConfiguratorPcPage() {
     }, [fetchedComputers, selectedComputer, setSelectedComputer]);
 
 
-    const handleAddComponent = (category: ComponentTypeEnum) => {
-        setSelectedCategory(category);
-        navigate(`/offers?category=${category}`);
+const handleAddComponent = (category: ComponentTypeEnum) => {
+    setSelectedCategory(category);
+    
+    // Podstawowe filtry (bez query)
+    const newFilters: any = {
+        componentType: category,
+        brand: "",
+        minPrize: 0,
+        maxPrize: 99999,
+        itemCondition: undefined,
+        shopName: "",
+        query: undefined,
+        sortBy: offerLeftPanelFilters.sortBy || SortByOffersEnum.NEWEST
     };
+
+    // Zapisz dane kompatybilności w session/local storage lub w osobnym atomie
+    if (selectedComputer?.offers) {
+        const processor = selectedComputer.offers.find(o => o.componentType === ComponentTypeEnum.PROCESSOR);
+        const motherboard = selectedComputer.offers.find(o => o.componentType === ComponentTypeEnum.MOTHERBOARD);
+        const graphicsCard = selectedComputer.offers.find(o => o.componentType === ComponentTypeEnum.GRAPHICS_CARD);
+
+        const compatibilityData: any = {};
+
+        switch (category) {
+            case ComponentTypeEnum.MOTHERBOARD:
+                if (processor && 'socketType' in processor) {
+                    compatibilityData.socketType = processor.socketType;
+                }
+                break;
+
+            case ComponentTypeEnum.CPU_COOLER:
+                if (processor && 'socketType' in processor) {
+                    compatibilityData.socketType = processor.socketType;
+                }
+                break;
+
+            case ComponentTypeEnum.MEMORY:
+                if (motherboard && 'memoryType' in motherboard) {
+                    compatibilityData.memoryType = motherboard.memoryType;
+                }
+                break;
+
+            case ComponentTypeEnum.PROCESSOR:
+                if (motherboard && 'socketType' in motherboard) {
+                    compatibilityData.socketType = motherboard.socketType;
+                }
+                break;
+
+            case ComponentTypeEnum.CASE_PC:
+                if (motherboard && 'format' in motherboard) {
+                    compatibilityData.format = motherboard.format;
+                }
+                break;
+
+            case ComponentTypeEnum.POWER_SUPPLY:
+                let totalPowerDraw = 0;
+                
+                if (processor && 'tdp' in processor) {
+                    totalPowerDraw += processor.tdp || 0;
+                }
+                
+                if (graphicsCard && 'powerDraw' in graphicsCard) {
+                    totalPowerDraw += graphicsCard.powerDraw || 0;
+                }
+                
+                if (totalPowerDraw > 0) {
+                    const recommendedPower = Math.ceil(totalPowerDraw * 1.3);
+                    compatibilityData.minPowerWatt = recommendedPower;
+                    newFilters.minPrize = recommendedPower;
+                }
+                break;
+        }
+
+        // Zapisz dane kompatybilności
+        if (Object.keys(compatibilityData).length > 0) {
+            sessionStorage.setItem('compatibilityFilter', JSON.stringify(compatibilityData));
+        } else {
+            sessionStorage.removeItem('compatibilityFilter');
+        }
+    } else {
+        sessionStorage.removeItem('compatibilityFilter');
+    }
+
+    setOfferLeftPanelFilters(newFilters);
+    navigate(`/offers?category=${category}`);
+};
 
     const handleSelectBuild = (id: number) => {
         const computer = fetchedComputers.find(c => c.id === id) || null;
