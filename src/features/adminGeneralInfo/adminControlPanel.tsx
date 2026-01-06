@@ -20,12 +20,15 @@ const AdminControlPanel = () => {
         const handleLogout = () => {
             try {
                 setAuthToken(null);
-                queryClient.clear();
                 setUser(null);
                 navigate("/admin/login");
+                setTimeout(() => {
+                queryClient.clear();
+                }, 100);
+                
         } catch (error) {
             console.error("Błąd podczas wylogowania:", error);
-                    showToast.error("Błąd podczas wylogowania");
+            showToast.error("Błąd podczas wylogowania");
         }
     };
     return (
