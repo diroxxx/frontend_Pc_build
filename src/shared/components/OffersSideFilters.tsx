@@ -200,7 +200,7 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
                         id="brand-select"
                         value={tempFilters.brand}
                         onChange={(e) => setTempFilters((prev) => ({ ...prev, brand: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                     >
                         <option value="">Wszyscy producenci</option>
                         {Array.isArray(brands) &&
@@ -225,7 +225,7 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
                                 itemCondition: e.target.value ? (e.target.value as ItemConditionEnum) : undefined,
                             }))
                         }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                     >
                         <option value="">Wszystkie stany</option>
                         {componentConditions.map((condition) => (
@@ -244,7 +244,7 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
                         id="shop-select"
                         value={tempFilters.shopName}
                         onChange={(e) => setTempFilters((prev) => ({ ...prev, shopName: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                     >
                         <option value="">Wszystkie sklepy</option>
                         {shopsNames.map((shop) => (
