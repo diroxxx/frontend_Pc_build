@@ -193,8 +193,8 @@ const OfferCardFlex = ({ offer } : Props) => {
                     
                     <span
                         className={`text-[10px] font-semibold px-1.5 py-0.5 rounded shadow-sm text-center
-                            ${offer.condition === "NEW" ? "bg-text-green-v1 text-ocean-dark-blue"
-                                : offer.condition === "USED" ? "bg-yellow-100 text-yellow-700"
+                            ${offer.condition === "NEW" ? "bg-teal-100 text-teal-800 "
+                                : offer.condition === "USED" ? "bg-amber-100 text-amber-800 "
                                     : "bg-ocean-red/20 text-ocean-red"}`}
                     >
                         {offer.condition === "NEW"
