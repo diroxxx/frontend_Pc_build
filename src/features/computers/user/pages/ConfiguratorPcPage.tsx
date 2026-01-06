@@ -177,7 +177,7 @@ const handleAddComponent = (category: ComponentTypeEnum) => {
 
 
     const handleCreateNewGuestBuild = () => {
-         const existingNumbers = fetchedComputers
+         const existingNumbers = guestcomputers
         .map(c => {
             const match = c.name.match(/Zestaw (\d+)$/);
             return match ? parseInt(match[1]) : 0;

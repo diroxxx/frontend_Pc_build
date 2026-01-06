@@ -14,6 +14,7 @@ import {
 import PaginatedList from "./PaginatedPosts.tsx";
 import { parseDateArray, formatDate, timeAgo } from "./PostTime.tsx";
 import { getCategoryColor } from "./categoryUtils.tsx";
+import { showToast } from "../../lib/ToastContainer.tsx";
 
 interface User {
     id: number;
@@ -87,7 +88,8 @@ const PostListItem: React.FC<PostListItemProps> = ({ post, onClick, currentUser 
         e.stopPropagation();
 
         if (!currentUser) {
-            alert("Musisz być zalogowany, aby głosować!");
+            // alert("Musisz być zalogowany, aby głosować!");
+            showToast.info("Zaloguj się, aby móc głosować na posty.");
             return;
         }
 
