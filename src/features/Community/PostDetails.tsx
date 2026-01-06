@@ -16,6 +16,7 @@ import {useAtom} from "jotai";
 import {userAtom} from "../auth/atoms/userAtom.tsx";
 import { Dialog } from "@mui/material";
 import {getCategoryColor} from "./categoryUtils.tsx";
+import { showToast } from '../../lib/ToastContainer.tsx';
 
 
 interface User {
@@ -38,6 +39,7 @@ interface Post {
     authorName?:string;
     createdAt: number[];
     category?: { id: number, name: string };
+    categoryName?: string;
 }
 
 interface PostCommentDTO {
@@ -119,7 +121,7 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
         setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
     };
 
-    if (loading) return <p className="text-blue-500 mt-4">Ładowanie zdjęć...</p>;
+    if (loading) return <p className="text-ocean-teal mt-4">Ładowanie zdjęć...</p>;
     if (error) return <p className="text-red-500 mt-4">{error}</p>;
     if (images.length === 0) return <p className="text-gray-500 mt-4 italic">Brak zdjęć do wyświetlenia.</p>;
 
@@ -140,13 +142,13 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
                     <>
                         <button
                             onClick={(e) => prevImage(e)}
-                            className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-black bg-opacity-40 text-white p-2 rounded-full hover:bg-opacity-60 transition"
+                            className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-ocean-dark-blue bg-opacity-40 text-white p-2 rounded-full hover:bg-opacity-60 transition"
                         >
                             <FaChevronLeft />
                         </button>
                         <button
                             onClick={(e) => nextImage(e)}
-                            className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-black bg-opacity-40 text-white p-2 rounded-full hover:bg-opacity-60 transition"
+                            className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-ocean-dark-blue bg-opacity-40 text-white p-2 rounded-full hover:bg-opacity-60 transition"
                         >
                             <FaChevronRight />
                         </button>
@@ -162,7 +164,7 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
                                 src={img.imageUrl}
                                 alt={img.filename}
                                 className={`w-20 aspect-square object-cover rounded cursor-pointer border-2 ${
-                                    index === currentIndex ? "border-blue-500" : "border-transparent"
+                                    index === currentIndex ? "border-ocean-blue" : "border-transparent"
                                 }`}
                                 onClick={() => setCurrentIndex(index)}
                                 onError={(e) => {
@@ -233,7 +235,8 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     const [loadingComments, setLoadingComments] = useState(true);
     const [commentsError, setCommentsError] = useState<string | null>(null);
     const creationDate = parseDateArray(post.createdAt);
-    const categoryName = post.category?.name || 'Ogólne';
+    // const categoryName = post.category?.name || 'Ogólne';
+    const categoryName = post.categoryName || post.category?.name || 'Ogólne';    
     const [netScore, setNetScore] = useState<number>(0);
     const [userVoteStatus, setUserVoteStatus] = useState<'upvote' | 'downvote' | null>(null);
     const [voteError, setVoteError] = useState<string | null>(null);
@@ -401,7 +404,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                     !user ? 'opacity-50 cursor-not-allowed' : ''
                 } ${
                     userVoteStatus === 'upvote'
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-ocean-blue text-white'
                         : `bg-gray-200 text-gray-700 ${user ? 'hover:bg-gray-300' : ''}`
                 }`}
                 onClick={() => handleVote('upvote')}
@@ -412,8 +415,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
             <span
                 className={`text-xl font-bold ${
-                    netScore > 0 ? 'text-gray-700' : netScore < 0 ? 'text-red-700' : 'text-gray-700'
-                }`}
+                netScore > 0 ? 'text-ocean-blue' : netScore < 0 ? 'text-ocean-red' : 'text-text-ocean-blue'                }`}
             >
                 {netScore}
             </span>
@@ -423,7 +425,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                     !user ? 'opacity-50 cursor-not-allowed' : ''
                 } ${
                     userVoteStatus === 'downvote'
-                        ? 'bg-red-600 text-white'
+                        ? 'bg-ocean-red text-white'
                         : `bg-gray-200 text-gray-700 ${user ? 'hover:bg-gray-300' : ''}`
                 }`}
                 onClick={() => handleVote('downvote')}
@@ -543,11 +545,13 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
             setCurrentContent(updatedContent);
             setIsEditing(false);
 
-            alert("Treść posta została zaktualizowana!");
+            // alert("Treść posta została zaktualizowana!");
+            showToast.success("Treść posta została zaktualizowana!");
 
         } catch (err: any) {
             console.error("Błąd aktualizacji posta:", err);
-            alert("Nie udało się zaktualizować treści posta. Sprawdź konsolę.");
+            // alert("Nie udało się zaktualizować treści posta. Sprawdź konsolę.");
+            showToast.error("Nie udało się zaktualizować treści posta.");
         }
     };
 
@@ -599,7 +603,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                         </button>
                         <button
                             type="submit"
-                            className="px-4 py-2 bg-blue-700-600 text-white rounded hover:bg-green-700 transition disabled:bg-gray-400"
+                            className="px-4 py-2 bg-ocean-teal text-white rounded hover:bg-teal-700 transition disabled:bg-gray-400"
                             disabled={loading || !content.trim()}
                         >
                             {loading ? 'Zapisywanie...' : 'Zapisz Zmiany'}
@@ -611,7 +615,8 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     };
     const handleInitiateDelete = () => {
         if (!isAuthor) {
-            alert("Brak uprawnień do usunięcia tego posta.");
+            // alert("Brak uprawnień do usunięcia tego posta.");
+            showToast.error("Brak uprawnień do usunięcia tego posta.");
             return;
         }
         setShowDeleteModal(true);
@@ -624,7 +629,8 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         try {
             await customAxios.delete(`/community/posts/delete/${post.id}`);
 
-            setToastMessage({ message: `Pomyślnie usunięto post`, type: 'success' });
+            // setToastMessage({ message: `Pomyślnie usunięto post`, type: 'success' });
+            showToast.success("Post został usunięty.");
 
             setShowDeleteModal(false);
             setTimeout(onBack, 1000);
@@ -634,7 +640,8 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
             const errorMessage = error.response?.data?.message || 'Wystąpił nieznany błąd podczas usuwania posta.';
 
 
-            setToastMessage({ message: `Nie udało się: ${errorMessage}`, type: 'error' });
+            // setToastMessage({ message: `Nie udało się: ${errorMessage}`, type: 'error' });
+            showToast.error(`Nie udało się usunąć posta: ${errorMessage}`);
 
             setShowDeleteModal(false);
         } finally {
@@ -707,10 +714,11 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
     const handleVote = async (voteType: 'upvote' | 'downvote') => {
         if (!user) {
-            setToastMessage({
-                message: "Musisz być zalogowany, aby oceniać posty.",
-                type: 'error'
-            });
+            // setToastMessage({
+            //     message: "Musisz być zalogowany, aby oceniać posty.",
+            //     type: 'error'
+            // });
+            showToast.info("Musisz być zalogowany, aby oceniać posty.");
             return;
         }
         setVoteError(null);
@@ -728,9 +736,11 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         } catch (err: any) {
             console.error("Błąd głosowania:", err);
             if (err.response?.status === 401) {
-                setToastMessage({ message: "Sesja wygasła. Zaloguj się ponownie.", type: 'error' });
+                // setToastMessage({ message: "Sesja wygasła. Zaloguj się ponownie.", type: 'error' });
+                showToast.error("Sesja wygasła. Zaloguj się ponownie.");
             } else {
-                setToastMessage({ message: "Wystąpił błąd podczas oddawania głosu.", type: 'error' });
+                // setToastMessage({ message: "Wystąpił błąd podczas oddawania głosu.", type: 'error' });
+                showToast.error("Wystąpił błąd podczas oddawania głosu.");
             }
         }
     };
@@ -738,10 +748,11 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
     const handleCommentVote = async (commentId: number, vote: "upvote" | "downvote") => {
         if (!user) {
-            setToastMessage({
-                message: "Musisz być zalogowany, aby oceniać komentarze.",
-                type: "error",
-            });
+            // setToastMessage({
+            //     message: "Musisz być zalogowany, aby oceniać komentarze.",
+            //     type: "error",
+            // });
+            showToast.info("Musisz być zalogowany, aby oceniać komentarze.");
             return;
         }
 
@@ -765,17 +776,19 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         } catch (err: any) {
 
             if (err.response?.status === 403) {
-                setToastMessage({
-                    message: "Nie możesz głosować na własny komentarz.",
-                    type: "error"
-                });
+                // setToastMessage({
+                //     message: "Nie możesz głosować na własny komentarz.",
+                //     type: "error"
+                // });
+                showToast.error("Nie możesz głosować na własny komentarz.");
                 return;
             }
 
-            setToastMessage({
-                message: "Wystąpił błąd podczas głosowania.",
-                type: "error"
-            });
+            // setToastMessage({
+            //     message: "Wystąpił błąd podczas głosowania.",
+            //     type: "error"
+            // });
+            showToast.error("Wystąpił błąd podczas głosowania.");
         }
     };
 
@@ -856,7 +869,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                                 <div className="h-6 w-px bg-gray-300 mx-2"></div>
                                 <button
                                     onClick={() => setIsEditing(true)}
-                                    className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition duration-150"
+                                    className="p-2 rounded-full bg-blue-100 text-ocean-blue hover:bg-ocean-blue-hover transition duration-150"
                                     title="Edytuj post"
                                 >
                                     <FaEdit className="w-4 h-4"/>
@@ -864,7 +877,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
                                 <button
                                     onClick={handleInitiateDelete}
-                                    className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition duration-150"
+                                    className="p-2 rounded-full bg-red-100 text-ocean-red hover:bg-ocean-red-hover transition duration-150"
                                     title="Usuń post"
                                 >
                                     <FaTimes className="w-4 h-4"/>
@@ -875,10 +888,10 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                 )}
 
                 <div className="flex items-center mb-2">
-                    <span className={`inline-block text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md ${getCategoryColor(post.category?.name)}`}>
+                    <span className={`inline-block text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-3 shadow-md ${getCategoryColor(post.categoryName)}`}>
                                         {categoryName}
                                     </span>
-                    <h1 className="text-4xl font-extrabold text-gray-900 leading-tight">
+                    <h1 className="text-4xl font-extrabold leading-tight">
                         {post.title}
                     </h1>
                 </div>
@@ -931,7 +944,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                 </div>
 
                 {loadingComments && (<p className="text-gray-500">Ładowanie komentarzy...</p>)}
-                {commentsError && (<p className="text-red-600 font-semibold">{commentsError}</p>)}
+                {commentsError && (<p className="text-ocean-red font-semibold">{commentsError}</p>)}
 
                 {!loadingComments && !commentsError && (
                     <div className="space-y-4">
@@ -964,7 +977,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                                                 {canEdit && (
                                                     <button
                                                         onClick={() => startEditingComment(comment.id, comment.content)}
-                                                        className="p-1.5 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition"
+                                                        className="p-1.5 rounded-full bg-blue-100 text-ocean-blue hover:bg-blue-200 transition"
                                                         title="Edytuj komentarz"
                                                     >
                                                         <FaEdit className="w-3 h-3"/>
@@ -973,7 +986,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                                                 {canDelete && (
                                                     <button
                                                         onClick={() => setCommentToDeleteId(comment.id)}
-                                                        className="p-1.5 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition"
+                                                        className="p-1.5 rounded-full bg-red-100 text-ocean-red hover:bg-red-200 transition"
                                                         title="Usuń komentarz"
                                                     >
                                                         <FaTimes className="w-3 h-3"/>
@@ -1013,11 +1026,11 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
                                             <div className="flex items-center space-x-4">
                                                 <button
-                                                    className={`p-1 rounded transition-colors ${
+                                                   className={`p-1 rounded transition-colors ${
                                                         !user ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
                                                     } ${
                                                         commentUserVote[comment.id] === "upvote"
-                                                            ? "text-white bg-blue-600 hover:bg-blue-700"
+                                                            ? "bg-ocean-blue text-white hover:bg-ocean-blue-hover"
                                                             : "text-gray-600 bg-gray-200"
                                                     }`}
                                                     onClick={() => handleCommentVote(comment.id, "upvote")}
@@ -1034,7 +1047,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
                                                         !user ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
                                                     } ${
                                                         commentUserVote[comment.id] === "downvote"
-                                                            ? "text-white bg-red-600 hover:bg-red-700"
+                                                            ? "bg-ocean-red text-white hover:bg-ocean-red-hover"
                                                             : "text-gray-600 bg-gray-200"
                                                     }`}
                                                     onClick={() => handleCommentVote(comment.id, "downvote")}

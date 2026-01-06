@@ -37,7 +37,7 @@ const PaginatedList = <T,>({ items, itemsPerPage = 5, renderItem }: PaginatedLis
                     {[...Array(totalPages)].map((_, idx) => (
                         <button
                             key={idx}
-                            className={`px-3 py-1 rounded ${currentPage === idx + 1 ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                            className={`px-3 py-1 rounded ${currentPage === idx + 1 ? 'bg-ocean-blue text-white' : 'bg-gray-200'}`}
                             onClick={() => goToPage(idx + 1)}
                         >
                             {idx + 1}

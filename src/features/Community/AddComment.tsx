@@ -76,12 +76,12 @@ const AddCommentForm: React.FC<AddCommentFormProps> = ({ postId, onCommentAdded 
             />
 
             {error && (
-                <p className="text-red-600 font-medium">{error}</p>
+                <p className="text-ocean-red font-medium">{error}</p>
             )}
 
             <button
                 type="submit"
-                className="px-6 py-2 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition disabled:bg-gray-400"
+                className="px-6 py-2 bg-ocean-blue text-white font-bold rounded hover:bg-ocean-blue-hover transition disabled:bg-gray-400 cursor-pointer"
                 disabled={loading || !commentContent.trim()}
             >
                 {loading ? 'Wysyłanie...' : 'Opublikuj Komentarz'}

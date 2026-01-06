@@ -8,16 +8,26 @@
 
 @theme {
   --color-ocean-red: #e63946;
+  --color-ocean-red-hover: #f04e5b;
   --color-ocean-light-blue: #A8DADC;
   --color-ocean-blue: #457B9D;
+  --color-ocean-blue-hover: #5288ab;
   --color-ocean-dark-blue: #1D3557;
   --color-ocean-white: #F1FAEE;
   --color-midnight-dark: #30343f;
 
+  --color-ocean-teal: #2a9d8f;
+  --color-ocean-teal-hover: #238276;
+
   --color-text-ocean-red: #e63946;
+  --color-text-ocean-red-hover: #f04e5b;
+
   --color-text-ocean-blue: #457B9D;
+  --color-text-ocean-blue-hover: #5288ab;
+
   --color-text-ocean-white: #F1FAEE;
   --color-text-midnight-dark: #30343f;
+  --color-text-ocean-dark-blue: #1D3557;
 
   --color-text-green-v1: #84a98c;
       /* gradient */
@@ -122,8 +132,7 @@ button {
 
 *:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
-  transition: box-shadow 0.15s ease-in-out;
+  /* box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); */
 }
 
 a:focus {
@@ -134,13 +143,13 @@ a:focus {
 
 button:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  /* box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); */
 }
 
 input:focus, textarea:focus, select:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
-  border-color: #3b82f6;
+  /* box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); */
+  /* border-color: #3b82f6; */
 }
 
 div:focus, span:focus, p:focus {

@@ -3,18 +3,33 @@ export const getCategoryColor = (name: string | undefined): string => {
 
     const normalizedName = name.trim().toLowerCase();
 
-    switch (normalizedName) {
+    // switch (normalizedName) {
+    //     case 'pomoc':
+    //         return 'bg-blue-600';
+    //     case 'zestawy':
+    //         return 'bg-green-600';
+    //     case 'newsy':
+    //         return 'bg-red-500';
+    //     case 'buildy użytkowników':
+    //         return 'bg-purple-600';
+    //     case 'ogólne':
+    //         return 'bg-gray-500';
+    //     default:
+    //         return 'bg-teal-500';
+    // }
+
+ switch (normalizedName) {
         case 'pomoc':
-            return 'bg-blue-600';
+            return 'bg-sky-500'; 
         case 'zestawy':
-            return 'bg-green-600';
+            return 'bg-teal-600'; 
         case 'newsy':
-            return 'bg-red-500';
+            return 'bg-rose-600'; 
         case 'buildy użytkowników':
-            return 'bg-purple-600';
+            return 'bg-indigo-600'; 
         case 'ogólne':
-            return 'bg-gray-500';
+            return 'bg-slate-500'; 
         default:
-            return 'bg-teal-500';
+            return 'bg-ocean-blue';
     }
 };

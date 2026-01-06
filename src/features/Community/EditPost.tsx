@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import customAxios from "../../lib/customAxios.tsx";
 import { FaArrowLeft } from 'react-icons/fa';
+import { showToast } from '../../lib/ToastContainer.tsx';
 
 interface Post {
     id: number;
@@ -38,7 +39,7 @@ const EditPostContentForm: React.FC<EditPostContentFormProps> = ({ initialPost, 
         try {
             await customAxios.put(`community/posts/${initialPost.id}`, updatedData);
 
-            alert(`Post "${initialPost.title}" został zaktualizowany!`);
+            showToast.success(`Post "${initialPost.title}" został zaktualizowany!`);
             onSuccess();
 
         } catch (err: any) {
@@ -87,14 +88,14 @@ const EditPostContentForm: React.FC<EditPostContentFormProps> = ({ initialPost, 
                     </div>
 
                     {error && (
-                        <p className="mt-4 p-3 rounded text-center font-semibold bg-red-100 text-red-700">
+                        <p className="mt-4 p-3 rounded text-center font-semibold  text-ocean-red">
                             {error}
                         </p>
                     )}
 
                     <button
                         type="submit"
-                        className="w-full mt-4 p-2 bg-green-600 text-white font-bold rounded hover:bg-green-700 transition"
+                        className="w-full mt-4 p-2 bg-ocean-blue text-white font-bold rounded hover:bg-ocean-blue-hover transition"
                         disabled={loading || !content.trim()}
                     >
                         {loading ? 'Zapisywanie...' : 'Zapisz Zmienioną Treść'}

@@ -159,18 +159,18 @@ const PostListItem: React.FC<PostListItemProps> = ({ post, onClick, currentUser 
                             >
                                 <button
                                     onClick={(e) => handleVote(e, 'upvote')}
-                                    className={`p-1 hover:scale-110 transition ${userVoteStatus === 'upvote' ? 'text-blue-600' : 'text-gray-400 hover:text-blue-500'}`}
+                                    className={`p-1 hover:scale-110 transition ${userVoteStatus === 'upvote' ? 'text-ocean-blue' : 'text-gray-400 hover:text-ocean-blue'}`}
                                 >
                                     <FaThumbsUp className="w-4 h-4" />
                                 </button>
 
-                                <span className={`font-bold text-sm min-w-[1.5rem] text-center ${netScore > 0 ? 'text-blue-600' : netScore < 0 ? 'text-red-600' : 'text-gray-600'}`}>
+                                <span className={`font-bold text-sm min-w-[1.5rem] text-center ${netScore > 0 ? 'text-ocean-blue' : netScore < 0 ? 'text-ocean-red' : 'text-gray-600'}`}>
                                     {netScore}
                                 </span>
 
                                 <button
                                     onClick={(e) => handleVote(e, 'downvote')}
-                                    className={`p-1 hover:scale-110 transition ${userVoteStatus === 'downvote' ? 'text-red-600' : 'text-gray-400 hover:text-red-500'}`}
+                                    className={`p-1 hover:scale-110 transition ${userVoteStatus === 'downvote' ? 'text-ocean-red' : 'text-gray-400 hover:text-text-ocean-red'}`}
                                 >
                                     <FaThumbsDown className="w-4 h-4" />
                                 </button>
@@ -286,7 +286,7 @@ const Community: React.FC = () => {
                 await Promise.all(uploadPromises);
             }
 
-            setPostStatus('Post opublikowany pomyślnie! 🎉');
+            setPostStatus('Post opublikowany pomyślnie!');
 
             setTimeout(() => {
                 setIsCreatingPost(false);
@@ -323,7 +323,7 @@ const Community: React.FC = () => {
     }
 
     if (isCreatingPost) {
-        if (!isAuthenticated) return <div className="p-6 text-center text-red-600">Zaloguj się!</div>;
+        if (!isAuthenticated) return <div className="p-6 text-center text-ocean-red">Zaloguj się!</div>;
         if (formLoading) return <div className="p-6 text-center">Ładowanie formularza...</div>;
 
         return (
@@ -414,7 +414,7 @@ const Community: React.FC = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => removeFile(index)}
-                                                className="text-red-500 hover:text-red-700 p-1"
+                                                className="text-ocean-red hover:text-ocean-red-hover p-1"
                                             >
                                                 <FaTimes />
                                             </button>
@@ -426,7 +426,8 @@ const Community: React.FC = () => {
 
                         <button
                             type="submit"
-                            className="w-full mt-6 p-3 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex justify-center items-center"
+                            // className="w-full mt-6 p-3 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex justify-center items-center"
+                            className="w-full mt-6 p-3 bg-ocean-blue text-white font-bold rounded hover:bg-ocean-blue-hover transition disabled:bg-gray-400 disabled:cursor-not-allowed flex justify-center items-center"
                             disabled={!title.trim() || !content.trim() || !categoryId || (postStatus !== null && postStatus.includes('...'))}
                         >
                             {postStatus && postStatus.includes('...') ? (
@@ -438,7 +439,7 @@ const Community: React.FC = () => {
                     </form>
 
                     {postStatus && !postStatus.includes('...') && (
-                        <p className={`mt-4 p-3 rounded text-center font-semibold ${postStatus.includes('pomyślnie') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        <p className={`mt-4 p-3 rounded text-center font-semibold ${postStatus.includes('pomyślnie') ? 'bg-green-100 text-ocean-teal' : 'bg-red-100 text-ocean-red'}`}>
                             {postStatus}
                         </p>
                     )}
@@ -451,7 +452,7 @@ const Community: React.FC = () => {
 
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
-            <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Forum Społeczności</h1>
+            <h1 className="text-3xl font-bold text-center mb-6 text-ocean-midnight-dark">Forum Społeczności</h1>
 
             <div className="flex justify-center items-center mb-6 space-x-4">
                 <select
@@ -466,7 +467,8 @@ const Community: React.FC = () => {
                 </select>
 
                 <button
-                    className={`px-4 py-2 rounded shadow-md transition duration-150 ${isAuthenticated ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}
+                    // className={`px-4 py-2 rounded shadow-md transition duration-150 ${isAuthenticated ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}
+                    className={`px-4 py-2 rounded shadow-md transition duration-150 ${isAuthenticated ? 'bg-ocean-teal text-white hover:bg-ocean-teal-hover' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}
                     onClick={() => isAuthenticated && setIsCreatingPost(true)}
                     disabled={!isAuthenticated}
                 >

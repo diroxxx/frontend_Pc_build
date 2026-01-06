@@ -11,7 +11,7 @@ import {ComponentTypeEnum} from "../../../../shared/dtos/BaseItemDto.ts";
 import {selectedComputerAtom} from "../../atoms/computerAtom.tsx";
 import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.tsx";
 import {guestComputersAtom} from "../../atoms/guestComputersAtom.ts";
-import { Info } from "lucide-react";
+import { Filter, Info } from "lucide-react";
 import {selectedCategoryAtom} from "../../atoms/selectedCategoryAtom.ts";
 import { offerLeftPanelFiltersAtom } from '../../../../shared/atoms/OfferLeftPanelFiltersAtom.ts';
 import { SortByOffersEnum } from '../../../../shared/dtos/SortByOffersEnum.ts';
@@ -50,7 +50,6 @@ export default function ConfiguratorPcPage() {
 const handleAddComponent = (category: ComponentTypeEnum) => {
     setSelectedCategory(category);
     
-    // Podstawowe filtry (bez query)
     const newFilters: any = {
         componentType: category,
         brand: "",
@@ -62,7 +61,6 @@ const handleAddComponent = (category: ComponentTypeEnum) => {
         sortBy: offerLeftPanelFilters.sortBy || SortByOffersEnum.NEWEST
     };
 
-    // Zapisz dane kompatybilności w session/local storage lub w osobnym atomie
     if (selectedComputer?.offers) {
         const processor = selectedComputer.offers.find(o => o.componentType === ComponentTypeEnum.PROCESSOR);
         const motherboard = selectedComputer.offers.find(o => o.componentType === ComponentTypeEnum.MOTHERBOARD);
@@ -120,7 +118,6 @@ const handleAddComponent = (category: ComponentTypeEnum) => {
                 break;
         }
 
-        // Zapisz dane kompatybilności
         if (Object.keys(compatibilityData).length > 0) {
             sessionStorage.setItem('compatibilityFilter', JSON.stringify(compatibilityData));
         } else {
@@ -152,7 +149,16 @@ const handleAddComponent = (category: ComponentTypeEnum) => {
             return;
         }
 
-        const nextNumber = fetchedComputers.length + 1;
+        const existingNumbers = fetchedComputers
+        .map(c => {
+            const match = c.name.match(/Zestaw (\d+)$/);
+            return match ? parseInt(match[1]) : 0;
+        })
+        .filter(n => n > 0)
+
+        const nextNumber = existingNumbers.length > 0
+        ? Math.max(...existingNumbers) + 1 
+        : 1;
 
         const newComputer: ComputerDto = {
             id: 0,
@@ -171,7 +177,16 @@ const handleAddComponent = (category: ComponentTypeEnum) => {
 
 
     const handleCreateNewGuestBuild = () => {
-        const nextNumber = guestcomputers.length + 1;
+         const existingNumbers = fetchedComputers
+        .map(c => {
+            const match = c.name.match(/Zestaw (\d+)$/);
+            return match ? parseInt(match[1]) : 0;
+        })
+        .filter(n => n > 0)
+
+        const nextNumber = existingNumbers.length > 0
+        ? Math.max(...existingNumbers) + 1 
+        : 1;
 
         const newComputer: ComputerDto = {
             id: Date.now(),
