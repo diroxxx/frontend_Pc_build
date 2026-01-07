@@ -13,6 +13,7 @@ import {useCpus} from "../../../shared/hooks/useCpus.ts";
 import {useGpuModels} from "../../../shared/hooks/useGpuModels.ts";
 import {useAtom} from "jotai/index";
 import {selectedComputerAtom} from "../../computers/atoms/computerAtom.tsx";
+import axios from "axios";
 
 const GamesPage = () => {
     const { data: games, isLoading, isError } = useGetAllGamesApi();
@@ -35,18 +36,18 @@ const GamesPage = () => {
     const processorTypes = cpus || [];
     const gpuTypes = gpuModels || [];
 
-const isConfigComplete = (config: GameFpsConfigDto | null): config is GameFpsConfigDto => {
-    return config !== null && 
-           !!selectedGame;
-};
+    const isConfigComplete = (config: GameFpsConfigDto | null): config is GameFpsConfigDto => {
+        return config !== null && 
+            !!selectedGame;
+    };
 
-const completeConfig = isConfigComplete(gameFpsConfig) ? gameFpsConfig : null;
+    const completeConfig = isConfigComplete(gameFpsConfig) ? gameFpsConfig : null;
 
-const {data: recommendedVideoData, refetch, isError:videoError,isLoading:videoLoading, isFetching:videoFetching} = useReccommendedVideo(completeConfig || undefined);
+    const {data: recommendedVideoData, refetch, isError:videoError, error: videoErrorDetails, isLoading:videoLoading, isFetching:videoFetching} = useReccommendedVideo(completeConfig || undefined);
 
-const {data: recOffersGame, refetch: refetchRecGame, isFetching: isFetchingRec, isLoading: isLoadingRec } = useCpuGpuGame(gameFpsConfig.gameTitle, gameFpsConfig.budget)
+    const {data: recOffersGame, refetch: refetchRecGame, isFetching: isFetchingRec, isLoading: isLoadingRec } = useCpuGpuGame(gameFpsConfig.gameTitle, gameFpsConfig.budget)
 
-// const compareModels = (modelInComp: )
+    const is404Error = videoErrorDetails && axios.isAxiosError(videoErrorDetails) && videoErrorDetails.response?.status === 404;
 
     if (isError) {
         return (
@@ -254,7 +255,7 @@ return (
                             </div>
                         </div>
 
-                        {videoError ? (
+                        {videoError && !is404Error ? (
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
                                 <p className="text-ocean-red text-sm">Błąd podczas pobierania wideo</p>
                             </div>
@@ -295,9 +296,9 @@ return (
                                     </div>
                                 </div>
                             </div>
-                        ) : recommendedVideoData === null ? (
+                        ) : is404Error || recommendedVideoData === null ? (
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
-                                <p className="text-gray-600 text-sm">Brak dopasowania</p>
+                                <p className="text-gray-600 text-sm">Brak filmiku dla podanych wymagań</p>
                             </div>
                         ) : null}
                     </div>
