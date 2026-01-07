@@ -15,6 +15,7 @@ import {
 import { Check, X } from 'lucide-react';
 import {type ComponentItem, ComponentTypeEnum } from '../../../../shared/dtos/BaseItemDto.ts';
 import {modalSx} from "../../../../shared/dtos/modalStyle.ts";
+import { useFetchBrands } from '../../../../shared/hooks/useFetchBrands.ts';
 interface AddComponentModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -28,6 +29,7 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
     const [brand, setBrand] = useState('');
     const [model, setModel] = useState('');
     const [details, setDetails] = useState<Record<string, string>>({});
+    const {data:brandsNames} = useFetchBrands();
 
     const handleDetailChange = (key: string, value: string) => {
         setDetails((prev) => ({ ...prev, [key]: value }));
@@ -288,8 +290,29 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
                             ))}
                         </Select>
                     </FormControl>
+                    <FormControl size="small" fullWidth required>
+                        <InputLabel id="brand-label" sx={{ color: 'rgba(241,250,238,0.8)' }}>Firma</InputLabel>
+                        <Select
+                                labelId="brand-label"
+                                value={brand}
+                                label="Firma"
+                                onChange={(e) => setBrand(e.target.value)}
+                                
+                                sx={{
+                                    '& .MuiSelect-select': { py: 1 },
+                                    bgcolor: 'rgba(255,255,255,0.02)',
+                                    color: 'var(--color-ocean-white)',
+                                    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(241,250,238,0.23)' },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(241,250,238,0.4)' },
+                                }}
+                            >
+                                <MenuItem value=""><em>-- Wybierz firme --</em></MenuItem>
+                                {brandsNames?.map((brand) => (
+                                    <MenuItem key={brand} value={brand}>{brand}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
 
-                    <CustomTextField label="Marka" value={brand} onChange={setBrand} required />
                     <CustomTextField label="Model" value={model} onChange={setModel} required />
                     {renderDynamicFields()}
                 </Stack>
