@@ -29,8 +29,7 @@ const GamesPage = () => {
         resolution: "" as typeof resolutionList[number],
         technology: "" as typeof technologyList[number],
         graphicsPreset: "" as typeof graphicsPresetList[number],
-        gameTitle: "",
-        budget: 0
+        gameTitle: ""
     });    
     
     const processorTypes = cpus || [];
@@ -191,8 +190,7 @@ return (
                                 </div>
 
                                 <div className="p-3 space-y-2">
-                                    <p className="text-[11px] text-gray-500">Wyszukiwanie ofert wymaga wybrania gry oraz ustawienia budżetu (min. 500 zł).</p>
-
+                                    <p className="text-[11px] text-gray-500">Wyszukiwanie ofert wymaga wybrania gry. Budżet jest opcjonalny.</p>
                                     <div>
                                         <label className="text-[10px] font-semibold text-midnight-dark mb-1 block">Budżet (zł)</label>
                                         <input
@@ -206,7 +204,7 @@ return (
                                     </div>
 
                                     {(() => {
-                                        const canSearchOffers = Boolean(selectedGame && gameFpsConfig.budget >= 500);
+                                        const canSearchOffers = Boolean(selectedGame);
                                         return (
                                             <button
                                                 onClick={() => { if (canSearchOffers) refetchRecGame(); }}
@@ -216,7 +214,7 @@ return (
                                                 ${canSearchOffers ? 'bg-ocean-teal text-white hover:bg-ocean-teal-hover' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
                                             >
                                                 <Search className="w-3 h-3" />
-                                                Szukaj ofert (budżet)
+                                            Szukaj ofert {gameFpsConfig.budget ? '(z budżetem)' : ''}
                                             </button>
                                         );
                                     })()}

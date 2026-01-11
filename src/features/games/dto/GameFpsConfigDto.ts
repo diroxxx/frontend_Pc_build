@@ -5,7 +5,7 @@ export type GameFpsConfigDto = {
     technology: typeof technologyList[number];
     cpu: string;
     gpu: string;
-    budget: number;
+    budget?: number;
 };
 
 export const resolutionList = ['1080p'] as const;
