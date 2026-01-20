@@ -155,7 +155,6 @@ const PostGallery: React.FC<PostGalleryProps> = ({ postId }) => {
                     </>
                 )}
 
-                {/* Miniatury */}
                 {images.length > 1 && (
                     <div className="flex justify-center mt-4 space-x-2 overflow-x-auto">
                         {images.map((img, index) => (
@@ -545,12 +544,10 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
             setCurrentContent(updatedContent);
             setIsEditing(false);
 
-            // alert("Treść posta została zaktualizowana!");
             showToast.success("Treść posta została zaktualizowana!");
 
         } catch (err: any) {
             console.error("Błąd aktualizacji posta:", err);
-            // alert("Nie udało się zaktualizować treści posta. Sprawdź konsolę.");
             showToast.error("Nie udało się zaktualizować treści posta.");
         }
     };
@@ -615,7 +612,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
     };
     const handleInitiateDelete = () => {
         if (!isAuthor) {
-            // alert("Brak uprawnień do usunięcia tego posta.");
             showToast.error("Brak uprawnień do usunięcia tego posta.");
             return;
         }
@@ -629,7 +625,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         try {
             await customAxios.delete(`/community/posts/delete/${post.id}`);
 
-            // setToastMessage({ message: `Pomyślnie usunięto post`, type: 'success' });
             showToast.success("Post został usunięty.");
 
             setShowDeleteModal(false);
@@ -639,8 +634,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
             console.error("Błąd usuwania posta:", error);
             const errorMessage = error.response?.data?.message || 'Wystąpił nieznany błąd podczas usuwania posta.';
 
-
-            // setToastMessage({ message: `Nie udało się: ${errorMessage}`, type: 'error' });
             showToast.error(`Nie udało się usunąć posta: ${errorMessage}`);
 
             setShowDeleteModal(false);
@@ -714,10 +707,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
     const handleVote = async (voteType: 'upvote' | 'downvote') => {
         if (!user) {
-            // setToastMessage({
-            //     message: "Musisz być zalogowany, aby oceniać posty.",
-            //     type: 'error'
-            // });
             showToast.info("Musisz być zalogowany, aby oceniać posty.");
             return;
         }
@@ -736,10 +725,8 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         } catch (err: any) {
             console.error("Błąd głosowania:", err);
             if (err.response?.status === 401) {
-                // setToastMessage({ message: "Sesja wygasła. Zaloguj się ponownie.", type: 'error' });
                 showToast.error("Sesja wygasła. Zaloguj się ponownie.");
             } else {
-                // setToastMessage({ message: "Wystąpił błąd podczas oddawania głosu.", type: 'error' });
                 showToast.error("Wystąpił błąd podczas oddawania głosu.");
             }
         }
@@ -748,10 +735,6 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
     const handleCommentVote = async (commentId: number, vote: "upvote" | "downvote") => {
         if (!user) {
-            // setToastMessage({
-            //     message: "Musisz być zalogowany, aby oceniać komentarze.",
-            //     type: "error",
-            // });
             showToast.info("Musisz być zalogowany, aby oceniać komentarze.");
             return;
         }
@@ -776,18 +759,10 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
         } catch (err: any) {
 
             if (err.response?.status === 403) {
-                // setToastMessage({
-                //     message: "Nie możesz głosować na własny komentarz.",
-                //     type: "error"
-                // });
                 showToast.error("Nie możesz głosować na własny komentarz.");
                 return;
             }
 
-            // setToastMessage({
-            //     message: "Wystąpił błąd podczas głosowania.",
-            //     type: "error"
-            // });
             showToast.error("Wystąpił błąd podczas głosowania.");
         }
     };
@@ -810,7 +785,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
                 try {
                     const statusRes = await customAxios.get(`/community/comments/${c.id}/vote/status`);
-                    statusMap[c.id] = statusRes.data; // null | "upvote" | "downvote"
+                    statusMap[c.id] = statusRes.data;
                 } catch {
                     statusMap[c.id] = null;
                 }

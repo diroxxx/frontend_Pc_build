@@ -213,7 +213,6 @@ function UserPage() {
 
     const [user] = useAtom(userAtom);
 
-    // --- POBIERANIE POSTÓW USERA ---
     useEffect(() => {
         if (activeTab === "posts" && user?.nickname) {
             const fetchPosts = async () => {
@@ -243,7 +242,6 @@ function UserPage() {
         }
     }, [activeTab, user?.nickname]);
 
-    // POBIERANIE ZESTAWÓW KOMPUTEROWYCH
     useEffect(() => {
         if (activeTab === "builds" && user?.email) {
             const fetchComputers = async () => {
@@ -319,7 +317,6 @@ function UserPage() {
     return (
         <div className="min-h-screen bg-gray-100">
             <div className="max-w-4xl mx-auto py-8 px-4">
-                {/* Navigation Tabs */}
                 <div className="flex justify-center mb-8">
                     <div className="bg-gray-200 rounded-full p-1 flex flex-wrap justify-center">
                         {["profile", "posts", "builds", "saved"].map((tab) => (
@@ -340,10 +337,8 @@ function UserPage() {
                     </div>
                 </div>
 
-                {/* --- PROFILE CONTENT --- */}
                 {activeTab === "profile" && <UserProfile />}
 
-                {/* --- MY POSTS CONTENT --- */}
                 {activeTab === "posts" && (
                     <div className="py-8">
                         <h3 className="text-xl font-semibold text-center mb-4">Moje Posty</h3>
@@ -374,7 +369,6 @@ function UserPage() {
                     </div>
                 )}
 
-                {/* --- MY BUILDS CONTENT --- */}
                 {activeTab === "builds" && <UserComputers />}
                 {activeTab === "builds" && (
                     <div className="py-8">
@@ -390,7 +384,6 @@ function UserPage() {
                             </div>
                         )}
 
-                        {/* LISTA ZESTAWÓW */}
                         {!loadingComputers && !errorComputers && computers.length > 0 && (
                             <div className="grid gap-4">
                                 {computers.map((comp) => (
@@ -432,7 +425,6 @@ function UserPage() {
                     </div>
                 )}
 
-                {/* --- SAVED CONTENT --- */}
                 {activeTab === "saved" && (
                     <div className="py-8">
                         <h3 className="text-xl font-semibold text-center mb-4">Zapisane Posty</h3>

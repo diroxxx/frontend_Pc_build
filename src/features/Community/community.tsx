@@ -88,7 +88,6 @@ const PostListItem: React.FC<PostListItemProps> = ({ post, onClick, currentUser 
         e.stopPropagation();
 
         if (!currentUser) {
-            // alert("Musisz być zalogowany, aby głosować!");
             showToast.info("Zaloguj się, aby móc głosować na posty.");
             return;
         }
@@ -270,7 +269,6 @@ const Community: React.FC = () => {
             const createdPost = response.data;
             const newPostId = createdPost.id;
 
-            // 2. WYSYŁANIE ZDJĘĆ
             if (selectedFiles.length > 0) {
                 setPostStatus(`Wysyłanie ${selectedFiles.length} zdjęć...`);
 
