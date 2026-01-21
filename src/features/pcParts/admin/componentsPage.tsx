@@ -16,7 +16,7 @@ import DownloadCsvTemplateButton from "./components/DownloadCsvTemplateButton.ts
 import {updateComponentApi} from "./api/updateComponentApi.ts";
 import { useAtom } from "jotai";
 import { componentIdToDeleteAtom, editingComponentAtom, showUpdateComponentModalAtom } from "./atoms/editComponentAtom.ts";
-import { deleteComponentApi } from "./api/deleteComponentApi.ts";
+import { LoadingSpinner } from "../../../assets/components/ui/LoadingSpinner.tsx";
 const ComponentsPage = () => {
     const { data: brandsData, isLoading: isLoadingBrands } = useFetchBrands();
     const brands = brandsData || [];
@@ -26,7 +26,7 @@ const ComponentsPage = () => {
 
 
     const componentsTypeList = Object.values(ComponentTypeEnum);
-    const {data: components,isLoading:loadingComponents, isFetching:fetchingComponents,error:errorComponents,isPlaceholderData:placeHolderComponents, refetch: refetchComps} = useFetchComponents(page, filters);
+    const {data: components,isLoading:loadingComponents, isFetching:fetchingComponents,error:errorComponents,isPlaceholderData:placeHolderComponents, refetch: refetchComps, isRefetching} = useFetchComponents(page, filters);
         
     const [showFormToAdd, setShowFormToAdd] = useState(false);
     const [showFormToUpdate, setShowFormToUpdate] = useAtom(showUpdateComponentModalAtom);
@@ -119,6 +119,7 @@ const ComponentsPage = () => {
                                     ...prev,
                                     itemType: e.target.value as ComponentTypeEnum | undefined,
                                 }))
+
                             }
                             className="border border-gray-300 rounded px-3 py-1.5 text-sm min-w-[150px]"
                         >
@@ -131,8 +132,11 @@ const ComponentsPage = () => {
                         </select>
 
                         <select
-                            value={filters.brand}
-                            onChange={(e) => setTmpFilters((prev) => ({ ...prev, brand: e.target.value }))}
+                            value={tmpFilters.brand}
+                            onChange={(e) => {
+                                setTmpFilters((prev) => ({ ...prev, brand: e.target.value }));
+
+                            }}
                             className="border border-gray-300 rounded px-3 py-1.5 text-sm min-w-[150px]"
                             disabled={isLoadingBrands}
                         >
