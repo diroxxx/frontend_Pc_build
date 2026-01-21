@@ -9,6 +9,8 @@ import {selectedComputerAtom} from "../atoms/computerAtom.tsx";
 import { Pencil } from "lucide-react";
 import {useUpdateComputerName} from "../user/hooks/updateComputerNameMutation.ts";
 import {guestComputersAtom} from "../atoms/guestComputersAtom.ts";
+import {EditIcon} from "lucide-react";
+
 interface BuildListProps {
     computers: ComputerDto[];
     onSelectBuild: (index: number) => void;

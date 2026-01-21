@@ -85,6 +85,7 @@ export interface GraphicsCardItem extends BaseItem {
     powerDraw: number;
     boostClock: number;
     lengthInMM: number;
+    baseModel: string;
 }
 
 export interface CoolerItem extends BaseItem {

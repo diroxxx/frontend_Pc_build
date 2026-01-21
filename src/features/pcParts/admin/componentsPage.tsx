@@ -1,5 +1,5 @@
 
-import {useState} from "react";
+import {use, useState} from "react";
 import Components from "./components/ComponentsList.tsx";
 import {useFetchComponents} from "./hooks/useFetchComponents.ts";
 import ReactPaginate from "react-paginate";
@@ -9,12 +9,14 @@ import {LeftArrow} from "../../../assets/icons/leftArrow.tsx";
 import {RightArrow} from "../../../assets/icons/rightArrow.tsx";
 import {PlusIcon} from "lucide-react";
 import AddComponentForm from "./components/AddComponentForm.tsx";
-
 import ImportCsvButton from "./components/ImportCsvButton.tsx";
 import {saveComponentApi} from "./api/saveComponentApi.ts";
 import {showToast} from "../../../lib/ToastContainer.tsx";
 import DownloadCsvTemplateButton from "./components/DownloadCsvTemplateButton.tsx";
-
+import {updateComponentApi} from "./api/updateComponentApi.ts";
+import { useAtom } from "jotai";
+import { componentIdToDeleteAtom, editingComponentAtom, showUpdateComponentModalAtom } from "./atoms/editComponentAtom.ts";
+import { deleteComponentApi } from "./api/deleteComponentApi.ts";
 const ComponentsPage = () => {
     const { data: brandsData, isLoading: isLoadingBrands } = useFetchBrands();
     const brands = brandsData || [];
@@ -24,8 +26,12 @@ const ComponentsPage = () => {
 
 
     const componentsTypeList = Object.values(ComponentTypeEnum);
-    const {data: components,isLoading:loadingComponents, isFetching:fetchingComponents,error:errorComponents,isPlaceholderData:placeHolderComponents} = useFetchComponents(page, filters);
-    const [showForm, setShowForm] = useState(false);
+    const {data: components,isLoading:loadingComponents, isFetching:fetchingComponents,error:errorComponents,isPlaceholderData:placeHolderComponents, refetch: refetchComps} = useFetchComponents(page, filters);
+        
+    const [showFormToAdd, setShowFormToAdd] = useState(false);
+    const [showFormToUpdate, setShowFormToUpdate] = useAtom(showUpdateComponentModalAtom);
+    const [componentToEdit, setComponentToEdit] = useAtom(editingComponentAtom);
+    const [componentIdToDelete, setComponentIdToDelete] = useAtom(componentIdToDeleteAtom);
     const [selectedType, setSelectedType] = useState<ComponentTypeEnum | "">("");
     const [importMessage, setImportMessage] = useState<string | null>(null);
 
@@ -34,9 +40,22 @@ const ComponentsPage = () => {
             .then(() => {
                 showToast.success("Dodano komponent");
             });
-        setShowForm(false);
+        setShowFormToAdd(false);
+        refetchComps();
     };
 
+    const  handleUpdateComponent = async (data: ComponentItem) => {
+        // console.log("Updating component:", data);
+        await   updateComponentApi(data)
+            .then(() => {
+                showToast.success("Zaktualizowano komponent");
+            });
+        setShowFormToUpdate(false);
+        setComponentToEdit(null);
+        refetchComps();
+    }
+
+ 
     const removeFilter = () => {
         setFilters({ itemType: undefined, brand: "", searchTerm: "" });
         setTmpFilters({ itemType: undefined, brand: "", searchTerm: "" });
@@ -44,6 +63,7 @@ const ComponentsPage = () => {
 
     const refetchComponents = () => {
         setFilters(tmpFilters);
+        refetchComps();
     }
 
  return (
@@ -53,7 +73,7 @@ const ComponentsPage = () => {
 
                 <div className="flex gap-2">
                     <button
-                        onClick={() => setShowForm(true)}
+                        onClick={() => setShowFormToAdd(true)}
                         className="px-3 py-1.5 bg-ocean-dark-blue text-white rounded hover:bg-ocean-blue text-sm font-medium flex items-center gap-1 transition-colors"
                     >
                         <PlusIcon className="w-5 h-5" />
@@ -62,11 +82,19 @@ const ComponentsPage = () => {
                 </div>
             </div>
 
-            {showForm && (
+            {showFormToAdd && (
                 <AddComponentForm
-                    isOpen={showForm}
-                    onClose={() => setShowForm(false)}
+                    isOpen={showFormToAdd}
+                    onClose={() => setShowFormToAdd(false)}
                     onSubmit={handleAddComponent}
+                />
+            )}
+            {showFormToUpdate && (
+                <AddComponentForm
+                    isOpen={showFormToUpdate}
+                    onClose={() => setShowFormToUpdate(false)}
+                    onSubmit={handleUpdateComponent}
+                    initialData={componentToEdit || undefined}
                 />
             )}
 

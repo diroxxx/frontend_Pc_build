@@ -113,7 +113,7 @@ const UsersPage = () => {
                         <th className="px-3 py-2 text-left font-medium">Pseudonim</th>
                         <th className="px-3 py-2 text-left font-medium">Email</th>
                         <th className="px-3 py-2 text-left font-medium">Rola</th>
-                        <th className="px-3 py-2 text-right font-medium">Akcje</th>
+                        <th className="px-3 py-2  font-medium">Akcje</th>
                     </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">

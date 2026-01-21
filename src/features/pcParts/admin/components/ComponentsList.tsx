@@ -14,6 +14,7 @@ interface ComponentsProps {
 }
 
 const Components = ({data, isLoading, isFetching, isPlaceholderData, error }: ComponentsProps) => {
+    // console.log(data)
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
@@ -42,6 +43,7 @@ const Components = ({data, isLoading, isFetching, isPlaceholderData, error }: Co
 
     return (
         <div className="space-y-4">
+
             <div className="rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                 <table className="w-full text-sm">
                     <thead className="bg-ocean-dark-blue text-ocean-white">
@@ -50,12 +52,13 @@ const Components = ({data, isLoading, isFetching, isPlaceholderData, error }: Co
                         <th className="px-3 py-2 text-left font-medium">Marka</th>
                         <th className="px-3 py-2 text-left font-medium">Model</th>
                         <th className="px-3 py-2 text-left font-medium">Szczegóły</th>
+                        <th className="px-3 py-2 text-left font-medium">Akcje</th>
                     </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                     {components.length === 0 ? (
                         <tr>
-                            <td colSpan={4} className="px-3 py-8 text-center text-midnight-dark">
+                            <td colSpan={5} className="px-3 py-8 text-center text-midnight-dark">
                                 Brak komponentów w bazie lub brak komponentów spełniających kryteria wyszukiwania.
                             </td>
                         </tr>

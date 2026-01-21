@@ -12,141 +12,280 @@ import {
     MenuItem,
     IconButton
 } from '@mui/material';
-import { Check, X } from 'lucide-react';
-import {type ComponentItem, ComponentTypeEnum } from '../../../../shared/dtos/BaseItemDto.ts';
+import { Check, Gpu, X } from 'lucide-react';
+import { type ComponentItem, ComponentTypeEnum } from '../../../../shared/dtos/BaseItemDto.ts';
 import {modalSx} from "../../../../shared/dtos/modalStyle.ts";
 import { useFetchBrands } from '../../../../shared/hooks/useFetchBrands.ts';
+import { set } from 'date-fns';
+import { showToast } from '../../../../lib/ToastContainer.tsx';
+import { useGpuModels } from '../../../../shared/hooks/useGpuModels.ts';
 interface AddComponentModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (data: ComponentItem) => void;
+    initialData?: ComponentItem;
 }
 
+const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, onSubmit, initialData }) => {
 
-
-const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, onSubmit }) => {
-    const [componentType, setComponentType] = useState<ComponentTypeEnum | ''>('');
-    const [brand, setBrand] = useState('');
-    const [model, setModel] = useState('');
-    const [details, setDetails] = useState<Record<string, string>>({});
     const {data:brandsNames} = useFetchBrands();
+    const {data: gpuModels} = useGpuModels();
 
-    const handleDetailChange = (key: string, value: string) => {
-        setDetails((prev) => ({ ...prev, [key]: value }));
-    };
+
+    const [componentToEdit, setComponentToEdit] = useState<Partial<ComponentItem >>(initialData || {} );
+    const [coolerSocketsTypeInput, setCoolerSocketsTypeInput] = useState<string>('');
+
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!componentType || !brand || !model) {
-            alert('Uzupełnij wszystkie wymagane pola');
-            return;
+        if (!componentToEdit.componentType || !componentToEdit.brand || !componentToEdit.model) {
+        showToast.error('Uzupełnij wszystkie wymagane pola');
+        return;
+    }
+
+    switch (componentToEdit.componentType) {
+        case ComponentTypeEnum.PROCESSOR: {
+            const requiredStrings = [
+                { field: componentToEdit.brand, name: 'Marka' },
+                { field: componentToEdit.model, name: 'Model' },
+                { field: componentToEdit.socketType, name: 'Socket' },
+                { field: componentToEdit.integratedGraphics, name: 'Zintegrowana grafika' }
+            ];
+            for (const { field, name } of requiredStrings) {
+                if (typeof field === 'string' && field.trim() === '') {
+                    showToast.error(`${name} nie może być pusty`);
+                    return;
+                }
+            }
+            break;
         }
+        case ComponentTypeEnum.GRAPHICS_CARD: {
+            const requiredStrings = [
+                { field: componentToEdit.brand, name: 'Marka' },
+                { field: componentToEdit.model, name: 'Model' },
+                { field: componentToEdit.gddr, name: 'Rodzaj pamięci' },
+                { field: componentToEdit.baseModel, name: 'Model bazowy' }
+            ];
+            for (const { field, name } of requiredStrings) {
+                if (typeof field === 'string' && field.trim() === '') {
+                    showToast.error(`${name} nie może być pusty`);
+                    return;
+                }
+            }
+            break;
+        }
+        case ComponentTypeEnum.MEMORY: {
+            const requiredStrings = [
+                { field: componentToEdit.brand, name: 'Marka' },
+                { field: componentToEdit.model, name: 'Model' },
+                { field: componentToEdit.type, name: 'Typ pamięci' }
+            ];
+            for (const { field, name } of requiredStrings) {
+                if (typeof field === 'string' && field.trim() === '') {
+                    showToast.error(`${name} nie może być pusty`);
+                    return;
+                }
+            }
+            break;
+        }
+        case ComponentTypeEnum.MOTHERBOARD: {
+            const requiredStrings = [
+                { field: componentToEdit.brand, name: 'Marka' },
+                { field: componentToEdit.model, name: 'Model' },
+                { field: componentToEdit.chipset, name: 'Chipset' },
+                { field: componentToEdit.socketType, name: 'Typ socketu' },
+                { field: componentToEdit.memoryType, name: 'Rodzaj pamięci' },
+                { field: componentToEdit.format, name: 'Format płyty' }
+            ];
+            for (const { field, name } of requiredStrings) {
+                if (typeof field === 'string' && field.trim() === '') {
+                    showToast.error(`${name} nie może być pusty`);
+                    return;
+                }
+            }
+            break;
+        }
+        case ComponentTypeEnum.POWER_SUPPLY: {
+            const requiredStrings = [
+                { field: componentToEdit.brand, name: 'Marka' },
+                { field: componentToEdit.model, name: 'Model' },
+                { field: componentToEdit.efficiencyRating, name: 'Certyfikat' },
+                { field: componentToEdit.modular, name: 'Modular' },
+                { field: componentToEdit.type, name: 'Typ' }
+            ];
+            for (const { field, name } of requiredStrings) {
+                if (typeof field === 'string' && field.trim() === '') {
+                    showToast.error(`${name} nie może być pusty`);
+                    return;
+                }
+            }
+            break;
+        }
+        case ComponentTypeEnum.STORAGE: {
+            const requiredStrings = [
+                { field: componentToEdit.brand, name: 'Marka' },
+                { field: componentToEdit.model, name: 'Model' }
+            ];
+            for (const { field, name } of requiredStrings) {
+                if (typeof field === 'string' && field.trim() === '') {
+                    showToast.error(`${name} nie może być pusty`);
+                    return;
+                }
+            }
+            break;
+        }
+        case ComponentTypeEnum.CPU_COOLER: {
+            const requiredStrings = [
+                { field: componentToEdit.brand, name: 'Marka' },
+                { field: componentToEdit.model, name: 'Model' },
+                { field: coolerSocketsTypeInput, name: 'Sockety' },
+                { field: componentToEdit.fanRpm, name: 'Obroty wentylatorów' },
+                { field: componentToEdit.noiseLevel, name: 'Hałas wentylatorów' },
+                { field: componentToEdit.radiatorSize, name: 'Wielkość radiatora' }
+            ];
+            for (const { field, name } of requiredStrings) {
+                if (typeof field === 'string' && field.trim() === '') {
+                    showToast.error(`${name} nie może być pusty`);
+                    return;
+                }
+            }
+            break;
+        }
+        case ComponentTypeEnum.CASE_PC: {
+            const requiredStrings = [
+                { field: componentToEdit.brand, name: 'Marka' },
+                { field: componentToEdit.model, name: 'Model' },
+                { field: componentToEdit.format, name: 'Format' }
+            ];
+            for (const { field, name } of requiredStrings) {
+                if (typeof field === 'string' && field.trim() === '') {
+                    showToast.error(`${name} nie może być pusty`);
+                    return;
+                }
+            }
+            break;
+        }
+        default:
+            showToast.error('Nieobsługiwany typ komponentu');
+            return;
+    }
+
+
 
         let newComponent: ComponentItem;
 
-        switch (componentType) {
+        switch (componentToEdit.componentType) {
             case ComponentTypeEnum.PROCESSOR:
                 newComponent = {
+                    id: componentToEdit.id,
                     componentType: ComponentTypeEnum.PROCESSOR,
-                    brand,
-                    model,
-                    cores: Number(details.cores),
-                    threads: Number(details.threads),
-                    baseClock: Number(details.baseClock),
-                    socketType: details.socketType,
-                    boostClock: Number(details.boostClock),
-                    integratedGraphics: details.integratedGraphics,
-                    tdp: Number(details.tdp),
+                    brand: componentToEdit.brand,
+                    model: componentToEdit.model,
+                    cores: Number(componentToEdit.cores),
+                    threads: Number(componentToEdit.threads),
+                    baseClock: Number(componentToEdit.baseClock),
+                    socketType: componentToEdit.socketType || '',
+                    boostClock: Number(componentToEdit.boostClock),
+                    integratedGraphics: componentToEdit.integratedGraphics || '',
+                    tdp: Number(componentToEdit.tdp),
                 };
                 break;
 
             case ComponentTypeEnum.GRAPHICS_CARD:
                 newComponent = {
+                    id: componentToEdit.id,
                     componentType: ComponentTypeEnum.GRAPHICS_CARD,
-                    brand,
-                    model,
-                    vram: Number(details.vram),
-                    gddr: details.gddr,
-                    powerDraw: Number(details.powerDraw),
-                    boostClock: Number(details.boostClock),
-                    lengthInMM: Number(details.lengthInMM),
+                    brand: componentToEdit.brand || '',
+                    model: componentToEdit.model || '',
+                    vram: Number(componentToEdit.vram),
+                    gddr: componentToEdit.gddr || '',
+                    powerDraw: Number(componentToEdit.powerDraw),
+                    boostClock: Number(componentToEdit.boostClock),
+                    lengthInMM: Number(componentToEdit.lengthInMM),
+                    baseModel: componentToEdit.baseModel || '',
                 };
                 break;
 
             case ComponentTypeEnum.MEMORY:
                 newComponent = {
+                    id: componentToEdit.id,
                     componentType: ComponentTypeEnum.MEMORY,
-                    brand,
-                    model,
-                    type: details.type,
-                    capacity: Number(details.capacity),
-                    speed: Number(details.speed),
-                    latency: Number(details.latency),
-                    amount: Number(details.amount),
+                    brand: componentToEdit.brand || '',
+                    model: componentToEdit.model || '',
+                    type: componentToEdit.type || '',
+                    capacity: Number(componentToEdit.capacity),
+                    speed: Number(componentToEdit.speed),
+                    latency: Number(componentToEdit.latency),
+                    amount: Number(componentToEdit.amount),
                 };
                 break;
 
             case ComponentTypeEnum.MOTHERBOARD:
                 newComponent = {
+                    id: componentToEdit.id,
                     componentType: ComponentTypeEnum.MOTHERBOARD,
-                    brand,
-                    model,
-                    chipset: details.chipset,
-                    socketType: details.socketType,
-                    memoryType: details.memoryType,
-                    format: details.format,
-                    ramSlots: Number(details.ramSlots),
-                    ramCapacity: Number(details.ramCapacity),
+                    brand: componentToEdit.brand || '',
+                    model: componentToEdit.model || '',
+                    chipset: componentToEdit.chipset || '',
+                    socketType: componentToEdit.socketType || '',
+                    memoryType: componentToEdit.memoryType || '',
+                    format: componentToEdit.format || '',
+                    ramSlots: Number(componentToEdit.ramSlots),
+                    ramCapacity: Number(componentToEdit.ramCapacity),
                 };
                 break;
 
             case ComponentTypeEnum.POWER_SUPPLY:
                 newComponent = {
+                    id: componentToEdit.id,
                     componentType: ComponentTypeEnum.POWER_SUPPLY,
-                    brand,
-                    model,
-                    maxPowerWatt: Number(details.maxPowerWatt),
-                    efficiencyRating: details.efficiencyRating,
-                    modular: details.modular,
-                    type: details.type,
+                    brand: componentToEdit.brand || '',
+                    model: componentToEdit.model || '',
+                    maxPowerWatt: Number(componentToEdit.maxPowerWatt),
+                    efficiencyRating: componentToEdit.efficiencyRating || '',
+                    modular: componentToEdit.modular || '',
+                    type: componentToEdit.type || '',
                 };
                 break;
 
             case ComponentTypeEnum.STORAGE:
                 newComponent = {
+                    id: componentToEdit.id,
                     componentType: ComponentTypeEnum.STORAGE,
-                    brand,
-                    model,
-                    capacity: Number(details.capacity),
+                    brand: componentToEdit.brand || '',
+                    model: componentToEdit.model || '',
+                    capacity: Number(componentToEdit.capacity),
                 };
                 break;
 
             case ComponentTypeEnum.CPU_COOLER:
                 newComponent = {
+                    id: componentToEdit.id,
                     componentType: ComponentTypeEnum.CPU_COOLER,
-                    brand,
-                    model,
-                    coolerSocketsType: details.coolerSocketsType
-                        ? details.coolerSocketsType.split(',').map((s) => s.trim())
+                    brand: componentToEdit.brand || '',
+                    model: componentToEdit.model || '',
+                    coolerSocketsType: coolerSocketsTypeInput
+                        ? coolerSocketsTypeInput.split(',').map((s) => s.trim())
                         : [],
-                    fanRpm: details.fanRpm,
-                    noiseLevel: details.noiseLevel,
-                    radiatorSize: details.radiatorSize,
+                    fanRpm: componentToEdit.fanRpm || '',
+                    noiseLevel: componentToEdit.noiseLevel || '',
+                    radiatorSize: componentToEdit.radiatorSize || '',
                 };
                 break;
 
             case ComponentTypeEnum.CASE_PC:
                 newComponent = {
+                    id: componentToEdit.id,
                     componentType: ComponentTypeEnum.CASE_PC,
-                    brand,
-                    model,
-                    format: details.format,
+                    brand: componentToEdit.brand || '',
+                    model: componentToEdit.model || '',
+                    format: componentToEdit.format || '',
                 };
                 break;
 
             default:
-                alert('Nieobsługiwany typ komponentu');
+                showToast.error('Nieobsługiwany typ komponentu');
                 return;
         }
 
@@ -155,93 +294,91 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
     };
 
     const handleClose = () => {
-        setComponentType('');
-        setBrand('');
-        setModel('');
-        setDetails({});
+        setComponentToEdit({} as ComponentItem);
+        setCoolerSocketsTypeInput('');
         onClose();
     };
 
     const renderDynamicFields = () => {
-        switch (componentType) {
+        switch (componentToEdit.componentType) {
             case ComponentTypeEnum.PROCESSOR:
                 return (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <CustomTextField label="Socket (string)" value={details.socketType} onChange={(v) => handleDetailChange('socketType', v)} />
-                        <CustomTextField label="Rdzenie (number)" value={details.cores} onChange={(v) => handleDetailChange('cores', v)} />
-                        <CustomTextField label="Taktowanie bazowe GHz (number)" value={details.baseClock} onChange={(v) => handleDetailChange('baseClock', v)} />
-                        <CustomTextField label="Taktowanie boost GHz (number)" value={details.boostClock} onChange={(v) => handleDetailChange('boostClock', v)} />
-                        <CustomTextField label="Wątki (number)" value={details.threads} onChange={(v) => handleDetailChange('threads', v)} />
-                        <CustomTextField label="Zintegrowana grafika (string)" value={details.integratedGraphics} onChange={(v) => handleDetailChange('integratedGraphics', v)} />
-                        <CustomTextField label="TDP (number)" value={details.tdp} onChange={(v) => handleDetailChange('tdp', v)} />
+                        <CustomTextField label="Socket (string)"  value={componentToEdit.socketType} onChange={(v) => setComponentToEdit({ ...componentToEdit, socketType: v })} />
+                        <CustomTextField label="Rdzenie (number)" type='number' value={componentToEdit.cores !== undefined ? String(componentToEdit.cores) : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, cores: Number(v) })} />
+                        <CustomTextField label="Taktowanie bazowe GHz (number)" type='number' value={componentToEdit.baseClock !== undefined ? String(componentToEdit.baseClock) : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, baseClock: Number(v) })} />
+                        <CustomTextField label="Taktowanie boost GHz (number)" type='number' value={componentToEdit.boostClock !== undefined ? String(componentToEdit.boostClock) : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, boostClock: Number(v) })} />
+                        <CustomTextField label="Wątki (number)" type='number' value={componentToEdit.threads !== undefined ? String(componentToEdit.threads) : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, threads: Number(v) })} />
+                        <CustomTextField label="Zintegrowana grafika (string)" value={componentToEdit.integratedGraphics} onChange={(v) => setComponentToEdit({ ...componentToEdit, integratedGraphics: v })} />
+                        <CustomTextField label="TDP (number)" type='number' value={componentToEdit.tdp !== undefined ? String(componentToEdit.tdp) : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, tdp: Number(v) })} />
                     </div>
                 );
 
             case ComponentTypeEnum.GRAPHICS_CARD:
                 return (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <CustomTextField label="Pamięć VRAM (number)" value={details.vram} onChange={(v) => handleDetailChange('vram', v)} />
-                        <CustomTextField label="Rodzaj pamięci (string)" value={details.gddr} onChange={(v) => handleDetailChange('gddr', v)} />
-                        <CustomTextField label="TDP (number)" value={details.powerDraw} onChange={(v) => handleDetailChange('powerDraw', v)} />
-                        <CustomTextField label="Boost Clock (number)" value={details.boostClock} onChange={(v) => handleDetailChange('boostClock', v)} />
-                        <CustomTextField label="Długość karty mm (number)" value={details.lengthInMM} onChange={(v) => handleDetailChange('lengthInMM', v)} />
+                        <CustomTextField label="Pamięć VRAM (number)" type='number' value={componentToEdit.vram !== undefined ? String(componentToEdit.vram) : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, vram: Number(v) })} />
+                        <CustomTextField label="Rodzaj pamięci (string)" value={componentToEdit.gddr !== undefined ? componentToEdit.gddr : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, gddr: v })} />
+                        <CustomTextField label="TDP (number)" type='number' value={componentToEdit.powerDraw !== undefined ? String(componentToEdit.powerDraw) : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, powerDraw: Number(v) })} />
+                        <CustomTextField label="Boost Clock (number)" type='number' value={componentToEdit.boostClock !== undefined ? String(componentToEdit.boostClock) : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, boostClock: Number(v) })} />
+                        <CustomTextField label="Długość karty mm (number)" type='number' value={componentToEdit.lengthInMM !== undefined ? String(componentToEdit.lengthInMM) : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, lengthInMM: Number(v) })} />
                     </div>
                 );
 
             case ComponentTypeEnum.MEMORY:
                 return (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <CustomTextField label="Typ pamięci (string)" value={details.type} onChange={(v) => handleDetailChange('type', v)} />
-                        <CustomTextField label="Pojemność GB (number)" value={details.capacity} onChange={(v) => handleDetailChange('capacity', v)} />
-                        <CustomTextField label="Taktowanie MHz (number)" value={details.speed} onChange={(v) => handleDetailChange('speed', v)} />
-                        <CustomTextField label="Opóźnienie CL (number)" value={details.latency} onChange={(v) => handleDetailChange('latency', v)} />
-                        <CustomTextField label="Ilość (number)" value={details.amount} onChange={(v) => handleDetailChange('amount', v)} />
+                        <CustomTextField label="Typ pamięci (string)" value={componentToEdit.type !== undefined ? componentToEdit.type : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, type: v })} />
+                        <CustomTextField label="Pojemność GB (number)" type='number' value={componentToEdit.capacity !== undefined ? String(componentToEdit.capacity) : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, capacity: Number(v) })} />
+                        <CustomTextField label="Taktowanie MHz (number)" type='number' value={componentToEdit.speed !== undefined ? String(componentToEdit.speed) : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, speed: Number(v) })} />
+                        <CustomTextField label="Opóźnienie CL (number)" type='number' value={componentToEdit.latency !== undefined ? String(componentToEdit.latency) : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, latency: Number(v) })} />
+                        <CustomTextField label="Ilość (number)" type='number' value={componentToEdit.amount !== undefined ? String(componentToEdit.amount) : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, amount: Number(v) })} />
                     </div>
                 );
 
             case ComponentTypeEnum.MOTHERBOARD:
                 return (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <CustomTextField label="Chipset (string)" value={details.chipset} onChange={(v) => handleDetailChange('chipset', v)} />
-                        <CustomTextField label="Typ socketu (string)" value={details.socketType} onChange={(v) => handleDetailChange('socketType', v)} />
-                        <CustomTextField label="Rodzaj pamięci (string)" value={details.memoryType} onChange={(v) => handleDetailChange('memoryType', v)} />
-                        <CustomTextField label="Format płyty (string)" value={details.format} onChange={(v) => handleDetailChange('format', v)} />
-                        <CustomTextField label="Ilość slotów RAM (number)" value={details.ramSlots} onChange={(v) => handleDetailChange('ramSlots', v)} />
-                        <CustomTextField label="Max pojemność RAM GB (number)" value={details.ramCapacity} onChange={(v) => handleDetailChange('ramCapacity', v)} />
+                        <CustomTextField label="Chipset (string)" value={componentToEdit.chipset !== undefined ? componentToEdit.chipset : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, chipset: v })} />
+                        <CustomTextField label="Typ socketu (string)" value={componentToEdit.socketType !== undefined ? componentToEdit.socketType : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, socketType: v })} />
+                        <CustomTextField label="Rodzaj pamięci (string)" value={componentToEdit.memoryType !== undefined ? componentToEdit.memoryType : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, memoryType: v })} />
+                        <CustomTextField label="Format płyty (string)" value={componentToEdit.format !== undefined ? componentToEdit.format : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, format: v })} />
+                        <CustomTextField label="Ilość slotów RAM (number)" type='number' value={componentToEdit.ramSlots !== undefined ? String(componentToEdit.ramSlots) : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, ramSlots: Number(v) })} />
+                        <CustomTextField label="Max pojemność RAM GB (number)" type='number' value={componentToEdit.ramCapacity !== undefined ? String(componentToEdit.ramCapacity) : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, ramCapacity: Number(v) })} />
                     </div>
                 );
 
             case ComponentTypeEnum.POWER_SUPPLY:
                 return (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <CustomTextField label="Moc maksymalna W (number)" value={details.maxPowerWatt} onChange={(v) => handleDetailChange('maxPowerWatt', v)} />
-                        <CustomTextField label="Certyfikat (string)" value={details.efficiencyRating} onChange={(v) => handleDetailChange('efficiencyRating', v)} />
-                        <CustomTextField label="Modular (string)" value={details.modular} onChange={(v) => handleDetailChange('modular', v)} />
-                        <CustomTextField label="Typ (string)" value={details.type} onChange={(v) => handleDetailChange('type', v)} />
+                        <CustomTextField label="Moc maksymalna W (number)" type='number' value={componentToEdit.maxPowerWatt !== undefined ? String(componentToEdit.maxPowerWatt) : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, maxPowerWatt: Number(v) })} />
+                        <CustomTextField label="Certyfikat (string)" value={componentToEdit.efficiencyRating !== undefined ? componentToEdit.efficiencyRating : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, efficiencyRating: v })} />
+                        <CustomTextField label="Modular (string)" value={componentToEdit.modular !== undefined ? componentToEdit.modular : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, modular: v })} />
+                        <CustomTextField label="Typ (string)" value={componentToEdit.type !== undefined ? componentToEdit.type : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, type: v })} />
                     </div>
                 );
 
             case ComponentTypeEnum.STORAGE:
                 return (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <CustomTextField label="Pojemność GB (number)" value={details.capacity} onChange={(v) => handleDetailChange('capacity', v)} />
+                        <CustomTextField label="Pojemność GB (number)" type='number' value={componentToEdit.capacity !== undefined ? String(componentToEdit.capacity) : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, capacity: Number(v) })} />
                     </div>
                 );
 
             case ComponentTypeEnum.CPU_COOLER:
                 return (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <CustomTextField label="Sockety (rozdziel przecinkami)" value={details.coolerSocketsType} onChange={(v) => handleDetailChange('coolerSocketsType', v)} />
-                        <CustomTextField label="Obroty wentylatorów (string)" value={details.fanRpm} onChange={(v) => handleDetailChange('fanRpm', v)} />
-                        <CustomTextField label="Hałas wentylatorów (string)" value={details.noiseLevel} onChange={(v) => handleDetailChange('noiseLevel', v)} />
-                        <CustomTextField label="Wielkość radiatora (string)" value={details.radiatorSize} onChange={(v) => handleDetailChange('radiatorSize', v)} />
+                        <CustomTextField label="Sockety (rozdziel przecinkami)" value={coolerSocketsTypeInput !== undefined ? coolerSocketsTypeInput : ''} onChange={setCoolerSocketsTypeInput} />
+                        <CustomTextField label="Obroty wentylatorów (string)" value={componentToEdit.fanRpm !== undefined ? componentToEdit.fanRpm : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, fanRpm: v })} />
+                        <CustomTextField label="Hałas wentylatorów (string)" value={componentToEdit.noiseLevel !== undefined ? componentToEdit.noiseLevel : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, noiseLevel: v })} />
+                        <CustomTextField label="Wielkość radiatora (string)" value={componentToEdit.radiatorSize !== undefined ? componentToEdit.radiatorSize : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, radiatorSize: v })} />
                     </div>
                 );
 
             case ComponentTypeEnum.CASE_PC:
                 return (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <CustomTextField label="Format (string)" value={details.format} onChange={(v) => handleDetailChange('format', v)} />
+                        <CustomTextField label="Format (string)" value={componentToEdit.format !== undefined ? componentToEdit.format : ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, format: v })} />
                     </div>
                 );
 
@@ -273,9 +410,10 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
                         <InputLabel id="component-type-label" sx={{ color: 'rgba(241,250,238,0.8)' }}>Typ komponentu</InputLabel>
                         <Select
                             labelId="component-type-label"
-                            value={componentType}
+                            value={componentToEdit.componentType || ''}
                             label="Typ komponentu"
-                            onChange={(e) => setComponentType(e.target.value as ComponentTypeEnum)}
+                            onChange={(e) => setComponentToEdit({ ...componentToEdit, componentType: e.target.value as ComponentTypeEnum })}
+                            disabled={!!initialData}
                             sx={{
                                 '& .MuiSelect-select': { py: 1 },
                                 bgcolor: 'rgba(255,255,255,0.02)',
@@ -294,9 +432,9 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
                         <InputLabel id="brand-label" sx={{ color: 'rgba(241,250,238,0.8)' }}>Firma</InputLabel>
                         <Select
                                 labelId="brand-label"
-                                value={brand}
+                                value={componentToEdit.brand || ''}
                                 label="Firma"
-                                onChange={(e) => setBrand(e.target.value)}
+                                onChange={(e) => setComponentToEdit({ ...componentToEdit, brand: e.target.value })}
                                 
                                 sx={{
                                     '& .MuiSelect-select': { py: 1 },
@@ -313,7 +451,32 @@ const AddComponentForm: React.FC<AddComponentModalProps> = ({ isOpen, onClose, o
                             </Select>
                         </FormControl>
 
-                    <CustomTextField label="Model" value={model} onChange={setModel} required />
+                        { componentToEdit.componentType === ComponentTypeEnum.GRAPHICS_CARD &&
+                            <FormControl size="small" fullWidth required>
+                        <InputLabel id="baseModel-label" sx={{ color: 'rgba(241,250,238,0.8)' }}>Model bazowy</InputLabel>
+                        <Select
+                                labelId="baseModel-label"
+                                value={componentToEdit.baseModel || ''}
+                                label="Model bazowy"
+                                onChange={(e) => setComponentToEdit({ ...componentToEdit, baseModel: Array.isArray(e.target.value) ? e.target.value[0] : e.target.value })}
+                                
+                                sx={{
+                                    '& .MuiSelect-select': { py: 1 },
+                                    bgcolor: 'rgba(255,255,255,0.02)',
+                                    color: 'var(--color-ocean-white)',
+                                    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(241,250,238,0.23)' },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(241,250,238,0.4)' },
+                                }}
+                            >
+                                <MenuItem value=""><em>-- Wybierz model bazowy --</em></MenuItem>
+                                {gpuModels?.map((model) => (
+                                    <MenuItem key={model} value={model}>{model}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        }
+
+                    <CustomTextField label="Model" value={componentToEdit.model || ''} onChange={(v) => setComponentToEdit({ ...componentToEdit, model: v })} required />
                     {renderDynamicFields()}
                 </Stack>
 
@@ -335,7 +498,8 @@ const CustomTextField: React.FC<{
     value?: string;
     onChange: (v: string) => void;
     required?: boolean;
-}> = ({ label, value, onChange, required = false }) => (
+    type?: string;
+}> = ({ label, value, onChange, required = false, type = "text" }) => (
     <TextField
         label={label}
         value={value || ''}
@@ -343,6 +507,8 @@ const CustomTextField: React.FC<{
         size="small"
         fullWidth
         required={required}
+        type={type}
+        inputProps={type === "number" ? { min: 0, step: "any" } : undefined}
         sx={{
             '& .MuiInputBase-root': { bgcolor: 'rgba(255,255,255,0.02)', color: 'var(--color-ocean-white)' },
             '& .MuiInputLabel-root': { color: 'rgba(241,250,238,0.8)' },
