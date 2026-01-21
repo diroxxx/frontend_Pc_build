@@ -68,8 +68,7 @@ function UserProfile(){
                 toast.success('Password changed successfully! You will be logged out.', {
                     duration: 3000,
                 });
-                
-                // Reset form
+
                 resetPasswordForm();
                 setTimeout(() => {
                     logout();
@@ -90,7 +89,6 @@ function UserProfile(){
     
     return(
         <div className="bg-gray-100 rounded-lg shadow-lg p-8 max-w-md mx-auto">
-                        {/* Profile Image */}
                         <div className="flex justify-center mb-6">
                             <div className="relative">
                                 <img
@@ -106,13 +104,10 @@ function UserProfile(){
                                         console.log("Image loaded successfully");
                                     }}
                                 />
-                                {/* <button className="absolute bottom-0 right-0 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-700 transition-colors duration-200">
-                                    edit
-                                </button> */}
                             </div>
                         </div>
 
-                        {/* Form Fields */}
+
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -146,11 +141,9 @@ function UserProfile(){
                                 </p>
                             </div>
 
-                            {/* Password Change Section */}
                             <div className="border-t pt-4">
                                 <h3 className="text-lg font-medium text-gray-700 mb-3">Change Password</h3>
-                                
-                                {/* Current Password */}
+
                                 <div className="mb-3">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         Current Password
@@ -195,7 +188,6 @@ function UserProfile(){
                                     </div>
                                 </div>
 
-                                {/* New Password Fields - Only show after verification */}
                                 {isPasswordVerified && (
                                     <>
                                         <div className="mb-3">
