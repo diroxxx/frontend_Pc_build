@@ -5,6 +5,7 @@ import { userAtom } from '../../auth/atoms/userAtom.tsx';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import {useLogout} from "../../auth/user/hooks/useLogout.ts";
+import { showToast } from '../../../lib/ToastContainer.tsx';
 
 function UserProfile(){
     const [user,] = useAtom(userAtom);
@@ -20,7 +21,7 @@ function UserProfile(){
     const logout = useLogout();
     const verifyCurrentPassword = async () => {
         if (!currentPassword) {
-            toast.error('Please enter your current password');
+            showToast.error('Please enter your current password');
             return;
         }
 
@@ -33,10 +34,10 @@ function UserProfile(){
 
             if (response.status === 200) {
                 setIsPasswordVerified(true);
-                toast.success('Password verified successfully');
+                showToast.success('Password verified successfully');
             }
         } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Current password is incorrect');
+            showToast.error(error.response?.data?.message || 'Current password is incorrect');
             setIsPasswordVerified(false);
         } finally {
             setIsVerifying(false);
@@ -45,17 +46,17 @@ function UserProfile(){
 
     const handlePasswordChange = async () => {
         if (!newPassword || !confirmPassword) {
-            toast.error('Please fill in all password fields');
+            showToast.error('Please fill in all password fields');
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            toast.error('New passwords do not match');
+            showToast.error('New passwords do not match');
             return;
         }
 
         if (newPassword.length < 8) {
-            toast.error('New password must be at least 8 characters long');
+            showToast.error('New password must be at least 8 characters long');
             return;
         }
 
@@ -65,9 +66,7 @@ function UserProfile(){
             });
 
             if (response.status === 200) {
-                toast.success('Password changed successfully! You will be logged out.', {
-                    duration: 3000,
-                });
+                showToast.success('Password changed successfully! You will be logged out.');
 
                 resetPasswordForm();
                 setTimeout(() => {
@@ -76,7 +75,7 @@ function UserProfile(){
                 }, 1000);
             }
         } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Failed to change password');
+            showToast.error(error.response?.data?.message || 'Failed to change password');
         }
     };
 
@@ -180,7 +179,7 @@ function UserProfile(){
                                             <button
                                                 onClick={verifyCurrentPassword}
                                                 disabled={isVerifying || !currentPassword}
-                                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                                className="px-4 py-2 bg-ocean-blue text-white rounded-md hover:bg-ocean-blue-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 cursor-pointer"
                                             >
                                                 {isVerifying ? 'Verifying...' : 'Verify'}
                                             </button>
@@ -255,7 +254,7 @@ function UserProfile(){
                                         <div className="flex gap-2">
                                             <button
                                                 onClick={handlePasswordChange}
-                                                className="flex-1 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors duration-200"
+                                                className="flex-1 bg-ocean-teal text-white py-2 rounded-md hover:bg-teal-400 transition-colors duration-200"
                                             >
                                                 Change Password
                                             </button>
