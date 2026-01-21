@@ -88,6 +88,13 @@ const OffersComponent = () => {
     }, [offerUpdateConfig]);
 
     useEffect(() => {
+    if (updateType === 'AUTOMATIC' && !interval) {
+        const firstKey = Object.keys(IntervalsMap)[0];
+        setInterval(firstKey);
+    }
+}, [updateType, interval]);
+
+    useEffect(() => {
         const saved = localStorage.getItem("selectedShops");
         if (saved) {
             setSelectedShopNames(JSON.parse(saved));
@@ -181,11 +188,14 @@ const saveOfferUpdateConfig = useCallback(async () => {
           </span>
                         <button
                             onClick={handleUpdateTypeToggle}
+                            disabled={hasOngoingUpdate}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-ocean-blue focus:ring-offset-2 ${
                                 updateType === 'AUTOMATIC'
                                     ? 'bg-ocean-blue'
                                     : 'bg-gray-200'
-                            }`}
+                            } ${hasOngoingUpdate ? 'opacity-50 cursor-not-allowed' : ''}  `}
+                            title={hasOngoingUpdate ? "Nie można przełączyć na automatyczną podczas trwającej ręcznej aktualizacji" : ""}
+
                         >
             <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
