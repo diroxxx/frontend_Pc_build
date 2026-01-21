@@ -64,7 +64,6 @@ const PostImage: React.FC<PostImageUploaderProps> = ({
             formData.append('postId', String(postId));
 
             try {
-                // Wywołanie endpointu POST w Spring Boot
                 const response = await customAxios.post<PostImageDTO>(
                     `community/posts/upload-image-to-db`,
                     formData,
