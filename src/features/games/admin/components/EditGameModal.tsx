@@ -134,6 +134,14 @@ export const EditGameModal = ({
             processorModel: modelObj?.processorModel ?? "",
             recGameLevel: modelObj?.recGameLevel ?? RecGameLevel.MIN,
         };
+
+            const exists = (gameInfoToChange.cpuSpecs ?? []).some(
+            (cpu) => cpu.processorId === newSpec.processorId && cpu.recGameLevel === newSpec.recGameLevel
+        );
+        if (exists) {
+            showToast.error("Ten procesor z tym poziomem już istnieje!");
+            return;
+        }
         setGameInfoToChange((prev) => ({ ...prev, cpuSpecs: [...(prev.cpuSpecs ?? []), newSpec] }));
     };
 

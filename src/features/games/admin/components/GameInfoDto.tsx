@@ -18,7 +18,6 @@ export function GameInfoDto({ gameReqCompDto,refetchGames, handleOpenEditGameMod
     const { title, imageUrl, cpuSpecs = [], gpuSpecs = [] } = gameReqCompDto;
     const [cacheBuster, setCacheBuster] = useState<number>(() => Date.now());
 
-
     useEffect(() => {
         setCacheBuster(Date.now());
     }, [gameReqCompDto]);
@@ -91,7 +90,7 @@ export function GameInfoDto({ gameReqCompDto,refetchGames, handleOpenEditGameMod
                             <div className="space-y-1">
                                 {cpuSpecs.length === 0 && <p className="text-xs">Brak danych</p>}
 
-                                {cpuSpecs.map((cpu,k) => (
+                                {cpuSpecs.map((cpu, k) => (
                                     <div
                                         key={k}
                                         className="flex items-center justify-between p-2 rounded-md"
