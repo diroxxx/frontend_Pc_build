@@ -54,6 +54,7 @@ export function AddNewGameModal({ open, handleClose, gamesTitles, gpus, cpus, re
 
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [titleError, setTitleError] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(false);
 
 
 
@@ -357,8 +358,8 @@ export function AddNewGameModal({ open, handleClose, gamesTitles, gpus, cpus, re
                         variant="contained"
                         size="small"
                         className="bg-[var(--color-ocean-blue)] hover:bg-[var(--color-ocean-dark-blue)] text-[var(--color-ocean-white)]"
-                    >
-                        Zapisz
+                        disabled={loading}>
+                        {loading ? "Zapisywanie..." : "Zapisz"}
                     </Button>
                 </div>
             </Box>

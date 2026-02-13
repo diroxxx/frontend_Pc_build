@@ -4,10 +4,12 @@ import {setAuthToken} from "../hooks/Auth.tsx";
 import { useAtom} from 'jotai';
 import { loginAdminAtom} from '../atoms/userAtom.tsx';
 import { AuthRedirect } from '../../../components/auth/AuthRedirect.tsx';
-
+import { LoadingSpinner } from '../../../assets/components/ui/LoadingSpinner.tsx';
 const AdminLoginPage = () => {
     const [, loginAdmin] = useAtom(loginAdminAtom);
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+
 
 
     const [credentials, setCredentials] = useState({
@@ -17,6 +19,7 @@ const AdminLoginPage = () => {
   
    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
            event.preventDefault();
+            setLoading(true);
            fetch("http://localhost:8080/auth/login/admin", {
                method: "POST",
                headers: {"content-type": "application/json"},
@@ -95,12 +98,14 @@ const AdminLoginPage = () => {
                             </div>
                         </div>
                         
-                        <button 
+                       <button 
                             type="submit"
-                            className="w-full bg-ocean-blue hover:bg-ocean-dark-blue text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 shadow-sm"
-                        >
-                            Zaloguj jako Administrator
-                        </button>
+                            className="w-full bg-ocean-blue hover:bg-ocean-dark-blue text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 shadow-sm flex items-center justify-center"
+                            disabled={loading}
+                            >
+                            {loading ? "Logowanie..." : "Zaloguj jako Administrator"}
+                           
+                            </button>
                     </form>
                     
                     <div className="text-center mt-6 pt-6 border-t border-gray-200">

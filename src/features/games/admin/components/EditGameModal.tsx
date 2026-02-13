@@ -21,6 +21,7 @@ import Button from "@mui/material/Button";
 import {updateGameReqCompApi} from "../api/updateGameReqCompApi.ts";
 import {modalSx} from "../../../../shared/dtos/modalStyle.ts";
 import Alert from "@mui/material/Alert";
+import { set } from "date-fns";
 
 interface GameModalProps {
     open: boolean;
@@ -55,6 +56,8 @@ export const EditGameModal = ({
 
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [titleError, setTitleError] = useState<string>("");
+    const [loading, setLoading] = useState(false);
+
 
 
     useEffect(() => {
@@ -190,7 +193,7 @@ export const EditGameModal = ({
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
-
+        setLoading(true);
         if (!validateTitle(gameInfoToChange.title)) return;
 
         if ((gameInfoToChange.cpuSpecs?.length ?? 0) === 0) {
@@ -419,8 +422,8 @@ export const EditGameModal = ({
                         Anuluj
                     </Button>
 
-                    <Button type="submit" variant="contained" size="small">
-                        Zapisz
+                    <Button type="submit" variant="contained" size="small" disabled={loading}>
+                        {loading ? "Zapisywanie..." : "Zapisz"}
                     </Button>
                 </div>
             </Box>
