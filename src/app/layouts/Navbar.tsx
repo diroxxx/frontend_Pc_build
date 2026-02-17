@@ -109,7 +109,7 @@ return (
             { (
                 <div className="border-t border-white border-opacity-20">
                     <nav className="px-6 py-3">
-                        <div className="flex gap-1 justify-center">
+                        <div className="flex gap-1 justify-center flex-wrap">
                             <button 
                                 onClick={() => navigate("/")} 
                                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
