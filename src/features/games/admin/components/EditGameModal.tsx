@@ -193,7 +193,6 @@ export const EditGameModal = ({
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
         if (!validateTitle(gameInfoToChange.title)) return;
 
         if ((gameInfoToChange.cpuSpecs?.length ?? 0) === 0) {
@@ -225,14 +224,17 @@ export const EditGameModal = ({
                 gpuSpecs: gameInfoToChange.gpuSpecs ?? [],
             };
 
+            setLoading(true);
             console.log(dtoToSend);
             setErrorMessage("");
             setTitleError("");
             await updateGameReqCompApi(dtoToSend, selectedFile).then(() => refetchGames());
             console.log("dtoToSend", dtoToSend);
             showToast.success("Zapisano zmiany");
+            setLoading(false);
             handleClose();
         } catch (err) {
+            setLoading(false);
             console.error("save failed", err);
             showToast.error("Błąd podczas zapisu");
         }
