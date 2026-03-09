@@ -4,11 +4,14 @@ import { useAtom } from 'jotai';
 import { userAtom } from '../../features/auth/atoms/userAtom.tsx';
 import {useLogout} from "../../features/auth/user/hooks/useLogout.ts";
 import {useQueryClient} from "@tanstack/react-query";
+import {themeAtom} from "../../shared/atoms/themeAtom.ts";
+import {Sun, Moon} from "lucide-react";
 
 export default function Navbar() {
     const navigate = useNavigate();
     const location = useLocation();
     const [user] = useAtom(userAtom);
+    const [theme, setTheme] = useAtom(themeAtom);
     // const [, logout] = useAtom(logoutUserAtom);
     const [showDropdown, setShowDropdown] = useState(false);
     const [, setIsScrolled] = useState(false);
@@ -50,7 +53,14 @@ return (
                     Pc-Build
                 </h1>
                 
-                <div className="flex gap-3 relative">
+                <div className="flex gap-3 relative items-center">
+                    <button
+                        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                        className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all duration-200"
+                        title={theme === 'dark' ? 'Przełącz na jasny motyw' : 'Przełącz na ciemny motyw'}
+                    >
+                        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                    </button>
                     {user ? (
                         <div ref={dropdownRef} className="relative flex items-center gap-3">
                             <span className="text-sm font-medium px-3 py-1 rounded-full">

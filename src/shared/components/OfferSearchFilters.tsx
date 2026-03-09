@@ -22,50 +22,46 @@ export const OfferSearchFilters = () => {
     };
 
     return (
-        <div className=" bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-            <div className="mx-auto max-w-7xl px-4 py-6">
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
 
-                    <div className="w-full md:flex-1">
-                        <div className="relative w-full">
-                            <input
-                                type="text"
-                                placeholder="Wyszukaj ofertę (np. Nvidia, RTX 4080)..."
-                                value={tempSearchFilter}
-                                onChange={(e) => setTempSearchFilter(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                                className="w-full px-5 py-3.5 pl-12 pr-12 text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ocean-blue/20 focus:border-ocean-blue transition-all"
-                            />
+            <div className="w-full sm:flex-1">
+                <div className="relative w-full">
+                    <input
+                        type="text"
+                        placeholder="Wyszukaj komponent (np. Nvidia, RTX 4080, AM5...)..."
+                        value={tempSearchFilter}
+                        onChange={(e) => setTempSearchFilter(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                        className="w-full px-4 py-2.5 pl-11 pr-10 text-sm bg-dark-surface border border-dark-border rounded-xl text-dark-text placeholder-dark-muted focus:border-dark-accent transition-colors"
+                    />
 
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                <SearchIcon className="h-5 w-5" />
-                            </div>
-
-                            {tempSearchFilter && (
-                                <button
-                                    onClick={handleSearch}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-ocean-blue hover:text-ocean-blue/80 transition"
-                                >
-                                    <ArrowRight className="h-5 w-5" />
-                                </button>
-                            )}
-                        </div>
+                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dark-muted">
+                        <SearchIcon className="h-4 w-4" />
                     </div>
 
-                    <div className="w-full md:w-60">
-                        <select
-                            value={offerLeftPanelFilters.sortBy}
-                            onChange={handleSortChange}
-                            className="w-full px-5 py-3.5 text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ocean-blue/20 focus:border-ocean-blue transition-all cursor-pointer bg-white"
+                    {tempSearchFilter && (
+                        <button
+                            onClick={handleSearch}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-accent hover:text-white transition"
                         >
-                            <option value={SortByOffersEnum.CHEAPEST}>Najtańsze</option>
-                            <option value={SortByOffersEnum.EXPENSIVE}>Najdroższe</option>
-                            <option value={SortByOffersEnum.NEWEST}>Najnowsze</option>
-                        </select>
-                    </div>
-
+                            <ArrowRight className="h-4 w-4" />
+                        </button>
+                    )}
                 </div>
             </div>
+
+            <div className="w-full sm:w-48">
+                <select
+                    value={offerLeftPanelFilters.sortBy}
+                    onChange={handleSortChange}
+                    className="w-full px-4 py-2.5 text-sm bg-dark-surface border border-dark-border rounded-xl text-dark-text focus:border-dark-accent transition-colors cursor-pointer"
+                >
+                    <option value={SortByOffersEnum.CHEAPEST}>Najtańsze</option>
+                    <option value={SortByOffersEnum.EXPENSIVE}>Najdroższe</option>
+                    <option value={SortByOffersEnum.NEWEST}>Najnowsze</option>
+                </select>
+            </div>
+
         </div>
     );
 

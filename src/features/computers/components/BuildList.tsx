@@ -71,28 +71,26 @@ const BuildList = ({
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6 border border-ocean-light-blue">
+        <div className="bg-dark-surface border border-dark-border rounded-xl p-5 mb-4">
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-midnight-dark">Twoje zestawy</h2>
+                <h2 className="text-xs font-bold text-dark-muted uppercase tracking-widest">Twoje zestawy</h2>
                 <button
                     type="button"
-                    onClick={() => {
-                        onCreateNew();
-                    }}
-                    className= "px-4 py-2 rounded-lg font-medium text-white bg-gradient-ocean hover:bg-gradient-ocean-hover"
+                    onClick={onCreateNew}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-dark-accent/15 text-dark-accent hover:bg-dark-accent hover:text-white text-xs font-semibold transition-all"
                 >
                     + Nowy zestaw
                 </button>
             </div>
 
             {isLoading ? (
-                <p className="text-center text-ocean-blue py-8">Ładowanie zestawów...</p>
+                <p className="text-center text-dark-muted text-sm py-6">Ładowanie zestawów...</p>
             ) : computers.length === 0 ? (
-                <p className="text-center py-8 text-ocean-blue">
+                <p className="text-center py-6 text-dark-muted text-sm">
                     Brak zestawów. Utwórz swój pierwszy!
                 </p>
             ) : (
-                <div className="grid gap-3 max-h-48 overflow-y-auto">
+                <div className="grid gap-2 max-h-48 overflow-y-auto pr-1">
                     {computers.map((computer) => (
                         <div
                             key={computer.id}
@@ -101,73 +99,52 @@ const BuildList = ({
                             onMouseLeave={() => setHoveredId(null)}
                             className={`p-3 rounded-lg border cursor-pointer transition-all duration-200 ${
                                 selectedComputer?.id === computer.id
-                                    ? "border-ocean-blue bg-ocean-light-blue bg-opacity-20 shadow-md"
-                                    : "border-ocean-light-blue hover:border-ocean-blue hover:bg-ocean-light-blue hover:bg-opacity-10"
+                                    ? "border-dark-accent/40 bg-dark-accent/10"
+                                    : "border-dark-border bg-dark-surface2 hover:border-dark-accent/30"
                             }`}
                         >
-                            <div className="flex justify-between items-center">
-                                <div className="flex flex-col relative">
+                            <div className="flex justify-between items-center gap-2">
+                                <div className="flex flex-col flex-1 min-w-0">
                                     {user && editingId === computer.id ? (
                                         <input
                                             type="text"
                                             value={newName}
                                             autoFocus
                                             onChange={(e) => setNewName(e.target.value)}
-                                            onBlur={() => {
-                                                saveName(computer.id);
-                                                setEditingId(null);
-                                            }}
+                                            onBlur={() => { saveName(computer.id); setEditingId(null); }}
                                             onKeyDown={(e) => {
                                                 if (e.key === "Enter") saveName(computer.id);
                                                 if (e.key === "Escape") setEditingId(null);
                                             }}
-                                            className="text-sm font-medium text-midnight-dark bg-transparent border-b border-ocean-blue focus:outline-none focus:ring-0 pr-6"
+                                            className="text-sm font-medium text-dark-text bg-transparent border-b border-dark-accent focus:outline-none pr-6"
                                         />
                                     ) : (
-                                        <div className="flex items-center group">
+                                        <div className="flex items-center gap-2 group">
                                             <h3
-                                                className="font-medium text-midnight-dark cursor-text"
-                                                onDoubleClick={(e) => {
-                                                    e.stopPropagation();
-                                                    if (user) startEditing(computer.id, computer.name);
-                                                }}
+                                                className={`text-sm font-semibold truncate cursor-text ${selectedComputer?.id === computer.id ? "text-dark-accent" : "text-dark-text"}`}
+                                                onDoubleClick={(e) => { e.stopPropagation(); if (user) startEditing(computer.id, computer.name); }}
                                             >
                                                 {computer.name}
                                             </h3>
-
                                             {user && hoveredId === computer.id && (
                                                 <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        startEditing(computer.id, computer.name);
-                                                    }}
-                                                    className="ml-2 text-ocean-blue opacity-0 group-hover:opacity-100 hover:text-ocean-dark-blue transition-opacity duration-200"
-                                                    title="Zmień nazwę zestawu"
+                                                    onClick={(e) => { e.stopPropagation(); startEditing(computer.id, computer.name); }}
+                                                    className="text-dark-muted hover:text-dark-accent transition-colors flex-shrink-0"
+                                                    title="Zmień nazwę"
                                                 >
-                                                    <Pencil size={16} />
+                                                    <Pencil size={13} />
                                                 </button>
                                             )}
                                         </div>
                                     )}
-
-                                    <p className="text-sm text-ocean-blue">
-                                        {(computer.offers || []).length} komponentów - {" "}
-                                        {computer.price.toLocaleString("pl-PL")} zł
+                                    <p className="text-[11px] text-dark-muted mt-0.5">
+                                        {(computer.offers || []).length} komponentów · {computer.price.toLocaleString("pl-PL")} zł
                                     </p>
                                 </div>
 
                                 <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        if (user) {
-                                            handleDelete(computer.id);
-                                        } else {
-                                            handleDeleteGuestComuter(computer.name)
-                                        }
-
-                                    }
-                                }
-                                    className="hover:text-ocean-red p-1 transition-colors duration-200 cursor-pointer"
+                                    onClick={(e) => { e.stopPropagation(); user ? handleDelete(computer.id) : handleDeleteGuestComuter(computer.name); }}
+                                    className="flex-shrink-0 text-dark-muted hover:text-ocean-red transition-colors p-1"
                                     title="Usuń zestaw"
                                 >
                                     <RemoveIcon />

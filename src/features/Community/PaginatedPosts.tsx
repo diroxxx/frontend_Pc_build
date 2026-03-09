@@ -25,9 +25,9 @@ const PaginatedList = <T,>({ items, itemsPerPage = 5, renderItem }: PaginatedLis
             </ul>
 
             {totalPages > 1 && (
-                <div className="flex justify-center mt-4 space-x-2">
+                <div className="flex justify-center items-center mt-6 gap-1.5">
                     <button
-                        className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+                        className="px-3 py-1.5 text-sm rounded-lg bg-dark-surface border border-dark-border text-dark-text hover:bg-dark-surface2 disabled:opacity-40 disabled:cursor-not-allowed transition"
                         onClick={() => goToPage(currentPage - 1)}
                         disabled={currentPage === 1}
                     >
@@ -37,7 +37,7 @@ const PaginatedList = <T,>({ items, itemsPerPage = 5, renderItem }: PaginatedLis
                     {[...Array(totalPages)].map((_, idx) => (
                         <button
                             key={idx}
-                            className={`px-3 py-1 rounded ${currentPage === idx + 1 ? 'bg-ocean-blue text-white' : 'bg-gray-200'}`}
+                            className={`w-8 h-8 text-sm rounded-lg font-medium transition ${currentPage === idx + 1 ? 'bg-ocean-blue text-white border border-ocean-blue' : 'bg-dark-surface border border-dark-border text-dark-muted hover:bg-dark-surface2 hover:text-dark-text'}`}
                             onClick={() => goToPage(idx + 1)}
                         >
                             {idx + 1}
@@ -45,7 +45,7 @@ const PaginatedList = <T,>({ items, itemsPerPage = 5, renderItem }: PaginatedLis
                     ))}
 
                     <button
-                        className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+                        className="px-3 py-1.5 text-sm rounded-lg bg-dark-surface border border-dark-border text-dark-text hover:bg-dark-surface2 disabled:opacity-40 disabled:cursor-not-allowed transition"
                         onClick={() => goToPage(currentPage + 1)}
                         disabled={currentPage === totalPages}
                     >

@@ -55,23 +55,23 @@ const AddCommentForm: React.FC<AddCommentFormProps> = ({ postId, onCommentAdded 
 
     if (!isAuthenticated) {
         return (
-            <div className="p-4 bg-yellow-100 text-yellow-800 border-l-4 border-yellow-500">
+            <div className="p-3 bg-yellow-500/10 text-yellow-600 border-l-4 border-yellow-500 rounded text-sm">
                 Zaloguj się, aby dodać komentarz.
             </div>
         );
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <h3 className="text-xl font-semibold text-gray-800">Dodaj Komentarz: </h3>
+        <form onSubmit={handleSubmit} className="space-y-3">
+            <h3 className="text-sm font-semibold text-dark-text">Dodaj komentarz</h3>
 
             <textarea
                 value={commentContent}
                 onChange={(e) => setCommentContent(e.target.value)}
                 placeholder="Napisz swój komentarz..."
-                rows={4}
+                rows={3}
                 required
-                className="w-full p-3 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-2.5 text-sm border border-dark-border rounded-lg bg-dark-surface text-dark-text placeholder:text-dark-muted focus:outline-none focus:ring-2 focus:ring-dark-accent/40"
                 disabled={loading}
             />
 
@@ -81,10 +81,10 @@ const AddCommentForm: React.FC<AddCommentFormProps> = ({ postId, onCommentAdded 
 
             <button
                 type="submit"
-                className="px-6 py-2 bg-ocean-blue text-white font-bold rounded hover:bg-ocean-blue-hover transition disabled:bg-gray-400 cursor-pointer"
+                className="px-4 py-1.5 text-sm bg-ocean-blue text-white font-semibold rounded-lg hover:bg-ocean-blue-hover transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 disabled={loading || !commentContent.trim()}
             >
-                {loading ? 'Wysyłanie...' : 'Opublikuj Komentarz'}
+                {loading ? 'Wysyłanie...' : 'Opublikuj'}
             </button>
         </form>
     );

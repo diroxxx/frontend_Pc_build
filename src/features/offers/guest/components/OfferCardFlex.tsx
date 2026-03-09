@@ -9,6 +9,7 @@ import {ImageOff} from "lucide-react";
 import {ShopImageComponent} from "./ShopImageComponent.tsx";
 import {userAtom} from "../../../auth/atoms/userAtom.tsx";
 import {guestComputersAtom} from "../../../computers/atoms/guestComputersAtom.ts";
+import {PriceHistoryModal} from "./PriceHistoryModal.tsx";
 
 interface Props {
     offer: ComponentOffer;
@@ -18,6 +19,7 @@ const OfferCardFlex = ({ offer } : Props) => {
     const selectedComputer = useAtomValue(selectedComputerAtom);
     const updateMutation = useUpdateOffersToComputer();
     const [imgError, setImgError] = useState(false);
+    const [showModal, setShowModal] = useState(false);
     const user =useAtomValue(userAtom);
     const [guestcomputers, setGuestComputers] = useAtom(guestComputersAtom);
 
@@ -174,11 +176,13 @@ const OfferCardFlex = ({ offer } : Props) => {
 
 
     return (
-        <div className="relative group bg-white border rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200 border-gray-200 hover:border-ocean-blue">
+        <>
+        {showModal && <PriceHistoryModal offer={offer} onClose={() => setShowModal(false)} />}
+        <div onClick={() => setShowModal(true)} className="relative group bg-dark-surface border border-dark-border rounded-xl p-4 hover:border-dark-accent/50 hover:bg-dark-surface2 transition-all duration-200 cursor-pointer overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[3px] before:bg-transparent before:transition-colors hover:before:bg-dark-accent">
             <div className="flex gap-4">
 
-                <div className="flex flex-col gap-1">
-                    <div className="w-24 h-24 flex items-center justify-center bg-gray-50 border border-gray-200 rounded">
+                <div className="flex flex-col gap-2 flex-shrink-0">
+                    <div className="w-20 h-20 flex items-center justify-center bg-dark-surface2 border border-dark-border rounded-xl overflow-hidden">
                         {hasValidPhoto && !imgError ? (
                             <img
                                 src={offer.photoUrl}
@@ -187,39 +191,42 @@ const OfferCardFlex = ({ offer } : Props) => {
                                 onError={() => setImgError(true)}
                             />
                         ) : (
-                            <ImageOff className="text-gray-400 w-10 h-10" strokeWidth={1.5} />
+                            <ImageOff className="text-dark-border w-8 h-8" strokeWidth={1.5} />
                         )}
                     </div>
-                    
+
                     <span
-                        className={`text-[10px] font-semibold px-1.5 py-0.5 rounded shadow-sm text-center
-                            ${offer.condition === "NEW" ? "bg-teal-100 text-teal-800 "
-                                : offer.condition === "USED" ? "bg-amber-100 text-amber-800 "
-                                    : "bg-ocean-red/20 text-ocean-red"}`}
+                        className={`text-[10px] font-semibold px-1.5 py-0.5 rounded text-center border
+                            ${offer.condition === "NEW"
+                                ? "bg-green-500/10 text-green-400 border-green-500/20"
+                                : offer.condition === "USED"
+                                    ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                                    : "bg-ocean-red/10 text-ocean-red border-ocean-red/20"}`}
                     >
                         {offer.condition === "NEW"
                             ? "NOWY"
                             : offer.condition === "USED"
                                 ? "UŻYWANY"
-                                : "USZKODZONY"}
+                                : "USZKODZ."}
                     </span>
                 </div>
 
-                <div className="flex-1 flex flex-col justify-between">
+                <div className="flex-1 flex flex-col justify-between min-w-0">
                     <div className="flex justify-between items-start gap-2">
-                        <div>
-                            <h3 className="text-sm sm:text-base font-semibold text-midnight-dark leading-tight">
+                        <div className="min-w-0">
+                            <h3 className="text-sm sm:text-base font-bold text-dark-text leading-tight truncate">
                                 <a
                                     href={offer.websiteUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="hover:text-ocean-blue hover:underline transition-colors"
+                                    className="hover:text-dark-accent transition-colors"
+                                    onClick={(e) => e.stopPropagation()}
                                 >
                                     {offer.brand} {offer.model}
                                 </a>
                             </h3>
                             {offer.title && (
-                                <p className="text-xs text-gray-500 mt-0.5 line-clamp-1 group-hover:line-clamp-2 transition-all">
+                                <p className="text-xs text-dark-muted mt-0.5 line-clamp-1 group-hover:line-clamp-2 transition-all">
                                     {offer.title}
                                 </p>
                             )}
@@ -235,39 +242,34 @@ const OfferCardFlex = ({ offer } : Props) => {
                             {specTags.map((tag, index) => (
                                 <span
                                     key={index}
-                                    className="text-xs px-2 py-0.5 rounded bg-ocean-light-blue bg-opacity-20 text-ocean-dark-blue border border-ocean-light-blue"
+                                    className="text-[11px] px-2 py-0.5 rounded-md bg-dark-tag-bg text-dark-tag-text border border-dark-tag-text/10 font-medium"
                                 >
-                  {tag}
-                </span>
+                                    {tag}
+                                </span>
                             ))}
                         </div>
                     )}
 
                     <div className="mt-3 flex justify-between items-center">
-                      <span className="text-lg font-bold text-ocean-dark-blue">
-                        {offer.price.toLocaleString("pl-PL")} zł
-                      </span>
+                        <span className="text-xl font-extrabold text-white">
+                            {offer.price.toLocaleString("pl-PL")} zł
+                        </span>
 
                         <button
-                            onClick={user ? updateComputer : updateComputerGuest}
-                            className="p-2 rounded-md bg-ocean-blue text-white hover:bg-ocean-dark-blue transition-colors"
+                            onClick={(e) => { e.stopPropagation(); (user ? updateComputer : updateComputerGuest)(); }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-dark-accent/15 text-dark-accent hover:bg-dark-accent hover:text-white transition-all text-xs font-semibold"
                             aria-label="Dodaj do zestawu"
                         >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="w-4 h-4"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth={2}
-                            >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                             </svg>
+                            Dodaj
                         </button>
                     </div>
                 </div>
             </div>
         </div>
+        </>
     );
 };
 export default OfferCardFlex;

@@ -1,6 +1,7 @@
 import {ComponentTypeEnum} from "../../../shared/dtos/BaseItemDto.ts";
 import {useAtomValue} from "jotai";
 import {selectedComputerAtom} from "../atoms/computerAtom.tsx";
+import {Filter} from "lucide-react";
 
 interface BuildConfigurationProps {
     categories: ComponentTypeEnum[];
@@ -28,31 +29,38 @@ export default function BuildConfiguration({
 
     const selectedComputer = useAtomValue(selectedComputerAtom)
     return (
-        <div className="bg-white rounded-xl shadow-md overflow-hidden border border-ocean-light-blue">
-            <div className="bg-ocean-blue text-white p-4">
-                <h2 className="text-lg font-semibold">
-                    {selectedComputer ? selectedComputer.name : "Wybierz lub utwórz zestaw"}
-                </h2>
-                {selectedComputer && (
-                    <p className="text-ocean-light-blue text-sm">
-                        Łączna cena: {selectedComputer.price.toLocaleString("pl-PL")} zł
-                    </p>
+        <div className="bg-dark-surface border border-dark-border rounded-xl overflow-hidden">
+            {/* Header */}
+            <div className="px-5 py-4 border-b border-dark-border flex items-center justify-between">
+                <div>
+                    <h2 className="text-sm font-bold text-dark-text">
+                        {selectedComputer ? selectedComputer.name : "Wybierz lub utwórz zestaw"}
+                    </h2>
+                    {selectedComputer && (
+                        <p className="text-xs text-dark-muted mt-0.5">
+                            {selectedComputer.offers?.length || 0} komponentów
+                        </p>
+                    )}
+                </div>
+                {selectedComputer && selectedComputer.offers?.length > 0 && (
+                    <span className="text-lg font-extrabold text-white">
+                        {selectedComputer.price.toLocaleString("pl-PL")} zł
+                    </span>
                 )}
             </div>
 
             {selectedComputer ? (
                 <div>
                     {categories.map((cat) => {
-                        const offer = selectedComputer.offers?.find(
-                            (o) => o.componentType === cat
-                        );
+                        const offer = selectedComputer.offers?.find(o => o.componentType === cat);
 
                         return (
                             <div
                                 key={cat}
-                                className="grid grid-cols-4 border-b border-gray-200 p-3 items-center last:border-b-0 hover:bg-gray-50 transition-colors"
+                                className="grid grid-cols-4 border-b border-dark-border px-5 py-3 items-center last:border-b-0 hover:bg-dark-surface2 transition-colors"
                             >
-                                <div className="font-medium text-midnight-dark">
+                                {/* Category label */}
+                                <div className="text-xs font-semibold text-dark-muted uppercase tracking-wide">
                                     {categoryLabels[cat] || cat}
                                 </div>
 
@@ -63,65 +71,54 @@ export default function BuildConfiguration({
                                                 <img
                                                     src={offer.photoUrl}
                                                     alt={`${offer.brand} ${offer.model}`}
-                                                    className="w-10 h-10 object-contain rounded border border-gray-300"
-                                                    onError={(e) =>
-                                                        (e.currentTarget.style.display = "none")
-                                                    }
+                                                    className="w-10 h-10 object-contain rounded-lg border border-dark-border bg-dark-surface2 flex-shrink-0"
+                                                    onError={(e) => (e.currentTarget.style.display = "none")}
                                                 />
                                             ) : (
-                                                <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs border border-dashed">
-                                                    brak
+                                                <div className="w-10 h-10 bg-dark-surface2 rounded-lg flex items-center justify-center border border-dark-border flex-shrink-0">
+                                                    <span className="text-[9px] text-dark-muted">brak</span>
                                                 </div>
                                             )}
-
-                                            <div>
-                                                <div className="font-medium text-midnight-dark text-sm leading-tight">
-
-                                                    <a
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        href={offer.websiteUrl}
-                                                        className="hover:underline"
-                                                    >
-                                                        {offer.brand} {offer.model}
-
-                                                    </a>
-                                                </div>
-                                                <div className="text-xs text-gray-500">
-                                                    {offer.shopName}
-                                                </div>
-                                                <div className="text-xs text-gray-500">
-
-                                                    {conditionLabel[offer.condition]}
+                                            <div className="min-w-0">
+                                                <a
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    href={offer.websiteUrl}
+                                                    className="text-xs font-semibold text-dark-text hover:text-dark-accent transition-colors line-clamp-1"
+                                                >
+                                                    {offer.brand} {offer.model}
+                                                </a>
+                                                <div className="flex items-center gap-1.5 mt-0.5">
+                                                    <span className="text-[10px] text-dark-muted">{offer.shopName}</span>
+                                                    <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${
+                                                        offer.condition === "NEW"
+                                                            ? "bg-green-500/10 text-green-400"
+                                                            : "bg-amber-500/10 text-amber-400"
+                                                    }`}>
+                                                        {conditionLabel[offer.condition]}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="font-semibold text-ocean-dark-blue text-sm">
+                                        <div className="text-sm font-bold text-white">
                                             {offer.price.toLocaleString("pl-PL")} zł
                                         </div>
 
                                         <button
-                                            className="px-3 py-1 text-sm rounded-md bg-gray-100 hover:bg-gray-200 text-midnight-dark transition-colors"
-                                            onClick={() =>
-                                                onAddComponent(cat as ComponentTypeEnum)
-                                            }
+                                            className="justify-self-end px-3 py-1.5 text-xs rounded-lg bg-dark-surface2 border border-dark-border text-dark-muted hover:border-dark-accent hover:text-dark-accent transition-all"
+                                            onClick={() => onAddComponent(cat as ComponentTypeEnum)}
                                         >
                                             Zmień
                                         </button>
                                     </>
                                 ) : (
                                     <>
-                                        <div className="text-ocean-blue italic text-sm">
-                                            Nie wybrano
-                                        </div>
-                                        <div></div>
-
+                                        <div className="text-xs text-dark-muted italic">Nie wybrano</div>
+                                        <div />
                                         <button
-                                            className="px-3 py-1 text-sm rounded-md bg-ocean-blue text-white hover:bg-ocean-dark-blue transition-colors"
-                                            onClick={() =>
-                                                onAddComponent(cat as ComponentTypeEnum)
-                                            }
+                                            className="justify-self-end flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg bg-dark-accent/15 text-dark-accent hover:bg-dark-accent hover:text-white border border-dark-accent/20 hover:border-dark-accent transition-all"
+                                            onClick={() => onAddComponent(cat as ComponentTypeEnum)}
                                         >
                                             + Dodaj
                                         </button>
@@ -130,23 +127,14 @@ export default function BuildConfiguration({
                             </div>
                         );
                     })}
-
-                    {selectedComputer.offers?.length > 0 && (
-                        <div className="bg-gray-100 border-t border-ocean-light-blue p-4 flex justify-between items-center">
-              <span className="text-sm font-medium text-midnight-dark">
-                Łączna cena zestawu:
-              </span>
-                            <span className="text-base font-bold text-ocean-dark-blue">
-                {selectedComputer.price.toLocaleString("pl-PL")} zł
-              </span>
-                        </div>
-                    )}
                 </div>
             ) : (
-                <div className="mt-6 text-center p-8 bg-ocean-light-blue bg-opacity-20 border border-ocean-light-blue rounded-lg">
-                    <p className="text-ocean-dark-blue">
-                        Wybierz istniejący zestaw lub utwórz nowy, aby rozpocząć
-                        konfigurację.
+                <div className="text-center p-10">
+                    <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-dark-surface2 border border-dark-border flex items-center justify-center">
+                        <Filter className="w-5 h-5 text-dark-muted" />
+                    </div>
+                    <p className="text-sm text-dark-muted">
+                        Wybierz istniejący zestaw lub utwórz nowy, aby rozpocząć konfigurację.
                     </p>
                 </div>
             )}

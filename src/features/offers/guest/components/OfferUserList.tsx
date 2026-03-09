@@ -34,7 +34,7 @@ const OfferUserList = ({offers, isLoading, isError, isRefetching, isFetching}:Of
     if (!offers || offers.length === 0) {
         return (
             <div className="flex justify-center items-center min-h-[400px]">
-                <p>Brak ofert spełniających wybrane kryteria</p>
+                <p className="text-dark-muted">Brak ofert spełniających wybrane kryteria</p>
             </div>
         );
     }
@@ -44,7 +44,7 @@ const OfferUserList = ({offers, isLoading, isError, isRefetching, isFetching}:Of
         <div className="relative">
 
             {showOverlay && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-dark-bg/60">
                     <LoadingSpinner />
                 </div>
             )}

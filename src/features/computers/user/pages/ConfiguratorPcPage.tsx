@@ -200,76 +200,51 @@ const handleAddComponent = (category: ComponentTypeEnum) => {
     }
 
     return (
-        <div className="max-w-7xl mx-auto p-5 min-h-screen">
-            <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-midnight-dark mb-4">Konfigurator PC</h1>
-            </div>
+        <div className="min-h-screen bg-dark-bg">
+            <div className="max-w-7xl mx-auto px-4 py-6">
 
-            {saveMutation.isPending && (
-                <>
-                    <p className="text-sm text-ocean-blue mt-2">Tworzenie nowego zestawu...</p>
-                    <LoadingSpinner/>
-                </>
-            )}
-
-            {saveMutation.isError && (
-                <p className="text-sm text-ocean-red mt-2">Nie udało się utworzyć zestawu</p>
-            )}
-
-                <div className={"relative"}>
-
-                    {user && (
-                        <div>
-
-                            <BuildList
-                                computers={fetchedComputers}
-                                onSelectBuild={handleSelectBuild}
-                                onCreateNew={handleCreateNewBuild}
-                                isLoading={isLoading}
-                            />
-
-                            <BuildConfiguration
-                                categories={categories}
-                                onAddComponent={handleAddComponent}
-                            />
-
-                        </div>
-                    )}
-
-                    {!user && (
-
-                        <div className=" mx-auto mb-6">
-                            <div className="bg-white border border-gray-100 shadow-sm rounded-lg p-6 flex gap-4 items-start">
-                                <div className="flex-shrink-0 bg-ocean-blue/10 text-ocean-blue rounded-full p-3">
-                                    <Info/>
-                                </div>
-
-                                <div className="flex-1">
-                                    <h3 className="text-lg font-semibold text-ocean-light-blue">Przypomnienie</h3>
-                                    <p className="mt-2 text-sm text-ocean-blue leading-relaxed">
-                                        Jako gość Twoje konfiguracje są przechowywane tylko lokalnie w przeglądarce. Jeśli wyczyścisz dane przeglądarki lub zmienisz urządzenie, stracisz swoje zestawy. Aby zachować swoje konfiguracje na stałe, zaloguj się lub zarejestruj konto.
-                                    </p>
-
-                                </div>
-                            </div>
-
-                            <div className="mt-6">
-                                <BuildList
-                                    computers={guestcomputers}
-                                    onSelectBuild={handleSelectGuestBuild}
-                                    onCreateNew={handleCreateNewGuestBuild}
-                                    isLoading={isLoading}
-                                />
-
-                                <BuildConfiguration
-                                    categories={categories}
-                                    onAddComponent={handleAddComponent}
-                                />
-                            </div>
-                        </div>
-                    )}
+                <div className="mb-6">
+                    <h1 className="text-2xl font-bold text-dark-text">Konfigurator PC</h1>
+                    <p className="text-sm text-dark-muted mt-1">Zbuduj swój zestaw komputerowy</p>
                 </div>
 
+                {saveMutation.isPending && (
+                    <div className="flex items-center gap-2 mb-4 text-sm text-dark-accent">
+                        <LoadingSpinner/>
+                        <span>Tworzenie nowego zestawu...</span>
+                    </div>
+                )}
+
+                {saveMutation.isError && (
+                    <p className="text-sm text-ocean-red mb-4">Nie udało się utworzyć zestawu</p>
+                )}
+
+                {!user && (
+                    <div className="bg-dark-surface border border-dark-accent/20 rounded-xl p-4 flex gap-3 items-start mb-6">
+                        <div className="flex-shrink-0 bg-dark-accent/10 text-dark-accent rounded-lg p-2.5">
+                            <Info size={18} />
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-semibold text-dark-text">Tryb gościa</h3>
+                            <p className="mt-1 text-xs text-dark-muted leading-relaxed">
+                                Twoje konfiguracje są przechowywane tylko lokalnie w przeglądarce. Zaloguj się lub zarejestruj, aby zachować zestawy na stałe.
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                <BuildList
+                    computers={user ? fetchedComputers : guestcomputers}
+                    onSelectBuild={user ? handleSelectBuild : handleSelectGuestBuild}
+                    onCreateNew={user ? handleCreateNewBuild : handleCreateNewGuestBuild}
+                    isLoading={isLoading}
+                />
+
+                <BuildConfiguration
+                    categories={categories}
+                    onAddComponent={handleAddComponent}
+                />
+            </div>
         </div>
     );
 }

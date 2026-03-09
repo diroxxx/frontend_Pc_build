@@ -29,12 +29,12 @@ function OffersUserPage() {
     useEffect(() => {
         if (componentCategoryParam) {
             setSelectedComponentByComputer(componentCategoryParam as ComponentTypeEnum);
-        } 
+        }
     }, []);
 
     const {data: offersData, isLoading: isLoadingOffers, error,isError, isFetching, isRefetching} = useFetchOffers(page, offerLeftPanelFilters);
     const compatibleOffers = useCompatibleOffers(offersData?.offers);
-    
+
     const offers = compatibleOffers ?? [];
     const [viewMode, setViewMode] = useAtom(viewModeAtom);
 
@@ -47,7 +47,7 @@ function OffersUserPage() {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
-    
+
     const scrollToTop = () => {
         window.scrollTo({
             top: 0,
@@ -57,12 +57,12 @@ function OffersUserPage() {
 
     if (error) return <p className="p-4 text-ocean-red">Błąd podczas pobierania danych.</p>;
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-dark-bg">
             <SidePanelBuilds />
 
-            <div className="border-b border-gray-200 sticky top-0 z-20 bg-white/80 backdrop-blur-sm">
+            <div className="border-b border-dark-border sticky top-0 z-20 bg-dark-surface/90 backdrop-blur-sm">
                 <div className="max-w-7xl mx-auto px-4 py-4 sm:py-5">
-                    <div className="flex items-center justify-between gap-4 flex-wrap ">
+                    <div className="flex items-center justify-between gap-4 flex-wrap">
                         <div className="flex-1 min-w-0">
                             <OfferSearchFilters/>
                         </div>
@@ -72,8 +72,8 @@ function OffersUserPage() {
                                 onClick={() => setViewMode("list")}
                                 className={`p-2.5 rounded-lg border transition-all duration-200 ${
                                     viewMode === "list"
-                                        ? "bg-ocean-blue text-white border-ocean-blue shadow-sm"
-                                        : "border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400"
+                                        ? "bg-dark-accent text-white border-dark-accent shadow-sm"
+                                        : "border-dark-border text-dark-muted hover:bg-dark-surface2 hover:border-dark-accent"
                                 }`}
                                 title="Widok listy"
                             >
@@ -84,8 +84,8 @@ function OffersUserPage() {
                                 onClick={() => setViewMode("grid")}
                                 className={`p-2.5 rounded-lg border transition-all duration-200 ${
                                     viewMode === "grid"
-                                        ? "bg-ocean-blue text-white border-ocean-blue shadow-sm"
-                                        : "border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400"
+                                        ? "bg-dark-accent text-white border-dark-accent shadow-sm"
+                                        : "border-dark-border text-dark-muted hover:bg-dark-surface2 hover:border-dark-accent"
                                 }`}
                                 title="Widok siatki"
                             >
@@ -98,8 +98,8 @@ function OffersUserPage() {
                             onClick={() => setShowMobileFilters(!showMobileFilters)}
                             className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-colors ${
                                 showMobileFilters
-                                    ? "bg-ocean-blue text-white"
-                                    : "bg-gray-100 hover:bg-gray-200 text-gray-800"
+                                    ? "bg-dark-accent text-white"
+                                    : "bg-dark-surface2 hover:bg-dark-border text-dark-text"
                             }`}
                         >
                             <SlidersHorizontal size={18}/>
@@ -112,7 +112,7 @@ function OffersUserPage() {
 
             <div className="max-w-7xl mx-auto px-4 py-6">
                 <div className="flex flex-col lg:flex-row lg:gap-6">
-                    <div className="hidden lg:block lg:w-80 lg:shrink-0">
+                    <div className="hidden lg:block lg:w-72 lg:shrink-0">
                         <div className="lg:sticky lg:top-24">
                             <OffersSideFilters chooseComponentTypeParam={selectedComponentByComputer}/>
                         </div>
@@ -121,12 +121,12 @@ function OffersUserPage() {
 
                     <div className="flex-1 min-w-0">
                         <div className={`lg:hidden mb-6 ${showMobileFilters ? "block" : "hidden"}`}>
-                            <div className="bg-white rounded-xl shadow-sm border p-5">
+                            <div className="bg-dark-surface rounded-xl border border-dark-border p-5">
                                 <div className="flex items-center justify-between mb-4">
-                                    <h3 className="font-semibold text-lg">Filtry i sortowanie</h3>
+                                    <h3 className="font-semibold text-lg text-dark-text">Filtry i sortowanie</h3>
                                     <button
                                         onClick={() => setShowMobileFilters(false)}
-                                        className="p-1 -mr-1 text-gray-500 hover:text-gray-800"
+                                        className="p-1 -mr-1 text-dark-muted hover:text-dark-text"
                                     >
                                         <X size={24}/>
                                     </button>
@@ -139,7 +139,7 @@ function OffersUserPage() {
                             {showScrollTop && (
                                 <button
                                     onClick={scrollToTop}
-                                    className="fixed bottom-6 right-6 z-40 bg-gradient-ocean hover:bg-gradient-ocean-hover text-white p-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 hover:shadow-xl"
+                                    className="fixed bottom-6 right-6 z-40 bg-dark-accent hover:bg-dark-accent-hover text-white p-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 hover:shadow-xl"
                                     title="Powrót na górę"
                                 >
                                     <svg
@@ -178,10 +178,10 @@ function OffersUserPage() {
                                 marginPagesDisplayed={1}
                                 pageCount={offersData?.totalPages ?? 1}
                                 containerClassName="flex justify-center gap-1 py-4"
-                                pageLinkClassName="px-3 py-1 block rounded bg-gray-100 cursor-pointer"
-                                activeLinkClassName="bg-ocean-dark-blue text-white font-semibold"
-                                previousLinkClassName="px-3 py-1 block rounded hover:bg-gray-200 cursor-pointer"
-                                nextLinkClassName="px-3 py-1 block rounded hover:bg-gray-200 cursor-pointer"
+                                pageLinkClassName="px-3 py-1 block rounded bg-dark-surface2 text-dark-muted cursor-pointer hover:text-dark-text"
+                                activeLinkClassName="!bg-dark-accent !text-white font-semibold"
+                                previousLinkClassName="px-3 py-1 block rounded text-dark-muted hover:bg-dark-surface2 hover:text-dark-text cursor-pointer"
+                                nextLinkClassName="px-3 py-1 block rounded text-dark-muted hover:bg-dark-surface2 hover:text-dark-text cursor-pointer"
                                 onClick={scrollToTop}
                             />
                         </div>

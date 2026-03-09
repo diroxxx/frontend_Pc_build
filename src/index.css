@@ -52,7 +52,32 @@
   --background-image-gradient-ocean-dark: linear-gradient(90deg, #457B9D 0%, #1D3557 100%);
   --background-image-gradient-ocean-dark-hover: linear-gradient(90deg, #5288ab 0%, #2a4467 100%);
 
+  /* Dark theme */
+  --color-dark-bg: #0d0f14;
+  --color-dark-surface: #141720;
+  --color-dark-surface2: #1c2030;
+  --color-dark-border: #252a3a;
+  --color-dark-accent: #4f8ef7;
+  --color-dark-accent-hover: #3a7de6;
+  --color-dark-text: #e8eaf0;
+  --color-dark-muted: #6b7280;
+  --color-dark-tag-bg: #1e2540;
+  --color-dark-tag-text: #8ba3d4;
 }
+/* Light theme overrides */
+html.theme-light {
+  --color-dark-bg: #f1f5f9;
+  --color-dark-surface: #ffffff;
+  --color-dark-surface2: #f8fafc;
+  --color-dark-border: #e2e8f0;
+  --color-dark-accent: #457B9D;
+  --color-dark-accent-hover: #1D3557;
+  --color-dark-text: #1f2937;
+  --color-dark-muted: #6b7280;
+  --color-dark-tag-bg: #e8f0fe;
+  --color-dark-tag-text: #457B9D;
+}
+
  /* css */
 
  @keyframes wave {

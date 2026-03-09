@@ -3,17 +3,16 @@ import {baseUrl} from "../../../shared/dtos/baseUrl.ts";
 
 const GameCard = ({ game }: { game: GameDto }) => {
     return (
-        <div className="group bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
-            <div className="relative w-full aspect-square overflow-hidden bg-gray-100">
-                <img 
-                    src={ baseUrl + game.imageUrl}
+        <div className="group bg-dark-surface border border-dark-border rounded-xl overflow-hidden hover:border-dark-accent/50 transition-all duration-200">
+            <div className="relative w-full aspect-square overflow-hidden bg-dark-surface2">
+                <img
+                    src={baseUrl + game.imageUrl}
                     alt={game.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
             </div>
-            
-            <div className="p-2 sm:p-3 bg-white">
-                <h2 className="text-xs sm:text-sm font-semibold text-midnight-dark group-hover:text-ocean-blue transition-colors line-clamp-1">
+            <div className="px-2 py-1.5">
+                <h2 className="text-[11px] font-semibold text-dark-text group-hover:text-dark-accent transition-colors line-clamp-1">
                     {game.title}
                 </h2>
             </div>

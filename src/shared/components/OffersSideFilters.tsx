@@ -117,13 +117,16 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
         sessionStorage.removeItem('compatibilityFilter');
     }, [setPage, setOfferLeftPanelFilters]);
 
-    return (
-        <div className="w-64 flex-shrink-0">
-            <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 sticky top-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Filtry</h3>
+    const selectClass = "w-full px-3 py-2 bg-dark-surface2 border border-dark-border rounded-lg text-dark-text text-sm focus:border-dark-accent transition-colors";
+    const labelClass = "block text-xs font-medium text-dark-muted mb-2 uppercase tracking-wide";
 
-                <div className="mb-6">
-                    <label htmlFor="category-select" className="block text-sm font-medium text-gray-700 mb-2">
+    return (
+        <div className="w-full flex-shrink-0">
+            <div className="bg-dark-surface rounded-xl p-5 border border-dark-border">
+                <h3 className="text-sm font-bold text-dark-muted uppercase tracking-widest mb-5">Filtry</h3>
+
+                <div className="mb-5">
+                    <label htmlFor="category-select" className={labelClass}>
                         Kategoria
                     </label>
                     <select
@@ -135,7 +138,7 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
                                 componentType: e.target.value ? (e.target.value as ComponentTypeEnum) : undefined,
                             }))
                         }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className={selectClass}
                     >
                         <option value="">Wszystkie kategorie</option>
                         {componentTypes.map((type) => (
@@ -146,12 +149,12 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
                     </select>
                 </div>
 
-                <div className="mb-6">
-                    <label htmlFor="min-price" className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="mb-5">
+                    <label htmlFor="min-price" className={labelClass}>
                         Cena: {tempFilters.minPrize} zł – {tempFilters.maxPrize} zł
                     </label>
 
-                    <div className="flex gap-2 items-center mb-2">
+                    <div className="flex gap-2 items-center mb-3">
                         <input
                             id="min-price"
                             aria-label="Minimalna cena"
@@ -159,7 +162,7 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
                             min={0}
                             value={tempFilters.minPrize}
                             onChange={(e) => setMinPrize(Number(e.target.value || 0))}
-                            className="w-1/2 px-2 py-1 border rounded"
+                            className="w-1/2 px-2 py-1.5 bg-dark-surface2 border border-dark-border rounded-lg text-dark-text text-sm text-center focus:border-dark-accent transition-colors"
                         />
                         <input
                             id="max-price"
@@ -168,7 +171,7 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
                             min={0}
                             value={tempFilters.maxPrize}
                             onChange={(e) => setMaxPrize(Number(e.target.value || 0))}
-                            className="w-1/2 px-2 py-1 border rounded"
+                            className="w-1/2 px-2 py-1.5 bg-dark-surface2 border border-dark-border rounded-lg text-dark-text text-sm text-center focus:border-dark-accent transition-colors"
                         />
                     </div>
 
@@ -179,7 +182,7 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
                             max={10000}
                             value={tempFilters.minPrize}
                             onChange={(e) => setMinPrize(Number(e.target.value))}
-                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                            className="w-full h-1.5 bg-dark-border rounded-lg appearance-none cursor-pointer accent-dark-accent"
                         />
                         <input
                             type="range"
@@ -187,20 +190,20 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
                             max={10000}
                             value={tempFilters.maxPrize}
                             onChange={(e) => setMaxPrize(Number(e.target.value))}
-                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                            className="w-full h-1.5 bg-dark-border rounded-lg appearance-none cursor-pointer accent-dark-accent"
                         />
                     </div>
                 </div>
 
-                <div className="mb-6">
-                    <label htmlFor="brand-select" className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="mb-5">
+                    <label htmlFor="brand-select" className={labelClass}>
                         Producent
                     </label>
                     <select
                         id="brand-select"
                         value={tempFilters.brand}
                         onChange={(e) => setTempFilters((prev) => ({ ...prev, brand: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className={selectClass}
                     >
                         <option value="">Wszyscy producenci</option>
                         {Array.isArray(brands) &&
@@ -212,8 +215,8 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
                     </select>
                 </div>
 
-                <div className="mb-6">
-                    <label htmlFor="condition-select" className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="mb-5">
+                    <label htmlFor="condition-select" className={labelClass}>
                         Stan
                     </label>
                     <select
@@ -225,7 +228,7 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
                                 itemCondition: e.target.value ? (e.target.value as ItemConditionEnum) : undefined,
                             }))
                         }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className={selectClass}
                     >
                         <option value="">Wszystkie stany</option>
                         {componentConditions.map((condition) => (
@@ -236,15 +239,15 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
                     </select>
                 </div>
 
-                <div className="mb-6">
-                    <label htmlFor="shop-select" className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="mb-5">
+                    <label htmlFor="shop-select" className={labelClass}>
                         Sklep
                     </label>
                     <select
                         id="shop-select"
                         value={tempFilters.shopName}
                         onChange={(e) => setTempFilters((prev) => ({ ...prev, shopName: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className={selectClass}
                     >
                         <option value="">Wszystkie sklepy</option>
                         {shopsNames.map((shop) => (
@@ -255,16 +258,16 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
                     </select>
                 </div>
 
-                <div className="mb-6">
+                <div className="space-y-2">
                     <button
                         onClick={applyFilters}
-                        className="w-full bg-ocean-dark-blue text-white py-2 rounded-lg hover:bg-ocean-blue transition mb-2"
+                        className="w-full bg-dark-accent hover:bg-dark-accent-hover text-white py-2.5 rounded-lg font-semibold text-sm transition-all"
                     >
                         Zastosuj filtry
                     </button>
                     <button
                         onClick={clearFilters}
-                        className="w-full px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                        className="w-full px-4 py-2 text-sm text-dark-muted border border-dark-border rounded-lg hover:border-dark-accent hover:text-dark-accent transition-colors"
                     >
                         Wyczyść filtry
                     </button>

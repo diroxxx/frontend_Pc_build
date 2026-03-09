@@ -59,45 +59,48 @@ export default function SidePanelBuilds() {
             </div>
 
             <div
-                className="fixed top-1/2 right-0 -translate-y-1/2 z-50 bg-white border border-gray-200 shadow-xl
-                   overflow-hidden flex flex-col justify-between transition-transform duration-500 ease-in-out"
+                className="fixed top-1/2 right-0 -translate-y-1/2 z-50 bg-dark-surface border border-dark-border shadow-2xl
+                   overflow-hidden flex flex-col transition-transform duration-500 ease-in-out"
                 style={{
-                    width: "340px",
-                    height: "480px",
-                    borderRadius: "12px 0 0 12px",
-                    transform: hovered ? "translateX(0)" : "translateX(340px)",
+                    width: "320px",
+                    height: "500px",
+                    borderRadius: "14px 0 0 14px",
+                    transform: hovered ? "translateX(0)" : "translateX(320px)",
+                    boxShadow: "-8px 0 32px rgba(0,0,0,0.4)",
                 }}
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
             >
-                <div className="p-4 overflow-y-auto flex-1">
-                    <h3 className="text-sm font-medium text-midnight-dark mb-2">
+                {/* Header */}
+                <div className="px-4 py-3 border-b border-dark-border flex-shrink-0">
+                    <h3 className="text-xs font-bold text-dark-muted uppercase tracking-widest">
                         Twoje zestawy ({computers?.length || 0})
                     </h3>
+                </div>
 
+                <div className="p-3 overflow-y-auto flex-1 space-y-3">
                     {(!computers || computers.length === 0) ? (
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-dark-muted py-2">
                             Brak zestawów — utwórz nowy w konfiguratorze.
                         </p>
                     ) : (
-                        <div className="space-y-1 max-h-32 overflow-y-auto">
+                        <div className="space-y-1">
                             {computers.map((computer, index) => (
                                 <div
                                     key={index}
                                     onClick={() => user ? handleSelectBuild(computer.id) : handleSelectGuestBuild(computer.id)}
-                                    className={`flex items-center justify-between p-2 rounded cursor-pointer transition-colors ${
+                                    className={`flex items-center justify-between p-2.5 rounded-lg cursor-pointer transition-all ${
                                         selectedComputer?.id === computer.id
-                                            ? "bg-ocean-light-blue bg-opacity-30 border border-ocean-blue"
-                                            : "bg-gray-50 hover:bg-gray-100"
+                                            ? "bg-dark-accent/15 border border-dark-accent/40 text-dark-accent"
+                                            : "bg-dark-surface2 border border-transparent hover:border-dark-border"
                                     }`}
                                 >
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-xs font-medium text-midnight-dark truncate">
+                                        <p className={`text-xs font-semibold truncate ${selectedComputer?.id === computer.id ? "text-dark-accent" : "text-dark-text"}`}>
                                             {computer.name}
                                         </p>
-                                        <p className="text-xs text-gray-500">
-                                            {(computer.offers?.length || 0)} komponentów - {" "}
-                                            {(computer.price ?? 0).toLocaleString("pl-PL")} zł
+                                        <p className="text-[11px] text-dark-muted mt-0.5">
+                                            {(computer.offers?.length || 0)} komponentów · {(computer.price ?? 0).toLocaleString("pl-PL")} zł
                                         </p>
                                     </div>
                                 </div>
@@ -106,45 +109,47 @@ export default function SidePanelBuilds() {
                     )}
 
                     {selectedComputer && (
-                        <div className="mt-4 border-t border-gray-200 pt-3">
-                            <h3 className="text-sm font-medium text-midnight-dark mb-2">
+                        <div className="border-t border-dark-border pt-3">
+                            <h4 className="text-xs font-bold text-dark-text mb-2 truncate">
                                 {selectedComputer.name}
-                            </h3>
+                            </h4>
 
                             {selectedComputer.offers?.length ? (
-                                <div className="space-y-1 max-h-40 overflow-y-auto">
+                                <div className="space-y-1">
                                     {selectedComputer.offers.map((offer: ComponentOffer, idx: number) => (
                                         <div
                                             key={idx}
-                                            className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 transition-colors"
+                                            className="flex items-center justify-between p-2 bg-dark-surface2 rounded-lg hover:border-dark-border border border-transparent transition-colors"
                                         >
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-xs font-medium text-midnight-dark truncate">
+                                                <p className="text-xs font-medium text-dark-text truncate">
                                                     {offer.brand} {offer.model}
                                                 </p>
-                                                <p className="text-xs text-gray-500">
-                                                    {offer.componentType} •{" "}
-                                                    {offer.price.toLocaleString("pl-PL")} zł
+                                                <p className="text-[11px] text-dark-muted mt-0.5">
+                                                    {offer.componentType} · {offer.price.toLocaleString("pl-PL")} zł
                                                 </p>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-xs text-gray-500 italic">
+                                <p className="text-xs text-dark-muted italic">
                                     Brak dodanych komponentów.
                                 </p>
                             )}
-
-                            <div className="mt-2 pt-2 border-t border-gray-200 flex justify-between items-center">
-                                <span className="text-xs font-medium text-midnight-dark">Łącznie:</span>
-                                <span className="text-xs font-bold text-ocean-dark-blue">
-                  {selectedComputer.price?.toLocaleString("pl-PL")} zł
-                </span>
-                            </div>
                         </div>
                     )}
                 </div>
+
+                {/* Footer – total */}
+                {selectedComputer && (
+                    <div className="px-4 py-3 border-t border-dark-border flex-shrink-0 flex justify-between items-center">
+                        <span className="text-xs font-medium text-dark-muted">Łącznie:</span>
+                        <span className="text-sm font-extrabold text-white">
+                            {selectedComputer.price?.toLocaleString("pl-PL")} zł
+                        </span>
+                    </div>
+                )}
             </div>
         </>
     );
