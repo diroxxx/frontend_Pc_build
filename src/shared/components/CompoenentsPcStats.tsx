@@ -4,51 +4,46 @@ import {ComponentTypeEnum, PolishComponentTypeEnum} from "../dtos/BaseItemDto.ts
 
 export default function CompoenentsPcStats() {
     const { data, isLoading, isError } = useComponentsPcStats();
+
     if (isLoading) {
-        return <div className="py-8 text-center text-gray-600">Ładowanie statystyk…</div>;
+        return <div className="py-8 text-center text-dark-muted text-sm">Ładowanie statystyk…</div>;
     }
 
     if (isError) {
-        return <div className="py-8 text-center text-red-500">Błąd podczas pobierania statystyk</div>;
+        return <div className="py-8 text-center text-red-400 text-sm">Błąd podczas pobierania statystyk</div>;
     }
 
     const items = (data ?? []) as ComponentsAmountPcDto[];
 
     return (
-        <section className="py-16 ">
-            <div className="px-6 md:px-12 lg:px-20 max-w-5xl mx-auto">
-
-                <h2 className="text-3xl font-bold text-ocean-dark-blue mb-8 text-center">
-                   Najpopularniejsze komponenty PC:
+        <div className="bg-dark-surface border border-dark-border rounded-xl overflow-hidden">
+            <div className="px-5 py-3 border-b border-dark-border">
+                <h2 className="text-xs font-bold text-dark-muted uppercase tracking-widest">
+                    Najpopularniejsze komponenty
                 </h2>
-
-                <div className="bg-white rounded-xl shadow-md p-6">
-                    <ul className="space-y-4">
-
-                        {items.map((component) => (
-                            <li
-                                key={component.componentType}
-                                className="flex items-center justify-between py-3 border-b last:border-b-0"
-                            >
-                                <div className="flex-1">
-                                    <div className="text-sm text-gray-500 mb-1">
-                                        {PolishComponentTypeEnum[
-                                            component.componentType as ComponentTypeEnum
-                                            ] ?? component.componentType}
-                                    </div>
-                                    <div className="font-semibold text-ocean-dark-blue">
-                                        {component.model}
-                                    </div>
-                                </div>
-                                <div className="text-2xl font-bold text-ocean-blue ml-4">
-                                    {component.amount}
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-
             </div>
-        </section>
+            <ul className="divide-y divide-dark-border">
+                {items.map((component) => (
+                    <li
+                        key={component.componentType}
+                        className="flex items-center justify-between px-5 py-3 hover:bg-dark-surface2 transition-colors"
+                    >
+                        <div className="flex-1 min-w-0">
+                            <div className="text-[10px] text-dark-muted uppercase tracking-wide mb-0.5">
+                                {PolishComponentTypeEnum[
+                                    component.componentType as ComponentTypeEnum
+                                ] ?? component.componentType}
+                            </div>
+                            <div className="text-sm font-semibold text-dark-text truncate">
+                                {component.model}
+                            </div>
+                        </div>
+                        <div className="text-lg font-extrabold text-dark-accent ml-4 flex-shrink-0">
+                            {component.amount}
+                        </div>
+                    </li>
+                ))}
+            </ul>
+        </div>
     );
 }

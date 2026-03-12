@@ -14,36 +14,36 @@ function MainPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-ocean-white">
+        <div className="min-h-screen bg-dark-bg">
             <SidePanelBuilds />
 
+            {/* Hero */}
             <div className="pt-24 pb-16 px-6 md:px-12 lg:px-20">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div className="order-2 md:order-1">
-
-                            <h1 className="text-5xl md:text-6xl font-black text-ocean-dark-blue leading-tight mb-8">
+                            <h1 className="text-5xl md:text-6xl font-black text-dark-text leading-tight mb-8">
                                 Składasz komputer?
                                 <br />
-                                <span className="text-ocean-blue">Masz tu wszystko.</span>
+                                <span className="text-dark-accent">Masz tu wszystko.</span>
                             </h1>
 
-                            <p className="text-xl text-gray-700 mb-10 max-w-xl">
+                            <p className="text-lg text-dark-muted mb-10 max-w-xl leading-relaxed">
                                 Oferty aktualizowane co chwilę.
                                 Konfigurator, społeczność, rekomendacja podzespołów na podstawie gier komputerowych.
                             </p>
 
-                            <div className="flex flex-col sm:flex-row gap-5">
+                            <div className="flex flex-col sm:flex-row gap-4">
                                 <button
                                     onClick={() => navigate("/builds")}
-                                    className="px-10 py-5 bg-ocean-blue text-white font-bold text-xl rounded-xl shadow-lg hover:bg-ocean-dark-blue transition-all hover:-translate-y-1"
+                                    className="px-8 py-4 bg-dark-accent text-white font-bold text-base rounded-xl hover:bg-dark-accent-hover transition-all hover:-translate-y-0.5 shadow-lg shadow-dark-accent/20"
                                 >
                                     Złóż swój zestaw
                                 </button>
 
                                 <button
                                     onClick={() => navigate("/offers")}
-                                    className="px-10 py-5 border-4 border-ocean-blue text-ocean-blue font-bold text-xl rounded-xl bg-white hover:bg-ocean-blue hover:text-white transition-all"
+                                    className="px-8 py-4 border border-dark-border bg-dark-surface text-dark-text font-bold text-base rounded-xl hover:border-dark-accent hover:text-dark-accent transition-all"
                                 >
                                     Zobacz aktualne ceny
                                 </button>
@@ -57,39 +57,40 @@ function MainPage() {
                 </div>
             </div>
 
-            <div className="bg-ocean-dark-blue py-20">
-                <div className="min-h-96 flex flex-col items-center justify-center px-6">
-
-                    <h2 className="text-4xl md:text-5xl font-black text-center text-ocean-white mb-4">
+            {/* Partner stores */}
+            <div className="border-t border-dark-border py-16">
+                <div className="max-w-5xl mx-auto px-6 flex flex-col items-center">
+                    <h2 className="text-2xl md:text-3xl font-bold text-dark-text text-center mb-2">
                         Obsługiwane sklepy
                     </h2>
-                    <p className="text-ocean-light-blue text-center text-lg mb-12">
+                    <p className="text-dark-muted text-center text-sm mb-10">
                         kolejne sklepy będą dodawane w przyszłości
                     </p>
 
-                    <div className="flex justify-center gap-2 max-w-5xl w-full">
+                    <div className="flex justify-center gap-6 flex-wrap">
                         {partnerStores.map((store) => (
                             <a
                                 key={store.name}
                                 href={store.website}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="group flex flex-col items-center"
+                                className="group flex flex-col items-center gap-2"
                             >
-                                <div className="bg-white p-6 rounded-2xl shadow-xl group-hover:shadow-2xl transition-shadow duration-300">
+                                <div className="w-24 h-14 flex items-center justify-center rounded-xl bg-white/90 group-hover:bg-white transition-all shadow-sm">
                                     <img
                                         src={store.logo}
                                         alt={store.name}
-                                        className="h-16 object-contain"
+                                        className="h-8 object-contain"
                                     />
                                 </div>
-                                <span className="mt-4 text-ocean-light-blue font-medium group-hover:text-white transition-colors">
+                                <span className="text-xs text-dark-muted font-medium group-hover:text-dark-accent transition-colors">
                                     {store.name}
                                 </span>
                             </a>
                         ))}
                     </div>
-                    <p className="mt-12 text-center text-ocean-light-blue/70 text-sm">
+
+                    <p className="mt-10 text-center text-dark-muted/60 text-xs">
                         Aktualizacje automatycznie w ciągu dnia
                     </p>
                 </div>
