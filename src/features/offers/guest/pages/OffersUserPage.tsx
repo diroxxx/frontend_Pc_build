@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import SidePanelBuilds from '../../../computers/components/SidePanelBuilds.tsx';
 import {useFetchOffers} from "../../../../shared/hooks/useFetchOffers.ts";
 import {ComponentTypeEnum} from "../../../../shared/dtos/BaseItemDto.ts";
@@ -48,12 +48,12 @@ function OffersUserPage() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const scrollToTop = () => {
+    const scrollToTop = useCallback(() => {
         window.scrollTo({
             top: 0,
             behavior: 'smooth'
         });
-    };
+    }, []);
 
     if (error) return <p className="p-4 text-ocean-red">Błąd podczas pobierania danych.</p>;
     return (
