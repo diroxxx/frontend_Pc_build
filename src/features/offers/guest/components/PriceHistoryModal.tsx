@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { X, TrendingDown, TrendingUp, Minus } from "lucide-react";
 import type { ComponentOffer } from "../../../../shared/dtos/OfferBase.ts";
 import {
@@ -11,47 +11,36 @@ import {
     Tooltip,
     Legend,
 } from "recharts";
+import { useGetComponentMinMax } from "../hooks/useGetComponentMinMax.ts";
+import { useGetMonthlyAvgPrices } from "../hooks/useGetMonthlyAvgPrices.ts";
+
+const MONTH_NAMES = ["Sty", "Lut", "Mar", "Kwi", "Maj", "Cze", "Lip", "Sie", "Wrz", "Paź", "Lis", "Gru"];
 
 interface Props {
     offer: ComponentOffer;
     onClose: () => void;
 }
 
-const mockOverall = [
-    { date: "Sty 25", price: 1520 },
-    { date: "Lut 25", price: 1480 },
-    { date: "Mar 25", price: 1510 },
-    { date: "Kwi 25", price: 1390 },
-    { date: "Maj 25", price: 1350 },
-    { date: "Cze 25", price: 1300 },
-    { date: "Lip 25", price: 1280 },
-    { date: "Sie 25", price: 1260 },
-    { date: "Wrz 25", price: 1310 },
-    { date: "Paź 25", price: 1290 },
-    { date: "Lis 25", price: 1240 },
-    { date: "Gru 25", price: 1200 },
-];
 
-const mockByShop = [
-    { date: "Sty 25", Allegro: 1550, OLX: 1480, "X-Kom": 1620 },
-    { date: "Lut 25", Allegro: 1510, OLX: 1440, "X-Kom": 1590 },
-    { date: "Mar 25", Allegro: 1540, OLX: 1460, "X-Kom": 1560 },
-    { date: "Kwi 25", Allegro: 1420, OLX: 1350, "X-Kom": 1500 },
-    { date: "Maj 25", Allegro: 1390, OLX: 1300, "X-Kom": 1480 },
-    { date: "Cze 25", Allegro: 1340, OLX: 1260, "X-Kom": 1420 },
-    { date: "Lip 25", Allegro: 1310, OLX: 1240, "X-Kom": 1400 },
-    { date: "Sie 25", Allegro: 1290, OLX: 1220, "X-Kom": 1380 },
-    { date: "Wrz 25", Allegro: 1340, OLX: 1270, "X-Kom": 1410 },
-    { date: "Paź 25", Allegro: 1320, OLX: 1250, "X-Kom": 1390 },
-    { date: "Lis 25", Allegro: 1270, OLX: 1200, "X-Kom": 1350 },
-    { date: "Gru 25", Allegro: 1230, OLX: 1160, "X-Kom": 1320 },
+const SHOP_PALETTE = [
+    "#4f8ef7", // blue
+    "#f59e0b", // amber
+    "#22c55e", // green
+    "#a78bfa", // violet
+    "#f43f5e", // rose
+    "#06b6d4", // cyan
+    "#fb923c", // orange
+    "#e879f9", // fuchsia
 ];
 
 const shopColors: Record<string, string> = {
     Allegro: "#f59e0b",
     OLX: "#22c55e",
-    "X-Kom": "#a78bfa",
+    AllegroLokalnie: "#a78bfa",
 };
+
+const getShopColor = (shop: string, index: number) =>
+    shopColors[shop] ?? SHOP_PALETTE[index % SHOP_PALETTE.length];
 
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload?.length) return null;
@@ -74,12 +63,47 @@ type ViewMode = "overall" | "by-shop";
 export const PriceHistoryModal = ({ offer, onClose }: Props) => {
     const [viewMode, setViewMode] = useState<ViewMode>("overall");
 
-    const firstPrice = mockOverall[0].price;
-    const lastPrice = mockOverall[mockOverall.length - 1].price;
-    const diff = lastPrice - firstPrice;
-    const diffPct = ((diff / firstPrice) * 100).toFixed(1);
-    const minPrice = Math.min(...mockOverall.map(d => d.price));
-    const maxPrice = Math.max(...mockOverall.map(d => d.price));
+    const { data: minMaxData } = useGetComponentMinMax(offer.id!);
+    const { data: monthlyAvgPrices } = useGetMonthlyAvgPrices(offer.id!);
+
+    const chartOverall = useMemo(() => {
+        if (!monthlyAvgPrices?.length) return [];
+        const byMonth: Record<number, number[]> = {};
+        for (const shop of monthlyAvgPrices) {
+            for (const { month, avgPrice } of shop.monthlyPrices) {
+                (byMonth[month] ??= []).push(avgPrice);
+            }
+        }
+        return Object.entries(byMonth)
+            .sort(([a], [b]) => Number(a) - Number(b))
+            .map(([month, prices]) => ({
+                date: MONTH_NAMES[Number(month) - 1],
+                price: Math.round(prices.reduce((s, p) => s + p, 0) / prices.length),
+            }));
+    }, [monthlyAvgPrices]);
+
+    const chartByShop = useMemo(() => {
+        if (!monthlyAvgPrices?.length) return [];
+        const byMonth: Record<number, Record<string, number>> = {};
+        for (const { shop, monthlyPrices } of monthlyAvgPrices) {
+            for (const { month, avgPrice } of monthlyPrices) {
+                (byMonth[month] ??= {})[shop] = Math.round(avgPrice);
+            }
+        }
+        return Object.entries(byMonth)
+            .sort(([a], [b]) => Number(a) - Number(b))
+            .map(([month, shops]) => ({ date: MONTH_NAMES[Number(month) - 1], ...shops }));
+    }, [monthlyAvgPrices]);
+
+    const availableShops = useMemo(
+        () => monthlyAvgPrices?.map((s) => s.shop) ?? [],
+        [monthlyAvgPrices]
+    );
+
+    const lastMonthPrice = chartOverall.at(-1)?.price ?? 0;
+    const prevMonthPrice = chartOverall.at(-2)?.price ?? 0;
+    const diff = lastMonthPrice - prevMonthPrice;
+    const diffPct = prevMonthPrice ? Math.round((diff / prevMonthPrice) * 100) : 0;
 
     return (
         <div
@@ -119,9 +143,9 @@ export const PriceHistoryModal = ({ offer, onClose }: Props) => {
                     <div className="px-5 py-4">
                         <p className="text-[11px] text-dark-muted uppercase tracking-wide mb-1">Min / Max (rok)</p>
                         <p className="text-sm font-semibold text-dark-text">
-                            <span className="text-green-400">{minPrice.toLocaleString("pl-PL")}</span>
+                            <span className="text-green-400">{minMaxData?.min.toLocaleString("pl-PL")}</span>
                             <span className="text-dark-muted mx-1">/</span>
-                            <span className="text-red-400">{maxPrice.toLocaleString("pl-PL")}</span>
+                            <span className="text-red-400">{minMaxData?.max.toLocaleString("pl-PL")}</span>
                             <span className="text-dark-muted text-xs ml-1">zł</span>
                         </p>
                     </div>
@@ -169,7 +193,7 @@ export const PriceHistoryModal = ({ offer, onClose }: Props) => {
                 <div className="px-4 pb-5 pt-3">
                     <ResponsiveContainer width="100%" height={240}>
                         {viewMode === "overall" ? (
-                            <LineChart data={mockOverall} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                            <LineChart data={chartOverall} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#252a3a" />
                                 <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 11 }} axisLine={false} tickLine={false} />
                                 <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} axisLine={false} tickLine={false} width={60}
@@ -186,21 +210,21 @@ export const PriceHistoryModal = ({ offer, onClose }: Props) => {
                                 />
                             </LineChart>
                         ) : (
-                            <LineChart data={mockByShop} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                            <LineChart data={chartByShop} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#252a3a" />
                                 <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 11 }} axisLine={false} tickLine={false} />
                                 <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} axisLine={false} tickLine={false} width={60}
                                     tickFormatter={(v) => `${v} zł`} />
                                 <Tooltip content={<CustomTooltip />} />
                                 <Legend wrapperStyle={{ fontSize: 12, color: "#6b7280", paddingTop: 8 }} />
-                                {Object.entries(shopColors).map(([shop, color]) => (
+                                {availableShops.map((shop, i) => (
                                     <Line
                                         key={shop}
                                         type="monotone"
                                         dataKey={shop}
-                                        stroke={color}
+                                        stroke={getShopColor(shop, i)}
                                         strokeWidth={2}
-                                        dot={{ fill: color, r: 3, strokeWidth: 0 }}
+                                        dot={{ fill: getShopColor(shop, i), r: 3, strokeWidth: 0 }}
                                         activeDot={{ r: 5 }}
                                     />
                                 ))}
