@@ -39,7 +39,7 @@ export const useCreatePost = (onSuccess: () => void) => {
         setPostStatus("Tworzenie posta...");
 
         try {
-            const response = await customAxios.post<Post>("community/", {
+            const response = await customAxios.post<Post>("community/posts", {
                 title,
                 content,
                 categoryId: parseInt(categoryId, 10),

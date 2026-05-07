@@ -131,7 +131,7 @@ const renderConditionBadge = (condition: string) => {
                 <ShopImageComponent shopName={offer.shopName}/>
             </div>
 
-            <div className="text-sm font-extrabold text-white flex-grow text-center">
+            <div className="text-sm font-extrabold text-dark-text flex-grow text-center">
                 {offer.price.toLocaleString("pl-PL")} zł
             </div>
 

@@ -227,7 +227,7 @@ const OfferCardFlex = ({ offer } : Props) => {
                     )}
 
                     <div className="mt-3 flex justify-between items-center">
-                        <span className="text-xl font-extrabold text-white">
+                        <span className="text-xl font-extrabold text-dark-text">
                             {offer.price.toLocaleString("pl-PL")} zł
                         </span>
 
