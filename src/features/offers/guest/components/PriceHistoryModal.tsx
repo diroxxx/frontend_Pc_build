@@ -10,6 +10,7 @@ import {
     CartesianGrid,
     Tooltip,
     Legend,
+    ReferenceLine,
 } from "recharts";
 import { useGetComponentMinMax } from "../hooks/useGetComponentMinMax.ts";
 import { useGetMonthlyAvgPrices } from "../hooks/useGetMonthlyAvgPrices.ts";
@@ -21,16 +22,15 @@ interface Props {
     onClose: () => void;
 }
 
-
 const SHOP_PALETTE = [
-    "#4f8ef7", // blue
-    "#f59e0b", // amber
-    "#22c55e", // green
-    "#a78bfa", // violet
-    "#f43f5e", // rose
-    "#06b6d4", // cyan
-    "#fb923c", // orange
-    "#e879f9", // fuchsia
+    "#4f8ef7",
+    "#f59e0b",
+    "#22c55e",
+    "#a78bfa",
+    "#f43f5e",
+    "#06b6d4",
+    "#fb923c",
+    "#e879f9",
 ];
 
 const shopColors: Record<string, string> = {
@@ -59,12 +59,17 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 type ViewMode = "overall" | "by-shop";
+type TimeRange = "3M" | "6M" | "1Y";
+
+const RANGE_MAP: Record<TimeRange, number> = { "3M": 3, "6M": 6, "1Y": 12 };
 
 export const PriceHistoryModal = ({ offer, onClose }: Props) => {
     const [viewMode, setViewMode] = useState<ViewMode>("overall");
+    const [timeRange, setTimeRange] = useState<TimeRange>("1Y");
 
-    const { data: minMaxData } = useGetComponentMinMax(offer.id!);
-    const { data: monthlyAvgPrices } = useGetMonthlyAvgPrices(offer.id!);
+    const { data: minMaxData, isLoading: minMaxLoading } = useGetComponentMinMax(offer.id!);
+    const { data: monthlyAvgPrices, isLoading: pricesLoading } = useGetMonthlyAvgPrices(offer.id!);
+    const isLoading = minMaxLoading || pricesLoading;
 
     const chartOverall = useMemo(() => {
         if (!monthlyAvgPrices?.length) return [];
@@ -95,25 +100,28 @@ export const PriceHistoryModal = ({ offer, onClose }: Props) => {
             .map(([month, shops]) => ({ date: MONTH_NAMES[Number(month) - 1], ...shops }));
     }, [monthlyAvgPrices]);
 
+    const filteredOverall = chartOverall.slice(-RANGE_MAP[timeRange]);
+    const filteredByShop = chartByShop.slice(-RANGE_MAP[timeRange]);
+
     const availableShops = useMemo(
         () => monthlyAvgPrices?.map((s) => s.shop) ?? [],
         [monthlyAvgPrices]
     );
 
-    const lastMonthPrice = chartOverall.at(-1)?.price ?? 0;
-    const prevMonthPrice = chartOverall.at(-2)?.price ?? 0;
-    const diff = lastMonthPrice - prevMonthPrice;
-    const diffPct = prevMonthPrice ? Math.round((diff / prevMonthPrice) * 100) : 0;
+    const lastMonthPrice = filteredOverall.at(-1)?.price ?? 0;
+    const firstMonthPrice = filteredOverall.at(0)?.price ?? 0;
+    const diff = lastMonthPrice - firstMonthPrice;
+    const diffPct = firstMonthPrice ? Math.round((diff / firstMonthPrice) * 100) : 0;
+
+    const hasData = filteredOverall.length > 0;
 
     return (
         <div
             className="fixed inset-0 z-[200] flex items-center justify-center p-4"
             onClick={onClose}
         >
-            {/* Backdrop */}
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
-            {/* Modal */}
             <div
                 className="relative bg-dark-surface border border-dark-border rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
@@ -142,30 +150,40 @@ export const PriceHistoryModal = ({ offer, onClose }: Props) => {
                     </div>
                     <div className="px-5 py-4">
                         <p className="text-[11px] text-dark-muted uppercase tracking-wide mb-1">Min / Max (rok)</p>
-                        <p className="text-sm font-semibold text-dark-text">
-                            <span className="text-green-400">{minMaxData?.min.toLocaleString("pl-PL")}</span>
-                            <span className="text-dark-muted mx-1">/</span>
-                            <span className="text-red-400">{minMaxData?.max.toLocaleString("pl-PL")}</span>
-                            <span className="text-dark-muted text-xs ml-1">zł</span>
-                        </p>
+                        {isLoading ? (
+                            <div className="h-5 bg-dark-surface2 rounded animate-pulse w-24" />
+                        ) : (
+                            <p className="text-sm font-semibold text-dark-text">
+                                <span className="text-green-400">{minMaxData?.min.toLocaleString("pl-PL")}</span>
+                                <span className="text-dark-muted mx-1">/</span>
+                                <span className="text-red-400">{minMaxData?.max.toLocaleString("pl-PL")}</span>
+                                <span className="text-dark-muted text-xs ml-1">zł</span>
+                            </p>
+                        )}
                     </div>
                     <div className="px-5 py-4">
-                        <p className="text-[11px] text-dark-muted uppercase tracking-wide mb-1">Zmiana (rok)</p>
-                        <div className="flex items-center gap-1.5">
-                            {diff < 0
-                                ? <TrendingDown size={16} className="text-green-400" />
-                                : diff > 0
-                                    ? <TrendingUp size={16} className="text-red-400" />
-                                    : <Minus size={16} className="text-dark-muted" />
-                            }
-                            <span className={`text-sm font-bold ${diff < 0 ? "text-green-400" : diff > 0 ? "text-red-400" : "text-dark-muted"}`}>
-                                {diff > 0 ? "+" : ""}{diff.toLocaleString("pl-PL")} zł ({diffPct}%)
-                            </span>
-                        </div>
+                        <p className="text-[11px] text-dark-muted uppercase tracking-wide mb-1">Zmiana ({timeRange})</p>
+                        {isLoading ? (
+                            <div className="h-5 bg-dark-surface2 rounded animate-pulse w-20" />
+                        ) : hasData ? (
+                            <div className="flex items-center gap-1.5">
+                                {diff < 0
+                                    ? <TrendingDown size={16} className="text-green-400" />
+                                    : diff > 0
+                                        ? <TrendingUp size={16} className="text-red-400" />
+                                        : <Minus size={16} className="text-dark-muted" />
+                                }
+                                <span className={`text-sm font-bold ${diff < 0 ? "text-green-400" : diff > 0 ? "text-red-400" : "text-dark-muted"}`}>
+                                    {diff > 0 ? "+" : ""}{diff.toLocaleString("pl-PL")} zł ({diffPct}%)
+                                </span>
+                            </div>
+                        ) : (
+                            <span className="text-dark-muted text-sm">—</span>
+                        )}
                     </div>
                 </div>
 
-                {/* View toggle */}
+                {/* Controls row */}
                 <div className="flex items-center gap-2 px-6 pt-4">
                     <button
                         onClick={() => setViewMode("overall")}
@@ -187,51 +205,92 @@ export const PriceHistoryModal = ({ offer, onClose }: Props) => {
                     >
                         Według sklepów
                     </button>
+
+                    <div className="flex-1" />
+
+                    {(["3M", "6M", "1Y"] as TimeRange[]).map((r) => (
+                        <button
+                            key={r}
+                            onClick={() => setTimeRange(r)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                                timeRange === r
+                                    ? "bg-dark-surface2 text-white"
+                                    : "text-dark-muted hover:text-dark-text"
+                            }`}
+                        >
+                            {r}
+                        </button>
+                    ))}
                 </div>
 
-                {/* Chart */}
-                <div className="px-4 pb-5 pt-3">
-                    <ResponsiveContainer width="100%" height={240}>
-                        {viewMode === "overall" ? (
-                            <LineChart data={chartOverall} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#252a3a" />
-                                <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 11 }} axisLine={false} tickLine={false} />
-                                <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} axisLine={false} tickLine={false} width={60}
-                                    tickFormatter={(v) => `${v} zł`} />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Line
-                                    type="monotone"
-                                    dataKey="price"
-                                    name="Cena"
-                                    stroke="#4f8ef7"
-                                    strokeWidth={2.5}
-                                    dot={{ fill: "#4f8ef7", r: 3, strokeWidth: 0 }}
-                                    activeDot={{ r: 5, fill: "#4f8ef7" }}
-                                />
-                            </LineChart>
-                        ) : (
-                            <LineChart data={chartByShop} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#252a3a" />
-                                <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 11 }} axisLine={false} tickLine={false} />
-                                <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} axisLine={false} tickLine={false} width={60}
-                                    tickFormatter={(v) => `${v} zł`} />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Legend wrapperStyle={{ fontSize: 12, color: "#6b7280", paddingTop: 8 }} />
-                                {availableShops.map((shop, i) => (
-                                    <Line
-                                        key={shop}
-                                        type="monotone"
-                                        dataKey={shop}
-                                        stroke={getShopColor(shop, i)}
-                                        strokeWidth={2}
-                                        dot={{ fill: getShopColor(shop, i), r: 3, strokeWidth: 0 }}
-                                        activeDot={{ r: 5 }}
+                {/* Chart / Skeleton / Empty */}
+                {isLoading ? (
+                    <div className="px-4 pb-5 pt-3 space-y-2 animate-pulse">
+                        <div className="h-4 bg-dark-surface2 rounded w-1/3" />
+                        <div className="h-48 bg-dark-surface2 rounded-xl" />
+                    </div>
+                ) : !hasData ? (
+                    <div className="px-4 pb-10 pt-6 text-center text-dark-muted text-sm">
+                        Brak danych historycznych dla tego komponentu.
+                    </div>
+                ) : (
+                    <div className="px-4 pb-5 pt-3">
+                        <ResponsiveContainer width="100%" height={240}>
+                            {viewMode === "overall" ? (
+                                <LineChart data={filteredOverall} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#252a3a" />
+                                    <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 11 }} axisLine={false} tickLine={false} />
+                                    <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} axisLine={false} tickLine={false} width={60}
+                                        tickFormatter={(v) => `${v} zł`} />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <ReferenceLine
+                                        y={offer.price}
+                                        stroke="#4f8ef7"
+                                        strokeDasharray="4 4"
+                                        strokeOpacity={0.5}
+                                        label={{ value: "Ta oferta", fill: "#4f8ef7", fontSize: 10, position: "insideTopRight" }}
                                     />
-                                ))}
-                            </LineChart>
-                        )}
-                    </ResponsiveContainer>
-                </div>
+                                    <Line
+                                        type="monotone"
+                                        dataKey="price"
+                                        name="Cena"
+                                        stroke="#4f8ef7"
+                                        strokeWidth={2.5}
+                                        dot={{ fill: "#4f8ef7", r: 3, strokeWidth: 0 }}
+                                        activeDot={{ r: 5, fill: "#4f8ef7" }}
+                                    />
+                                </LineChart>
+                            ) : (
+                                <LineChart data={filteredByShop} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#252a3a" />
+                                    <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 11 }} axisLine={false} tickLine={false} />
+                                    <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} axisLine={false} tickLine={false} width={60}
+                                        tickFormatter={(v) => `${v} zł`} />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Legend wrapperStyle={{ fontSize: 12, color: "#6b7280", paddingTop: 8 }} />
+                                    <ReferenceLine
+                                        y={offer.price}
+                                        stroke="#4f8ef7"
+                                        strokeDasharray="4 4"
+                                        strokeOpacity={0.5}
+                                        label={{ value: "Ta oferta", fill: "#4f8ef7", fontSize: 10, position: "insideTopRight" }}
+                                    />
+                                    {availableShops.map((shop, i) => (
+                                        <Line
+                                            key={shop}
+                                            type="monotone"
+                                            dataKey={shop}
+                                            stroke={getShopColor(shop, i)}
+                                            strokeWidth={2}
+                                            dot={{ fill: getShopColor(shop, i), r: 3, strokeWidth: 0 }}
+                                            activeDot={{ r: 5 }}
+                                        />
+                                    ))}
+                                </LineChart>
+                            )}
+                        </ResponsiveContainer>
+                    </div>
+                )}
             </div>
         </div>
     );

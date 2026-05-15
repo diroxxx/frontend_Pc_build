@@ -5,7 +5,7 @@ import {showToast} from "../../../../lib/ToastContainer.tsx";
 import {selectedComputerAtom} from "../../../computers/atoms/computerAtom.tsx";
 import {useUpdateOffersToComputer} from "../../../offersUpdates/admin/hooks/useUpdateOffersToComputer.ts";
 import {validateCompatibility} from "../../../computers/hooks/validateCompatibility.ts";
-import {ImageOff} from "lucide-react";
+import {ImageOff, TrendingUp} from "lucide-react";
 import {ShopImageComponent} from "./ShopImageComponent.tsx";
 import {userAtom} from "../../../auth/atoms/userAtom.tsx";
 import {guestComputersAtom} from "../../../computers/atoms/guestComputersAtom.ts";
@@ -231,6 +231,14 @@ const OfferCardFlex = ({ offer } : Props) => {
                             {offer.price.toLocaleString("pl-PL")} zł
                         </span>
 
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-dark-surface2 text-dark-muted hover:text-dark-text transition-all text-xs font-semibold"
+                            aria-label="Historia cen"
+                        >
+                            <TrendingUp size={14} />
+                            Historia
+                        </button>
                         <button
                             onClick={(e) => { e.stopPropagation(); (user ? updateComputer : updateComputerGuest)(); }}
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-dark-accent/15 text-dark-accent hover:bg-dark-accent hover:text-white transition-all text-xs font-semibold"

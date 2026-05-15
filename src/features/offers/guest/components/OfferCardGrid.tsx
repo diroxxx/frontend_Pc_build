@@ -1,4 +1,4 @@
-import {ImageOff, Plus} from "lucide-react";
+import {ImageOff, Plus, TrendingUp} from "lucide-react";
 import type {ComponentOffer} from "../../../../shared/dtos/OfferBase.ts";
 import {showToast} from "../../../../lib/ToastContainer.tsx";
 import {validateCompatibility} from "../../../computers/hooks/validateCompatibility.ts";
@@ -112,6 +112,10 @@ const renderConditionBadge = (condition: string) => {
                 <ImageOff className="text-dark-border w-10 h-10" strokeWidth={1.5} />
             )}
             {renderConditionBadge(offer.condition)}
+            <div className="absolute bottom-1 left-1 flex items-center gap-0.5 bg-dark-bg/70 backdrop-blur-sm text-dark-muted text-[9px] px-1.5 py-0.5 rounded-md">
+                <TrendingUp size={9} />
+                <span>Historia cen</span>
+            </div>
         </div>
 
         <div className="p-2 text-center flex-1 flex items-center justify-center min-h-[3rem]">
