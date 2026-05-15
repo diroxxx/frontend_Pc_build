@@ -7,6 +7,7 @@ import type {OfferFiltersType} from "../atoms/OfferLeftPanelFiltersAtom.ts";
 import {useFetchBrands} from "../hooks/useFetchBrands.ts";
 import {useShopsNames} from "../hooks/useShopsNames.ts";
 import {offerPageAtom} from "../atoms/OfferPageAtom.ts";
+import {Tag} from "lucide-react";
 
 type OffersFiltersProps = {
     chooseComponentTypeParam?: ComponentTypeEnum;
@@ -41,6 +42,7 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
         shopName: offerLeftPanelFilters.shopName ?? "",
         query: offerLeftPanelFilters.query ?? "",
         sortBy: offerLeftPanelFilters.sortBy ?? undefined,
+        dealOnly: offerLeftPanelFilters.dealOnly ?? false,
     }));
 
     useEffect(() => {
@@ -53,6 +55,7 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
             shopName: offerLeftPanelFilters.shopName ?? "",
             query: offerLeftPanelFilters.query ?? "",
             sortBy: offerLeftPanelFilters.sortBy ?? undefined,
+            dealOnly: offerLeftPanelFilters.dealOnly ?? false,
         });
     }, [offerLeftPanelFilters]);
 
@@ -111,6 +114,7 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
             shopName: "",
             query: "",
             sortBy: undefined,
+            dealOnly: false,
         };
         setOfferLeftPanelFilters(empty);
         setTempFilters(empty);
@@ -256,6 +260,32 @@ export const OffersSideFilters = ({ chooseComponentTypeParam }: OffersFiltersPro
                             </option>
                         ))}
                     </select>
+                </div>
+
+                <div className="mb-5">
+                    <button
+                        onClick={() =>
+                            setTempFilters((prev) => ({ ...prev, dealOnly: !prev.dealOnly }))
+                        }
+                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg border text-sm font-semibold transition-all ${
+                            tempFilters.dealOnly
+                                ? "bg-green-500/15 border-green-500/40 text-green-400"
+                                : "bg-dark-surface2 border-dark-border text-dark-muted hover:border-dark-accent hover:text-dark-accent"
+                        }`}
+                    >
+                        <span className="flex items-center gap-2">
+                            <Tag size={14} />
+                            Tylko okazje
+                        </span>
+                        {tempFilters.dealOnly && (
+                            <span className="text-[10px] font-bold bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">
+                                AKTYWNY
+                            </span>
+                        )}
+                    </button>
+                    <p className="text-[10px] text-dark-muted mt-1.5 leading-relaxed">
+                        Cena ≤ 105% historycznego minimum
+                    </p>
                 </div>
 
                 <div className="space-y-2">

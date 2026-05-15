@@ -51,7 +51,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                 <div key={entry.name} className="flex items-center gap-2 mb-1">
                     <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: entry.color }} />
                     <span className="text-dark-text">{entry.name}:</span>
-                    <span className="font-bold text-white">{entry.value.toLocaleString("pl-PL")} zł</span>
+                    <span className="font-bold text-white">
+                        {entry.value != null ? `${entry.value.toLocaleString("pl-PL")} zł` : "—"}
+                    </span>
                 </div>
             ))}
         </div>
@@ -59,61 +61,63 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 type ViewMode = "overall" | "by-shop";
-type TimeRange = "3M" | "6M" | "1Y";
-
-const RANGE_MAP: Record<TimeRange, number> = { "3M": 3, "6M": 6, "1Y": 12 };
 
 export const PriceHistoryModal = ({ offer, onClose }: Props) => {
     const [viewMode, setViewMode] = useState<ViewMode>("overall");
-    const [timeRange, setTimeRange] = useState<TimeRange>("1Y");
 
     const { data: minMaxData, isLoading: minMaxLoading } = useGetComponentMinMax(offer.id!);
     const { data: monthlyAvgPrices, isLoading: pricesLoading } = useGetMonthlyAvgPrices(offer.id!);
     const isLoading = minMaxLoading || pricesLoading;
 
+    const makeLabel = (month: number, year?: number) => {
+        const m = MONTH_NAMES[month - 1];
+        return year != null ? `${m} '${String(year).slice(-2)}` : m;
+    };
+
     const chartOverall = useMemo(() => {
         if (!monthlyAvgPrices?.length) return [];
-        const byMonth: Record<number, number[]> = {};
+        const byKey: Record<string, { prices: number[]; month: number; year?: number }> = {};
         for (const shop of monthlyAvgPrices) {
-            for (const { month, avgPrice } of shop.monthlyPrices) {
-                (byMonth[month] ??= []).push(avgPrice);
+            for (const { month, year, avgPrice } of shop.monthlyPrices) {
+                const key = year != null ? `${year}-${String(month).padStart(2, "0")}` : String(month);
+                if (!byKey[key]) byKey[key] = { prices: [], month, year };
+                byKey[key].prices.push(avgPrice);
             }
         }
-        return Object.entries(byMonth)
-            .sort(([a], [b]) => Number(a) - Number(b))
-            .map(([month, prices]) => ({
-                date: MONTH_NAMES[Number(month) - 1],
+        return Object.entries(byKey)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([, { prices, month, year }]) => ({
+                date: makeLabel(month, year),
                 price: Math.round(prices.reduce((s, p) => s + p, 0) / prices.length),
             }));
     }, [monthlyAvgPrices]);
 
     const chartByShop = useMemo(() => {
         if (!monthlyAvgPrices?.length) return [];
-        const byMonth: Record<number, Record<string, number>> = {};
+        const byKey: Record<string, { shops: Record<string, number>; month: number; year?: number }> = {};
         for (const { shop, monthlyPrices } of monthlyAvgPrices) {
-            for (const { month, avgPrice } of monthlyPrices) {
-                (byMonth[month] ??= {})[shop] = Math.round(avgPrice);
+            for (const { month, year, avgPrice } of monthlyPrices) {
+                const key = year != null ? `${year}-${String(month).padStart(2, "0")}` : String(month);
+                if (!byKey[key]) byKey[key] = { shops: {}, month, year };
+                byKey[key].shops[shop] = Math.round(avgPrice);
             }
         }
-        return Object.entries(byMonth)
-            .sort(([a], [b]) => Number(a) - Number(b))
-            .map(([month, shops]) => ({ date: MONTH_NAMES[Number(month) - 1], ...shops }));
+        return Object.entries(byKey)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([, { shops, month, year }]) => ({ date: makeLabel(month, year), ...shops }));
     }, [monthlyAvgPrices]);
-
-    const filteredOverall = chartOverall.slice(-RANGE_MAP[timeRange]);
-    const filteredByShop = chartByShop.slice(-RANGE_MAP[timeRange]);
 
     const availableShops = useMemo(
         () => monthlyAvgPrices?.map((s) => s.shop) ?? [],
         [monthlyAvgPrices]
     );
 
-    const lastMonthPrice = filteredOverall.at(-1)?.price ?? 0;
-    const firstMonthPrice = filteredOverall.at(0)?.price ?? 0;
+    const lastMonthPrice = chartOverall.at(-1)?.price ?? 0;
+    const firstMonthPrice = chartOverall.at(0)?.price ?? 0;
     const diff = lastMonthPrice - firstMonthPrice;
     const diffPct = firstMonthPrice ? Math.round((diff / firstMonthPrice) * 100) : 0;
-
-    const hasData = filteredOverall.length > 0;
+    const hasEnoughForDiff = chartOverall.length > 1;
+    const hasData = chartOverall.length > 0;
 
     return (
         <div
@@ -123,7 +127,7 @@ export const PriceHistoryModal = ({ offer, onClose }: Props) => {
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
             <div
-                className="relative bg-dark-surface border border-dark-border rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden"
+                className="relative bg-dark-surface border border-dark-border rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
@@ -162,10 +166,12 @@ export const PriceHistoryModal = ({ offer, onClose }: Props) => {
                         )}
                     </div>
                     <div className="px-5 py-4">
-                        <p className="text-[11px] text-dark-muted uppercase tracking-wide mb-1">Zmiana ({timeRange})</p>
+                        <p className="text-[11px] text-dark-muted uppercase tracking-wide mb-1">Zmiana (1Y)</p>
                         {isLoading ? (
                             <div className="h-5 bg-dark-surface2 rounded animate-pulse w-20" />
-                        ) : hasData ? (
+                        ) : !hasEnoughForDiff ? (
+                            <span className="text-dark-muted text-sm">Za mało danych</span>
+                        ) : (
                             <div className="flex items-center gap-1.5">
                                 {diff < 0
                                     ? <TrendingDown size={16} className="text-green-400" />
@@ -177,8 +183,6 @@ export const PriceHistoryModal = ({ offer, onClose }: Props) => {
                                     {diff > 0 ? "+" : ""}{diff.toLocaleString("pl-PL")} zł ({diffPct}%)
                                 </span>
                             </div>
-                        ) : (
-                            <span className="text-dark-muted text-sm">—</span>
                         )}
                     </div>
                 </div>
@@ -205,22 +209,6 @@ export const PriceHistoryModal = ({ offer, onClose }: Props) => {
                     >
                         Według sklepów
                     </button>
-
-                    <div className="flex-1" />
-
-                    {(["3M", "6M", "1Y"] as TimeRange[]).map((r) => (
-                        <button
-                            key={r}
-                            onClick={() => setTimeRange(r)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                                timeRange === r
-                                    ? "bg-dark-surface2 text-white"
-                                    : "text-dark-muted hover:text-dark-text"
-                            }`}
-                        >
-                            {r}
-                        </button>
-                    ))}
                 </div>
 
                 {/* Chart / Skeleton / Empty */}
@@ -237,7 +225,7 @@ export const PriceHistoryModal = ({ offer, onClose }: Props) => {
                     <div className="px-4 pb-5 pt-3">
                         <ResponsiveContainer width="100%" height={240}>
                             {viewMode === "overall" ? (
-                                <LineChart data={filteredOverall} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                                <LineChart data={chartOverall} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#252a3a" />
                                     <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 11 }} axisLine={false} tickLine={false} />
                                     <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} axisLine={false} tickLine={false} width={60}
@@ -261,7 +249,7 @@ export const PriceHistoryModal = ({ offer, onClose }: Props) => {
                                     />
                                 </LineChart>
                             ) : (
-                                <LineChart data={filteredByShop} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                                <LineChart data={chartByShop} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#252a3a" />
                                     <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 11 }} axisLine={false} tickLine={false} />
                                     <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} axisLine={false} tickLine={false} width={60}

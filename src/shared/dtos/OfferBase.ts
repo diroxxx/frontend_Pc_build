@@ -6,6 +6,9 @@ export interface OfferBase {
     websiteUrl: string;
     price: number;
     shopName: string;
+    // Backend powinien zwracać isDeal: true gdy cena oferty <= 105% historycznego minimum dla danego komponentu
+    // Wymagane: endpoint GET /offers musi zwracać to pole w każdym obiekcie oferty
+    isDeal?: boolean;
 }
 
 

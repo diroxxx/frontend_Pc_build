@@ -12,6 +12,8 @@ export type OfferFiltersType = {
     shopName?: string;
     query?: string;
     sortBy?: SortByOffersEnum;
+    // Filtr "Okazja": gdy true, backend zwraca tylko oferty gdzie cena <= 105% historycznego minimum
+    dealOnly?: boolean;
 }
 
 export const offerLeftPanelFiltersAtom = atom<OfferFiltersType>({

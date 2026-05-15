@@ -5,7 +5,7 @@ import {showToast} from "../../../../lib/ToastContainer.tsx";
 import {selectedComputerAtom} from "../../../computers/atoms/computerAtom.tsx";
 import {useUpdateOffersToComputer} from "../../../offersUpdates/admin/hooks/useUpdateOffersToComputer.ts";
 import {validateCompatibility} from "../../../computers/hooks/validateCompatibility.ts";
-import {ImageOff, TrendingUp} from "lucide-react";
+import {ImageOff, TrendingUp, Tag} from "lucide-react";
 import {ShopImageComponent} from "./ShopImageComponent.tsx";
 import {userAtom} from "../../../auth/atoms/userAtom.tsx";
 import {guestComputersAtom} from "../../../computers/atoms/guestComputersAtom.ts";
@@ -154,8 +154,19 @@ const OfferCardFlex = ({ offer } : Props) => {
     return (
         <>
         {showModal && <PriceHistoryModal offer={offer} onClose={() => setShowModal(false)} />}
-        <div onClick={() => setShowModal(true)} className="relative group bg-dark-surface border border-dark-border rounded-xl p-4 hover:border-dark-accent/50 hover:bg-dark-surface2 transition-all duration-200 cursor-pointer overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[3px] before:bg-transparent before:transition-colors hover:before:bg-dark-accent">
-            <div className="flex gap-4">
+        <div className={`relative group bg-dark-surface rounded-xl transition-all duration-200 overflow-hidden ${
+            offer.isDeal
+                ? "border-2 border-green-500/60 hover:border-green-400 shadow-[0_0_12px_rgba(34,197,94,0.15)]"
+                : "border border-dark-border hover:border-dark-accent/50 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[3px] before:bg-transparent before:transition-colors hover:before:bg-dark-accent"
+        }`}>
+            {offer.isDeal && (
+                <div className="flex items-center gap-1.5 bg-green-500/15 border-b border-green-500/30 px-4 py-1.5">
+                    <Tag size={13} className="text-green-400 flex-shrink-0" />
+                    <span className="text-xs font-bold text-green-400 tracking-wide">OKAZJA</span>
+                    <span className="text-[10px] text-green-500/70 ml-auto">cena blisko minimum</span>
+                </div>
+            )}
+            <div className="flex gap-4 p-4">
 
                 <div className="flex flex-col gap-2 flex-shrink-0">
                     <div className="w-20 h-20 flex items-center justify-center bg-dark-surface2 border border-dark-border rounded-xl overflow-hidden">
@@ -231,24 +242,26 @@ const OfferCardFlex = ({ offer } : Props) => {
                             {offer.price.toLocaleString("pl-PL")} zł
                         </span>
 
-                        <button
-                            onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-dark-surface2 text-dark-muted hover:text-dark-text transition-all text-xs font-semibold"
-                            aria-label="Historia cen"
-                        >
-                            <TrendingUp size={14} />
-                            Historia
-                        </button>
-                        <button
-                            onClick={(e) => { e.stopPropagation(); (user ? updateComputer : updateComputerGuest)(); }}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-dark-accent/15 text-dark-accent hover:bg-dark-accent hover:text-white transition-all text-xs font-semibold"
-                            aria-label="Dodaj do zestawu"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                            </svg>
-                            Dodaj
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-dark-surface2 text-dark-muted hover:text-dark-text transition-all text-xs font-semibold"
+                                aria-label="Historia cen"
+                            >
+                                <TrendingUp size={14} />
+                                Historia
+                            </button>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); (user ? updateComputer : updateComputerGuest)(); }}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-dark-accent/15 text-dark-accent hover:bg-dark-accent hover:text-white transition-all text-xs font-semibold"
+                                aria-label="Dodaj do zestawu"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                                </svg>
+                                Dodaj
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

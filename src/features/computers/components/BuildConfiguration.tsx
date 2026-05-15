@@ -2,6 +2,7 @@ import {ComponentTypeEnum} from "../../../shared/dtos/BaseItemDto.ts";
 import {useAtomValue} from "jotai";
 import {selectedComputerAtom} from "../atoms/computerAtom.tsx";
 import {Filter} from "lucide-react";
+import BudgetBreakdown from "./BudgetBreakdown.tsx";
 
 interface BuildConfigurationProps {
     categories: ComponentTypeEnum[];
@@ -50,6 +51,13 @@ export default function BuildConfiguration({
             </div>
 
             {selectedComputer ? (
+                <>
+                {selectedComputer.offers?.length > 0 && (
+                    <BudgetBreakdown
+                        offers={selectedComputer.offers}
+                        totalPrice={selectedComputer.price}
+                    />
+                )}
                 <div>
                     {categories.map((cat) => {
                         const offer = selectedComputer.offers?.find(o => o.componentType === cat);
@@ -128,6 +136,7 @@ export default function BuildConfiguration({
                         );
                     })}
                 </div>
+                </>
             ) : (
                 <div className="text-center p-10">
                     <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-dark-surface2 border border-dark-border flex items-center justify-center">

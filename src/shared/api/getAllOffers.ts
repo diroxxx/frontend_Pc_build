@@ -25,6 +25,9 @@ export async function getAllOffers(page: number = 0,
     if (filters?.shopName) params.append('shopName', filters.shopName);
     if (filters?.query) params.append('query', filters.query);
     if (filters?.sortBy) params.append('sortBy', filters.sortBy);
+    // Backend: dodaj obsługę parametru "dealOnly=true" w GET /offers
+    // Gdy dealOnly=true, zwracaj tylko oferty gdzie price <= 1.05 * historyczne_minimum_dla_komponentu
+    if (filters?.dealOnly) params.append('dealOnly', 'true');
 
     const res = await customAxios.get(`/offers?${params.toString()}`);
     return res.data;

@@ -1,4 +1,4 @@
-import {ImageOff, Plus, TrendingUp} from "lucide-react";
+import {ImageOff, Plus, TrendingUp, Tag} from "lucide-react";
 import type {ComponentOffer} from "../../../../shared/dtos/OfferBase.ts";
 import {showToast} from "../../../../lib/ToastContainer.tsx";
 import {validateCompatibility} from "../../../computers/hooks/validateCompatibility.ts";
@@ -99,8 +99,19 @@ const renderConditionBadge = (condition: string) => {
     return (
     <>
     {showModal && <PriceHistoryModal offer={offer} onClose={() => setShowModal(false)} />}
-    <div onClick={() => setShowModal(true)} className="relative border border-dark-border rounded-xl hover:border-dark-accent/50 transition-all duration-200 cursor-pointer bg-dark-surface hover:bg-dark-surface2 flex flex-col h-full">
-        <div className="relative w-full h-36 bg-dark-surface2 flex items-center justify-center overflow-hidden rounded-t-xl flex-shrink-0">
+    <div className={`relative rounded-xl transition-all duration-200 bg-dark-surface flex flex-col h-full ${
+        offer.isDeal
+            ? "border-2 border-green-500/60 hover:border-green-400 shadow-[0_0_12px_rgba(34,197,94,0.15)]"
+            : "border border-dark-border hover:border-dark-accent/50"
+    }`}>
+        {offer.isDeal && (
+            <div className="flex items-center gap-1.5 bg-green-500/15 border-b border-green-500/30 px-3 py-1.5 rounded-t-xl">
+                <Tag size={13} className="text-green-400 flex-shrink-0" />
+                <span className="text-xs font-bold text-green-400 tracking-wide">OKAZJA</span>
+                <span className="text-[10px] text-green-500/70 ml-auto">cena blisko minimum</span>
+            </div>
+        )}
+        <div className={`relative w-full h-36 bg-dark-surface2 flex items-center justify-center overflow-hidden flex-shrink-0 ${offer.isDeal ? "" : "rounded-t-xl"}`}>
             {hasValidPhoto && !imgError ? (
                 <img
                     src={offer.photoUrl}
@@ -112,10 +123,6 @@ const renderConditionBadge = (condition: string) => {
                 <ImageOff className="text-dark-border w-10 h-10" strokeWidth={1.5} />
             )}
             {renderConditionBadge(offer.condition)}
-            <div className="absolute bottom-1 left-1 flex items-center gap-0.5 bg-dark-bg/70 backdrop-blur-sm text-dark-muted text-[9px] px-1.5 py-0.5 rounded-md">
-                <TrendingUp size={9} />
-                <span>Historia cen</span>
-            </div>
         </div>
 
         <div className="p-2 text-center flex-1 flex items-center justify-center min-h-[3rem]">
@@ -130,14 +137,22 @@ const renderConditionBadge = (condition: string) => {
             </a>
         </div>
 
-        <div className="px-2 pb-2 flex items-center justify-between gap-2 flex-shrink-0">
+        <div className="px-2 pb-2 flex items-center justify-between gap-1.5 flex-shrink-0">
             <div className="flex-shrink-0">
                 <ShopImageComponent shopName={offer.shopName}/>
             </div>
 
-            <div className="text-sm font-extrabold text-dark-text flex-grow text-center">
+            <div className="text-xs font-extrabold text-dark-text flex-grow text-center">
                 {offer.price.toLocaleString("pl-PL")} zł
             </div>
+
+            <button
+                onClick={() => setShowModal(true)}
+                className="p-1.5 rounded-lg bg-dark-surface2 text-dark-muted hover:text-dark-text transition-all flex items-center justify-center flex-shrink-0"
+                aria-label="Historia cen"
+            >
+                <TrendingUp size={13} />
+            </button>
 
             <button
                 onClick={(e) => { e.stopPropagation(); (user ? updateComputer : updateComputerGuest)(); }}
