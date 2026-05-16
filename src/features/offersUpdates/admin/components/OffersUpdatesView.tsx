@@ -2,7 +2,7 @@ import { useOfferUpdates } from "../hooks/useOffersUpdates.ts";
 import type { OfferUpdateInfo } from "../dto/OfferUpdateInfo.ts";
 import type { OfferShopUpdate } from "../dto/OfferShopUpdate.ts";
 import { useShopOfferUpdates } from "../hooks/useShopUpdates.ts";
-import { ArrowUp, ArrowDown, CheckCircle2, Loader2, XCircle, History } from "lucide-react";
+import { ArrowUp, ArrowDown, CheckCircle2, Loader2, XCircle, History, HelpCircle } from "lucide-react";
 import { formatDistanceStrict } from "date-fns";
 import { pl } from "date-fns/locale";
 import { LoadingSpinner } from "../../../../assets/components/ui/LoadingSpinner.tsx";
@@ -56,11 +56,21 @@ function ShopCell({ shop }: { shop: OfferShopUpdate }) {
                     {allTypes.map((type) => {
                         const added   = shop.offersAdded?.[type]   ?? 0;
                         const deleted = shop.offersDeleted?.[type] ?? 0;
+                        const isUnknown = type === "UNKNOWN";
                         return (
-                            <span key={type} className="inline-flex items-center gap-1 bg-white border border-gray-200 px-1.5 py-0.5 rounded text-[10px]">
-                                <span className="text-gray-500">{type}</span>
+                            <span
+                                key={type}
+                                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] border ${
+                                    isUnknown
+                                        ? "bg-amber-50 border-amber-300 text-amber-700"
+                                        : "bg-white border-gray-200 text-gray-500"
+                                }`}
+                                title={isUnknown ? "Nieprzypisane — brak dopasowania do komponentu" : undefined}
+                            >
+                                {isUnknown && <HelpCircle className="w-2.5 h-2.5 text-amber-500 flex-shrink-0" />}
+                                <span>{type}</span>
                                 {added > 0 && (
-                                    <span className="flex items-center gap-0.5 text-green-600 font-semibold">
+                                    <span className={`flex items-center gap-0.5 font-semibold ${isUnknown ? "text-amber-600" : "text-green-600"}`}>
                                         <ArrowUp className="w-2 h-2" />{added}
                                     </span>
                                 )}
