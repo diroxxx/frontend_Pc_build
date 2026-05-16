@@ -1,29 +1,22 @@
-import {useGetOffersShopsAmountStats} from "../hooks/useGetOffersShopsAmountStats.ts";
-import {Loader2} from "lucide-react";
-import {Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip} from "recharts";
-import React from "react";
+import { useGetOffersShopsAmountStats } from "../hooks/useGetOffersShopsAmountStats.ts";
+import { Loader2 } from "lucide-react";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, Legend } from "recharts";
 
-const COLORS = [
-    "#0077B6",
-    "#00B4D8",
-    "#90E0EF",
-    "#48CAE4",
-    "#023E8A",
-    "#0096C7",
-];
-const ShopOffersShareChart: React.FC = () => {
+const COLORS = ["#7dd3fc", "#38bdf8", "#0ea5e9", "#bae6fd", "#0284c7", "#e0f2fe"];
+
+export default function ShopOffersShareChart() {
     const { data, isLoading, error } = useGetOffersShopsAmountStats();
 
     if (isLoading)
         return (
-            <div className="flex justify-center items-center h-64 bg-gradient-admin-info/90 backdrop-blur-sm rounded-xl shadow-lg border border-ocean-white/10">
-                <Loader2 className="w-6 h-6 text-ocean-blue animate-spin" />
+            <div className="flex justify-center items-center h-64">
+                <Loader2 className="w-8 h-8 text-white/60 animate-spin" />
             </div>
         );
 
     if (error || !data)
         return (
-            <div className="flex justify-center items-center h-64 bg-gradient-admin-info/90 backdrop-blur-sm rounded-xl shadow-lg border border-ocean-white/10 text-red-300 font-medium">
+            <div className="flex justify-center items-center h-64 text-red-300 text-sm">
                 Błąd podczas ładowania danych
             </div>
         );
@@ -36,63 +29,52 @@ const ShopOffersShareChart: React.FC = () => {
     }));
 
     return (
-        <div className="bg-gradient-admin-info/90 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-ocean-white/10">
-            <div className="flex justify-center items-center h-[300px] bg-ocean-white/5 rounded-lg p-4">
-                <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                        <Pie
-                            data={chartData}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={60}
-                            outerRadius={100}
-                            paddingAngle={4}
-                            dataKey="value"
-                        >
-                            {chartData.map((entry, index) => (
-                                <Cell
-                                    key={`cell-${index}`}
-                                    fill={COLORS[index % COLORS.length]}
-                                    className="transition-all duration-300 hover:opacity-80"
-                                />
-                            ))}
-                        </Pie>
+        <div className="h-72 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                    <Pie
+                        data={chartData}
+                        cx="50%"
+                        cy="45%"
+                        innerRadius={65}
+                        outerRadius={100}
+                        paddingAngle={3}
+                        dataKey="value"
+                        strokeWidth={0}
+                    >
+                        {chartData.map((_, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                    </Pie>
 
-                        <Tooltip
-                            formatter={(value: number, name: string, props: any) => [
-                                `${value} ofert (${props.payload.percent}%)`,
-                                props.payload.name,
-                            ]}
-                            contentStyle={{
-                                backgroundColor: "rgba(255,255,255,0.95)",
-                                border: "1px solid #bae6fd",
-                                borderRadius: "8px",
-                                color: "#0f172a",
-                                fontSize: "0.85rem",
-                            }}
-                            labelStyle={{ color: "#38bdf8", fontWeight: "bold" }}
-                        />
+                    <Tooltip
+                        formatter={(value: number, _name: string, props: any) => [
+                            `${value.toLocaleString()} ofert (${props.payload.percent}%)`,
+                            props.payload.name,
+                        ]}
+                        contentStyle={{
+                            backgroundColor: "#1e293b",
+                            border: "1px solid rgba(255,255,255,0.15)",
+                            borderRadius: "8px",
+                            color: "#f1f5f9",
+                            fontSize: "0.8rem",
+                        }}
+                        labelStyle={{ display: "none" }}
+                    />
 
-                        <Legend
-                            layout="horizontal"
-                            align="center"
-                            verticalAlign="bottom"
-                            wrapperStyle={{
-                                fontSize: "13px",
-                                color: "#e0f7ff",
-                                marginTop: "10px",
-                            }}
-                            formatter={(value) => (
-                                <span style={{ color: "#e0f7ff", fontWeight: 500 }}>
-                                    {value}
-                                </span>
-                            )}
-                        />
-                    </PieChart>
-                </ResponsiveContainer>
-            </div>
+                    <Legend
+                        layout="horizontal"
+                        align="center"
+                        verticalAlign="bottom"
+                        iconType="circle"
+                        iconSize={8}
+                        wrapperStyle={{ fontSize: 12, color: "rgba(255,255,255,0.7)", paddingTop: 8 }}
+                        formatter={(value) => (
+                            <span style={{ color: "rgba(255,255,255,0.8)" }}>{value}</span>
+                        )}
+                    />
+                </PieChart>
+            </ResponsiveContainer>
         </div>
     );
-};
-
-export default ShopOffersShareChart;
+}

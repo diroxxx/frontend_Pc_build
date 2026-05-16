@@ -9,7 +9,6 @@ import {selectedComputerAtom} from "../atoms/computerAtom.tsx";
 import { Pencil } from "lucide-react";
 import {useUpdateComputerName} from "../user/hooks/updateComputerNameMutation.ts";
 import {guestComputersAtom} from "../atoms/guestComputersAtom.ts";
-import {EditIcon} from "lucide-react";
 
 interface BuildListProps {
     computers: ComputerDto[];
@@ -36,16 +35,17 @@ const BuildList = ({
     const [hoveredId, setHoveredId] = useState<number | null>(null);
     const [guestComputer, setGuestComputer] = useAtom(guestComputersAtom);
 
-    const handleDelete = (id: number) => {
+    const handleDelete = (id: number, name: string) => {
         if (!user?.email) {
             showToast.warning("Musisz być zalogowany, aby usunąć zestaw");
             return;
         }
+        if (!window.confirm(`Czy na pewno chcesz usunąć zestaw "${name}"?`)) return;
         deleteMutation.mutate(id);
     };
 
-    const handleDeleteGuestComuter = (name: string) => {
-
+    const handleDeleteGuestComputer = (name: string) => {
+        if (!window.confirm(`Czy na pewno chcesz usunąć zestaw "${name}"?`)) return;
         const updatedComputers = guestComputer.filter(computer => computer.name !== name);
         setGuestComputer(updatedComputers);
         showToast.success(`Zestaw ${name} został usunięty`);
@@ -90,7 +90,7 @@ const BuildList = ({
                     Brak zestawów. Utwórz swój pierwszy!
                 </p>
             ) : (
-                <div className="grid gap-2 max-h-48 overflow-y-auto pr-1">
+                <div className="grid gap-2 max-h-[420px] overflow-y-auto pr-1">
                     {computers.map((computer) => (
                         <div
                             key={computer.id}
@@ -143,7 +143,7 @@ const BuildList = ({
                                 </div>
 
                                 <button
-                                    onClick={(e) => { e.stopPropagation(); user ? handleDelete(computer.id) : handleDeleteGuestComuter(computer.name); }}
+                                    onClick={(e) => { e.stopPropagation(); user ? handleDelete(computer.id, computer.name) : handleDeleteGuestComputer(computer.name); }}
                                     className="flex-shrink-0 text-dark-muted hover:text-ocean-red transition-colors p-1"
                                     title="Usuń zestaw"
                                 >

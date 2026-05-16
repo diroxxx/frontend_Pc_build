@@ -770,7 +770,7 @@ const PostDetails: React.FC<PostDetailProps> = ({ post, onBack }) => {
 
 
     return (
-        <div className="bg-dark-bg min-h-screen">
+        <div className="bg-dark-bg">
             {/* Top bar */}
             <div className="max-w-7xl mx-auto px-4 pt-3 pb-2">
                 <button

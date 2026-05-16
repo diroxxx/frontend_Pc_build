@@ -2,7 +2,6 @@ import {ComponentTypeEnum} from "../../../shared/dtos/BaseItemDto.ts";
 import {useAtomValue} from "jotai";
 import {selectedComputerAtom} from "../atoms/computerAtom.tsx";
 import {Filter} from "lucide-react";
-import BudgetBreakdown from "./BudgetBreakdown.tsx";
 
 interface BuildConfigurationProps {
     categories: ComponentTypeEnum[];
@@ -43,21 +42,10 @@ export default function BuildConfiguration({
                         </p>
                     )}
                 </div>
-                {selectedComputer && selectedComputer.offers?.length > 0 && (
-                    <span className="text-lg font-extrabold text-white">
-                        {selectedComputer.price.toLocaleString("pl-PL")} zł
-                    </span>
-                )}
             </div>
 
             {selectedComputer ? (
                 <>
-                {selectedComputer.offers?.length > 0 && (
-                    <BudgetBreakdown
-                        offers={selectedComputer.offers}
-                        totalPrice={selectedComputer.price}
-                    />
-                )}
                 <div>
                     {categories.map((cat) => {
                         const offer = selectedComputer.offers?.find(o => o.componentType === cat);
@@ -65,7 +53,7 @@ export default function BuildConfiguration({
                         return (
                             <div
                                 key={cat}
-                                className="grid grid-cols-4 border-b border-dark-border px-5 py-3 items-center last:border-b-0 hover:bg-dark-surface2 transition-colors"
+                                className="grid grid-cols-[90px_1fr_auto_auto] gap-x-3 border-b border-dark-border px-5 py-3 items-center last:border-b-0 hover:bg-dark-surface2 transition-colors"
                             >
                                 {/* Category label */}
                                 <div className="text-xs font-semibold text-dark-muted uppercase tracking-wide">

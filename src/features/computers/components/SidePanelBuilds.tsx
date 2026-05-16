@@ -2,6 +2,17 @@ import {useEffect, useState} from "react";
 import type {ComponentOffer} from "../../../shared/dtos/OfferBase.ts";
 
 import {useAtom} from "jotai";
+
+const CATEGORY_LABELS: Record<string, string> = {
+    PROCESSOR: "CPU",
+    GRAPHICS_CARD: "GPU",
+    MOTHERBOARD: "Płyta główna",
+    CPU_COOLER: "Chłodzenie",
+    CASE_PC: "Obudowa",
+    MEMORY: "RAM",
+    POWER_SUPPLY: "Zasilacz",
+    STORAGE: "Pamięć",
+};
 import {useFetchComputersByEmail} from "../user/hooks/useFetchComputersByEmail.ts";
 import {userAtom} from "../../auth/atoms/userAtom.tsx";
 import {selectedComputerAtom} from "../atoms/computerAtom.tsx";
@@ -126,7 +137,7 @@ export default function SidePanelBuilds() {
                                                     {offer.brand} {offer.model}
                                                 </p>
                                                 <p className="text-[11px] text-dark-muted mt-0.5">
-                                                    {offer.componentType} · {offer.price.toLocaleString("pl-PL")} zł
+                                                    {CATEGORY_LABELS[offer.componentType] ?? offer.componentType} · {offer.price.toLocaleString("pl-PL")} zł
                                                 </p>
                                             </div>
                                         </div>
@@ -145,7 +156,7 @@ export default function SidePanelBuilds() {
                 {selectedComputer && (
                     <div className="px-4 py-3 border-t border-dark-border flex-shrink-0 flex justify-between items-center">
                         <span className="text-xs font-medium text-dark-muted">Łącznie:</span>
-                        <span className="text-sm font-extrabold text-white">
+                        <span className="text-sm font-extrabold text-dark-text">
                             {selectedComputer.price?.toLocaleString("pl-PL")} zł
                         </span>
                     </div>

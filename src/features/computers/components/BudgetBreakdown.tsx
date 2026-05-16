@@ -30,7 +30,7 @@ const CustomTooltip = ({ active, payload }: any) => {
     return (
         <div className="bg-dark-surface border border-dark-border rounded-xl px-3 py-2 shadow-2xl text-xs">
             <p className="text-dark-text font-semibold">{name}</p>
-            <p className="text-white font-bold mt-0.5">{value.toLocaleString("pl-PL")} zł</p>
+            <p className="text-dark-text font-bold mt-0.5">{value.toLocaleString("pl-PL")} zł</p>
             <p className="text-dark-muted">{pct}%</p>
         </div>
     );
@@ -54,48 +54,54 @@ export default function BudgetBreakdown({ offers, totalPrice }: Props) {
     );
 
     return (
-        <div className="border-t border-dark-border px-5 py-4">
-            <p className="text-xs font-semibold text-dark-muted uppercase tracking-wide mb-3">Podział budżetu</p>
-            <div className="flex items-center gap-4">
-                <div className="w-28 h-28 flex-shrink-0">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie
-                                data={data}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={28}
-                                outerRadius={52}
-                                paddingAngle={2}
-                                dataKey="value"
-                                strokeWidth={0}
-                            >
-                                {data.map((entry) => (
-                                    <Cell key={entry.componentType} fill={entry.color} />
-                                ))}
-                            </Pie>
-                            <Tooltip content={<CustomTooltip />} />
-                        </PieChart>
-                    </ResponsiveContainer>
+        <div className="px-4 py-4 space-y-4">
+            {/* Donut chart z ceną w środku */}
+            <div className="relative">
+                <ResponsiveContainer width="100%" height={180}>
+                    <PieChart>
+                        <Pie
+                            data={data}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={52}
+                            outerRadius={80}
+                            paddingAngle={2}
+                            dataKey="value"
+                            strokeWidth={0}
+                        >
+                            {data.map((entry) => (
+                                <Cell key={entry.componentType} fill={entry.color} />
+                            ))}
+                        </Pie>
+                        <Tooltip content={<CustomTooltip />} />
+                    </PieChart>
+                </ResponsiveContainer>
+                {/* Łączna cena w środku donuta */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span className="text-[10px] text-dark-muted uppercase tracking-wide">Łącznie</span>
+                    <span className="text-base font-extrabold text-dark-text leading-tight">
+                        {totalPrice.toLocaleString("pl-PL")} zł
+                    </span>
                 </div>
+            </div>
 
-                <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-                    {data.map((entry) => (
-                        <div key={entry.componentType} className="flex items-center gap-1.5">
-                            <span
-                                className="w-2 h-2 rounded-full flex-shrink-0"
-                                style={{ background: entry.color }}
-                            />
-                            <span className="text-[11px] text-dark-muted">{entry.name}</span>
-                            <span className="text-[11px] font-semibold text-dark-text">
-                                {entry.pct}%
-                            </span>
-                            <span className="text-[11px] text-dark-muted">
-                                · {entry.value.toLocaleString("pl-PL")} zł
-                            </span>
-                        </div>
-                    ))}
-                </div>
+            {/* Legenda — pełna szerokość, każdy wiersz z nazwą i wartością */}
+            <div className="space-y-2">
+                {data.map((entry) => (
+                    <div key={entry.componentType} className="flex items-center gap-2">
+                        <span
+                            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                            style={{ background: entry.color }}
+                        />
+                        <span className="text-xs text-dark-muted flex-1 truncate">{entry.name}</span>
+                        <span className="text-xs font-bold text-dark-text flex-shrink-0 w-8 text-right">
+                            {entry.pct}%
+                        </span>
+                        <span className="text-xs text-dark-muted flex-shrink-0 w-20 text-right">
+                            {entry.value.toLocaleString("pl-PL")} zł
+                        </span>
+                    </div>
+                ))}
             </div>
         </div>
     );

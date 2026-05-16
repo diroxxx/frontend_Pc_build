@@ -39,8 +39,8 @@ const CommunityPage: React.FC = () => {
     }
 
     if (isCreatingPost) {
-        if (!isAuthenticated) return <div className="p-6 text-center text-ocean-red bg-dark-bg min-h-screen">Zaloguj się!</div>;
-        if (isLoading) return <div className="p-6 text-center text-dark-text bg-dark-bg min-h-screen">Ładowanie formularza...</div>;
+        if (!isAuthenticated) return <div className="p-6 text-center text-ocean-red bg-dark-bg">Zaloguj się!</div>;
+        if (isLoading) return <div className="p-6 text-center text-dark-text bg-dark-bg">Ładowanie formularza...</div>;
 
         return (
             <CreatePostForm
@@ -58,7 +58,7 @@ const CommunityPage: React.FC = () => {
     const sortedPosts = getSortedPosts();
 
     return (
-        <div className="bg-dark-bg min-h-screen">
+        <div className="bg-dark-bg">
             {/* Header */}
             <div className="bg-dark-surface border-b border-dark-border">
                 <div className="max-w-4xl mx-auto px-4 py-5 flex items-end justify-between">

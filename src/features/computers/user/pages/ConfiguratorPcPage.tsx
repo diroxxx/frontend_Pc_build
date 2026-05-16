@@ -5,13 +5,14 @@ import {useFetchComputersByEmail} from "../hooks/useFetchComputersByEmail.ts";
 import {useEffect} from "react";
 import BuildList from "../../components/BuildList.tsx";
 import BuildConfiguration from "../../components/BuildConfiguration.tsx";
+import BudgetBreakdown from "../../components/BudgetBreakdown.tsx";
 import {useSaveComputerByUserEmail} from "../hooks/useSaveComputersByUserEmail.ts";
 import type {ComputerDto} from "../../../../shared/dtos/ComputerDto.ts";
 import {ComponentTypeEnum} from "../../../../shared/dtos/BaseItemDto.ts";
 import {selectedComputerAtom} from "../../atoms/computerAtom.tsx";
 import {LoadingSpinner} from "../../../../assets/components/ui/LoadingSpinner.tsx";
 import {guestComputersAtom} from "../../atoms/guestComputersAtom.ts";
-import { Filter, Info } from "lucide-react";
+import { Info } from "lucide-react";
 import {selectedCategoryAtom} from "../../atoms/selectedCategoryAtom.ts";
 import { offerLeftPanelFiltersAtom } from '../../../../shared/atoms/OfferLeftPanelFiltersAtom.ts';
 import { SortByOffersEnum } from '../../../../shared/dtos/SortByOffersEnum.ts';
@@ -200,7 +201,7 @@ const handleAddComponent = (category: ComponentTypeEnum) => {
     }
 
     return (
-        <div className="min-h-screen bg-dark-bg">
+        <div className="bg-dark-bg">
             <div className="max-w-7xl mx-auto px-4 py-6">
 
                 <div className="mb-6">
@@ -233,17 +234,42 @@ const handleAddComponent = (category: ComponentTypeEnum) => {
                     </div>
                 )}
 
-                <BuildList
-                    computers={user ? fetchedComputers : guestcomputers}
-                    onSelectBuild={user ? handleSelectBuild : handleSelectGuestBuild}
-                    onCreateNew={user ? handleCreateNewBuild : handleCreateNewGuestBuild}
-                    isLoading={isLoading}
-                />
+                <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr_260px] gap-6 items-start">
+                    {/* Lewa kolumna — lista zestawów */}
+                    <div className="lg:sticky lg:top-6">
+                        <BuildList
+                            computers={user ? fetchedComputers : guestcomputers}
+                            onSelectBuild={user ? handleSelectBuild : handleSelectGuestBuild}
+                            onCreateNew={user ? handleCreateNewBuild : handleCreateNewGuestBuild}
+                            isLoading={isLoading}
+                        />
+                    </div>
 
-                <BuildConfiguration
-                    categories={categories}
-                    onAddComponent={handleAddComponent}
-                />
+                    {/* Środkowa kolumna — lista komponentów */}
+                    <BuildConfiguration
+                        categories={categories}
+                        onAddComponent={handleAddComponent}
+                    />
+
+                    {/* Prawa kolumna — wykres budżetu */}
+                    <div className="lg:sticky lg:top-6">
+                        {selectedComputer && selectedComputer.offers?.length > 0 ? (
+                            <div className="bg-dark-surface border border-dark-border rounded-xl overflow-hidden">
+                                <div className="px-5 py-4 border-b border-dark-border">
+                                    <h2 className="text-xs font-bold text-dark-muted uppercase tracking-widest">Podział budżetu</h2>
+                                </div>
+                                <BudgetBreakdown
+                                    offers={selectedComputer.offers}
+                                    totalPrice={selectedComputer.price}
+                                />
+                            </div>
+                        ) : (
+                            <div className="bg-dark-surface border border-dark-border rounded-xl p-5 text-center text-dark-muted text-sm">
+                                Dodaj komponenty, aby zobaczyć podział budżetu.
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     );

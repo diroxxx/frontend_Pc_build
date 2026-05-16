@@ -1,224 +1,219 @@
 import { useOfferUpdates } from "../hooks/useOffersUpdates.ts";
-import type { OfferUpdateInfo} from "../dto/OfferUpdateInfo.ts";
+import type { OfferUpdateInfo } from "../dto/OfferUpdateInfo.ts";
 import type { OfferShopUpdate } from "../dto/OfferShopUpdate.ts";
-import {useShopOfferUpdates} from "../hooks/useShopUpdates.ts";
-
-import { ArrowUp, ArrowDown, CheckCircle2, Loader2 } from "lucide-react";
+import { useShopOfferUpdates } from "../hooks/useShopUpdates.ts";
+import { ArrowUp, ArrowDown, CheckCircle2, Loader2, XCircle, History } from "lucide-react";
 import { formatDistanceStrict } from "date-fns";
 import { pl } from "date-fns/locale";
 import { LoadingSpinner } from "../../../../assets/components/ui/LoadingSpinner.tsx";
-
 
 function ShopUpdateSubscriber({ updateId, isActive }: { updateId: number; isActive: boolean }) {
     useShopOfferUpdates(updateId, isActive);
     return null;
 }
 
+const STATUS_ICON = {
+    RUNNING:   <Loader2 className="w-3.5 h-3.5 text-ocean-blue animate-spin" />,
+    COMPLETED: <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />,
+    FAILED:    <XCircle className="w-3.5 h-3.5 text-red-400" />,
+};
+
+function ShopCell({ shop }: { shop: OfferShopUpdate }) {
+    const totalAdded   = Object.values(shop.offersAdded   ?? {}).reduce((s, v) => s + v, 0);
+    const totalDeleted = Object.values(shop.offersDeleted ?? {}).reduce((s, v) => s + v, 0);
+
+    const allTypes = Array.from(new Set([
+        ...Object.keys(shop.offersAdded   ?? {}),
+        ...Object.keys(shop.offersDeleted ?? {}),
+    ])).sort().filter(t => (shop.offersAdded?.[t] ?? 0) + (shop.offersDeleted?.[t] ?? 0) > 0);
+
+    return (
+        <div className="px-2 py-1.5 rounded-lg bg-gray-50 border border-gray-200 text-xs min-w-[130px]">
+            {/* Shop header */}
+            <div className="flex items-center gap-1.5 mb-1">
+                {STATUS_ICON[shop.status as keyof typeof STATUS_ICON]}
+                <span className="font-semibold text-gray-700">{shop.shopName}</span>
+                <div className="flex items-center gap-1 ml-auto">
+                    {totalAdded > 0 && (
+                        <span className="flex items-center gap-0.5 font-bold text-green-600">
+                            <ArrowUp className="w-2.5 h-2.5" />{totalAdded}
+                        </span>
+                    )}
+                    {totalDeleted > 0 && (
+                        <span className="flex items-center gap-0.5 font-bold text-red-400">
+                            <ArrowDown className="w-2.5 h-2.5" />{totalDeleted}
+                        </span>
+                    )}
+                    {totalAdded === 0 && totalDeleted === 0 && shop.status === 'COMPLETED' && (
+                        <span className="text-gray-300">—</span>
+                    )}
+                </div>
+            </div>
+
+            {/* Per-type details */}
+            {allTypes.length > 0 && (
+                <div className="flex flex-wrap gap-1 pl-5">
+                    {allTypes.map((type) => {
+                        const added   = shop.offersAdded?.[type]   ?? 0;
+                        const deleted = shop.offersDeleted?.[type] ?? 0;
+                        return (
+                            <span key={type} className="inline-flex items-center gap-1 bg-white border border-gray-200 px-1.5 py-0.5 rounded text-[10px]">
+                                <span className="text-gray-500">{type}</span>
+                                {added > 0 && (
+                                    <span className="flex items-center gap-0.5 text-green-600 font-semibold">
+                                        <ArrowUp className="w-2 h-2" />{added}
+                                    </span>
+                                )}
+                                {deleted > 0 && (
+                                    <span className="flex items-center gap-0.5 text-red-400 font-semibold">
+                                        <ArrowDown className="w-2 h-2" />{deleted}
+                                    </span>
+                                )}
+                            </span>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function UpdateRow({ update, isEven }: { update: OfferUpdateInfo; isEven: boolean }) {
+    const started  = new Date(update.startedAt);
+    const finished = update.finishedAt ? new Date(update.finishedAt) : null;
+    const isActive = update.shops?.some(s => s.status === 'RUNNING') ?? false;
+
+    const duration = finished
+        ? formatDistanceStrict(started, finished, { locale: pl })
+        : null;
+
+    const totalAdded   = update.shops?.reduce((sum, s) =>
+        sum + Object.values(s.offersAdded   ?? {}).reduce((a, v) => a + v, 0), 0) ?? 0;
+    const totalDeleted = update.shops?.reduce((sum, s) =>
+        sum + Object.values(s.offersDeleted ?? {}).reduce((a, v) => a + v, 0), 0) ?? 0;
+
+    return (
+        <tr className={`border-b border-gray-100 last:border-0 ${isEven ? 'bg-white' : 'bg-gray-50/50'} ${isActive ? 'ring-1 ring-inset ring-ocean-blue/30' : ''}`}>
+            {/* ID */}
+            <td className="px-4 py-3 text-xs font-bold text-gray-400 whitespace-nowrap">
+                #{update.id}
+            </td>
+
+            {/* Date */}
+            <td className="px-3 py-3 text-xs text-gray-600 whitespace-nowrap">
+                {started.toLocaleString('pl-PL', {
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit',
+                })}
+            </td>
+
+            {/* Duration */}
+            <td className="px-3 py-3 text-xs text-gray-400 whitespace-nowrap">
+                {isActive ? (
+                    <span className="flex items-center gap-1 text-ocean-blue font-medium">
+                        <Loader2 className="w-3 h-3 animate-spin" /> W toku
+                    </span>
+                ) : duration ?? '—'}
+            </td>
+
+            {/* Total changes */}
+            <td className="px-3 py-3 whitespace-nowrap">
+                <div className="flex items-center gap-2">
+                    {totalAdded > 0 && (
+                        <span className="flex items-center gap-0.5 text-xs font-bold text-green-600">
+                            <ArrowUp className="w-3 h-3" />{totalAdded}
+                        </span>
+                    )}
+                    {totalDeleted > 0 && (
+                        <span className="flex items-center gap-0.5 text-xs font-bold text-red-400">
+                            <ArrowDown className="w-3 h-3" />{totalDeleted}
+                        </span>
+                    )}
+                    {totalAdded === 0 && totalDeleted === 0 && !isActive && (
+                        <span className="text-xs text-gray-300">brak</span>
+                    )}
+                </div>
+            </td>
+
+            {/* Shops inline */}
+            <td className="px-3 py-3">
+                <div className="flex flex-wrap gap-1.5">
+                    {update.shops?.map(shop => (
+                        <ShopCell key={shop.shopName} shop={shop} />
+                    )) ?? <span className="text-xs text-gray-300">—</span>}
+                </div>
+            </td>
+        </tr>
+    );
+}
+
 const OffersUpdatesView = () => {
     const { data: updates = [], isLoading, error } = useOfferUpdates();
 
-    if (isLoading) {
+    if (isLoading)
         return (
-            <div className="flex items-center justify-center min-h-[400px]">
+            <div className="flex items-center justify-center py-16">
                 <div className="text-center">
                     <LoadingSpinner />
-                    <p className="mt-4 text-midnight-dark text-sm">Ładowanie aktualizacji...</p>
+                    <p className="mt-3 text-gray-500 text-sm">Ładowanie aktualizacji...</p>
                 </div>
             </div>
         );
-    }
 
-    if (error) {
+    if (error)
         return (
-            <div className="p-4 bg-ocean-red/10 border border-ocean-red/30 rounded-lg">
-                <p className="text-ocean-red font-medium">Błąd podczas pobierania danych.</p>
+            <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                <p className="text-red-600 text-sm font-medium">Błąd podczas pobierania danych.</p>
             </div>
         );
-    }
 
-    if (!updates.length) {
+    if (!updates.length)
         return (
-            <div className="text-center p-8 bg-ocean-white rounded-lg border border-ocean-light-blue">
-                <p className="text-midnight-dark">Brak aktualizacji.</p>
+            <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
+                <History className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                <p className="text-gray-400 text-sm">Brak historii aktualizacji.</p>
             </div>
         );
-    }
 
     const sortedUpdates = [...updates].sort(
         (a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime()
     );
 
     return (
-        <div className="space-y-6">
-            {sortedUpdates.map((u) => (
+        <div>
+            {sortedUpdates.map(u => (
                 <ShopUpdateSubscriber key={u.id} updateId={u.id} isActive={!u.finishedAt} />
             ))}
 
-            {sortedUpdates.map((update: OfferUpdateInfo) => {
-                const started = new Date(update.startedAt);
-                const finished = update.finishedAt ? new Date(update.finishedAt) : null;
-                
-                const isActive = update.shops?.some(shop => shop.status === 'RUNNING') ?? false;
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 flex items-center gap-2">
+                    <History className="w-4 h-4 text-gray-400" />
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
+                        Historia aktualizacji ({sortedUpdates.length})
+                    </span>
+                </div>
 
-                const duration =
-                    finished &&
-                    formatDistanceStrict(started, finished, { locale: pl, addSuffix: false });
-
-                return (
-                    <div
-                        key={update.id}
-                        className={`border rounded-xl p-6 shadow-sm bg-white hover:shadow-md transition-all ${
-                            isActive ? 'border-ocean-blue' : 'border-gray-200'
-                        }`}
-                    >
-                        <div className="flex justify-between items-start mb-4">
-                            <div className="flex items-center gap-3">
-                                <div>
-                                    <h2 className="font-semibold text-lg text-midnight-dark">
-                                        Aktualizacja #{update.id}
-                                    </h2>
-                                    <p className="text-sm text-gray-500 mt-0.5">
-                                        {started.toLocaleString('pl-PL', {
-                                            day: '2-digit',
-                                            month: '2-digit',
-                                            year: 'numeric',
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                        })}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="text-right">
-                                <span
-                                    className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                                        isActive
-                                            ? "bg-ocean-blue/10 text-ocean-blue"
-                                            : "bg-ocean-light-blue/30 text-ocean-dark-blue"
-                                    }`}
-                                >
-                                    {isActive ? "W toku..." : "Zakończona"}
-                                </span>
-                                {!isActive && duration && (
-                                    <p className="text-xs text-gray-500 mt-1">
-                                        Czas: {duration}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Shops */}
-                        {update.shops?.length ? (
-                            <div className="space-y-3">
-                                {update.shops.map((shop: OfferShopUpdate) => {
-                                    const totalDeleted = Object.values(shop.offersDeleted ?? {})
-                                        .reduce((sum, val) => sum + val, 0);
-
-                                    const totalAdded = Object.values(shop.offersAdded ?? {})
-                                        .reduce((sum, val) => sum + val, 0);
-
-                                    const allTypes = new Set([
-                                        ...Object.keys(shop.offersAdded ?? {}),
-                                        ...Object.keys(shop.offersDeleted ?? {})
-                                    ]);
-                                    
-                                    return (
-                                        <div
-                                            key={shop.shopName}
-                                            className="p-4 rounded-lg border border-gray-200 bg-gray-50"
-                                        >
-                                            <div className="flex items-center justify-between mb-3">
-                                                <div className="flex items-center gap-2">
-                                                    {shop.status === 'RUNNING' && (
-                                                        <Loader2 className="w-5 h-5 text-ocean-blue animate-spin" />
-                                                    )}
-                                                    {shop.status === 'COMPLETED' && (
-                                                        <CheckCircle2 className="w-5 h-5 text-green-600" />
-                                                    )}
-                                                    {shop.status === 'FAILED' && (
-                                                        <CheckCircle2 className="w-5 h-5 text-ocean-red" />
-                                                    )}
-                                                    <h3 className="font-semibold text-midnight-dark">
-                                                        {shop.shopName}
-                                                    </h3>
-                                                </div>
-                                                
-                                                <div className="flex items-center gap-3">
-                                                    {totalAdded > 0 && (
-                                                        <div className="flex items-center gap-1 text-sm">
-                                                            <ArrowUp className="w-4 h-4 text-green-600" />
-                                                            <span className="font-semibold text-green-600">
-                                                                {totalAdded}
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                    {totalDeleted > 0 && (
-                                                        <div className="flex items-center gap-1 text-sm">
-                                                            <ArrowDown className="w-4 h-4 text-ocean-red" />
-                                                            <span className="font-semibold text-ocean-red">
-                                                                {totalDeleted}
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {allTypes.size > 0 ? (
-                                                <div className="flex flex-wrap gap-2">
-                                                    {Array.from(allTypes)
-                                                        .sort()
-                                                        .map((type) => {
-                                                            const added = shop.offersAdded?.[type] ?? 0;
-                                                            const deleted = shop.offersDeleted?.[type] ?? 0;
-                                                            
-                                                            if (added === 0 && deleted === 0) return null;
-
-                                                            return (
-                                                                <div
-                                                                    key={type}
-                                                                    className="inline-flex items-center gap-2 bg-white border border-gray-300 px-3 py-1.5 rounded-lg text-sm"
-                                                                >
-                                                                    <span className="text-gray-700 font-medium">{type}</span>
-                                                                    <div className="flex items-center gap-2">
-                                                                        {added > 0 && (
-                                                                            <div className="flex items-center gap-0.5">
-                                                                                <ArrowUp className="w-3.5 h-3.5 text-green-600" />
-                                                                                <span className="font-semibold text-green-600">
-                                                                                    {added}
-                                                                                </span>
-                                                                            </div>
-                                                                        )}
-                                                                        {deleted > 0 && (
-                                                                            <div className="flex items-center gap-0.5">
-                                                                                <ArrowDown className="w-3.5 h-3.5 text-ocean-red" />
-                                                                                <span className="font-semibold text-ocean-red">
-                                                                                    {deleted}
-                                                                                </span>
-                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        })}
-                                                </div>
-                                            ) : (
-                                                <p className="text-sm text-gray-500 italic">
-                                                    Brak zmian w tym sklepie
-                                                </p>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ) : (
-                            <p className="text-sm text-gray-500 italic mt-3">
-                                Brak danych o sklepach.
-                            </p>
-                        )}
-                    </div>
-                );
-            })}
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                        <thead>
+                            <tr className="border-b border-gray-100">
+                                <th className="px-4 py-2.5 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wide">ID</th>
+                                <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Data</th>
+                                <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Czas</th>
+                                <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Zmiany</th>
+                                <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Sklepy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {sortedUpdates.map((update, i) => (
+                                <UpdateRow key={update.id} update={update} isEven={i % 2 === 0} />
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     );
 };
+
 export default OffersUpdatesView;

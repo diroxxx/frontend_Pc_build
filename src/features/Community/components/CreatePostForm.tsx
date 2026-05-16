@@ -30,7 +30,7 @@ const CreatePostForm: React.FC<CreatePostFormProps> = ({ categories, currentUser
     };
 
     return (
-        <div className="bg-dark-bg min-h-screen p-6">
+        <div className="bg-dark-bg p-6">
             <button
                 className="mb-4 px-4 py-2 bg-dark-surface border border-dark-border text-dark-text rounded-lg hover:bg-dark-surface2 flex items-center transition"
                 onClick={handleCancel}

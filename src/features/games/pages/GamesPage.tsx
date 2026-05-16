@@ -11,8 +11,6 @@ import {useCpuGpuGame} from "../hooks/useCpuGpuGame.ts";
 import OfferCardFlex from "../../offers/guest/components/OfferCardFlex.tsx";
 import {useCpus} from "../../../shared/hooks/useCpus.ts";
 import {useGpuModels} from "../../../shared/hooks/useGpuModels.ts";
-import {useAtom} from "jotai/index";
-import {selectedComputerAtom} from "../../computers/atoms/computerAtom.tsx";
 import axios from "axios";
 
 const selectClass = "w-full px-2 py-1.5 text-xs bg-dark-surface2 border border-dark-border rounded-lg text-dark-text focus:border-dark-accent transition-colors";
@@ -21,7 +19,6 @@ const labelClass = "text-[10px] font-semibold text-dark-muted uppercase tracking
 const GamesPage = () => {
     const { data: games, isLoading, isError } = useGetAllGamesApi();
     const [selectedGame, setSelectedGame] = useState<GameDto | null>(null);
-    const [selectedComputer] = useAtom(selectedComputerAtom);
 
     const {data:cpus} = useCpus();
     const {data:gpuModels} = useGpuModels();
@@ -38,11 +35,10 @@ const GamesPage = () => {
     const processorTypes = cpus || [];
     const gpuTypes = gpuModels || [];
 
-    const isConfigComplete = (config: GameFpsConfigDto | null): config is GameFpsConfigDto => {
-        return config !== null && !!selectedGame;
-    };
+    const isConfigComplete = (config: GameFpsConfigDto): boolean =>
+        !!selectedGame && !!config.cpu && !!config.gpu && !!config.resolution && !!config.technology && !!config.graphicsPreset;
 
-    const completeConfig = isConfigComplete(gameFpsConfig) ? gameFpsConfig : null;
+    const completeConfig = isConfigComplete(gameFpsConfig) ? gameFpsConfig : undefined;
 
     const {data: recommendedVideoData, refetch, isError:videoError, error: videoErrorDetails, isLoading:videoLoading, isFetching:videoFetching} = useReccommendedVideo(completeConfig || undefined);
     const {data: recOffersGame, refetch: refetchRecGame, isFetching: isFetchingRec, isLoading: isLoadingRec } = useCpuGpuGame(gameFpsConfig.gameTitle, gameFpsConfig.budget);
@@ -51,19 +47,19 @@ const GamesPage = () => {
 
     if (isError) {
         return (
-            <div className="min-h-screen bg-dark-bg flex items-center justify-center">
+            <div className="bg-dark-bg flex items-center justify-center py-32">
                 <p className="text-ocean-red">Błąd podczas pobierania gier</p>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-dark-bg">
+        <div className="bg-dark-bg">
             <div className="max-w-[1920px] mx-auto px-4 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
 
                     {/* LEFT SIDEBAR */}
-                    <div className="col-span-2 space-y-3">
+                    <div className="col-span-3 space-y-3">
                         <div className="sticky top-6 space-y-3">
 
                             {/* Video search panel */}
@@ -228,12 +224,12 @@ const GamesPage = () => {
                     </div>
 
                     {/* CENTER — game grid + video */}
-                    <div className="col-span-6 space-y-4">
+                    <div className="col-span-5 space-y-4">
 
                         {/* Game picker */}
                         <div className="bg-dark-surface border border-dark-border rounded-xl p-4">
                             <h2 className="text-xs font-bold text-dark-muted uppercase tracking-widest mb-3">Wybierz grę</h2>
-                            <div className="grid grid-cols-6 gap-2">
+                            <div className="grid grid-cols-4 gap-3">
                                 {isLoading ? (
                                     <div className="col-span-full flex justify-center py-8"><LoadingSpinner /></div>
                                 ) : games?.map((game: GameDto) => (

@@ -1,4 +1,4 @@
-import {useState } from "react";
+import { useState } from "react";
 import UsersPage from "../usersManagment/admin/usersPage.tsx";
 import { useNavigate } from "react-router-dom";
 import { setAuthToken } from "../auth/hooks/Auth.tsx";
@@ -9,91 +9,93 @@ import OffersComponent from "../offersUpdates/admin/offersUpdatePage.tsx";
 import GeneralPage from "./generalPage.tsx";
 import ComponentsPage from "../pcParts/admin/componentsPage.tsx";
 import OffersAdminPage from "../offers/Admin/OffersAdminPage.tsx";
-import {useQueryClient} from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import AdminGamesPage from "../games/admin/pages/AdminGamesPage.tsx";
-const AdminControlPanel = () => {
-        const [activeTab, setActiveTab] = useState("general");
-        const navigate = useNavigate();
-        const [getUser,setUser] = useAtom(userAtom);
-        const queryClient = useQueryClient();
+import { LayoutDashboard, RefreshCw, Tag, Cpu, Users, Gamepad2, LogOut, ShieldCheck, AlertCircle } from "lucide-react";
+import UnknownOffersPage from "../unknownOffers/UnknownOffersPage.tsx";
 
-        const handleLogout = () => {
-            try {
-                setAuthToken(null);
-                setUser(null);
-                navigate("/admin/login");
-                setTimeout(() => {
-                queryClient.clear();
-                }, 100);
-                
+const TABS = [
+    { key: "general",      label: "Ogólne",             icon: LayoutDashboard },
+    { key: "offersUpdate", label: "Aktualizacje ofert",  icon: RefreshCw },
+    { key: "offers",       label: "Oferty",              icon: Tag },
+    { key: "components",   label: "Komponenty",          icon: Cpu },
+    { key: "users",        label: "Użytkownicy",         icon: Users },
+    { key: "games",        label: "Gry",                 icon: Gamepad2 },
+    { key: "unknown",      label: "Nieprzypisane",       icon: AlertCircle },
+];
+
+const AdminControlPanel = () => {
+    const [activeTab, setActiveTab] = useState("general");
+    const navigate = useNavigate();
+    const [, setUser] = useAtom(userAtom);
+    const queryClient = useQueryClient();
+
+    const handleLogout = () => {
+        try {
+            setAuthToken(null);
+            setUser(null);
+            navigate("/admin/login");
+            setTimeout(() => queryClient.clear(), 100);
         } catch (error) {
             console.error("Błąd podczas wylogowania:", error);
             showToast.error("Błąd podczas wylogowania");
         }
     };
-    return (
-        <div className="min-h-screen bg-gray-100 font-sans">
-            <div className="bg-gradient-blue-horizontal text-white py-6 mb-6 relative">
-                <button
-                    onClick={handleLogout}
-                    className="absolute top-3 right-4 bg-ocean-red hover:bg-oceane-red text-white px-3 py-1.5 rounded-lg transition-colors duration-200 flex items-center gap-2 font-medium text-sm"
-                >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                        />
-                    </svg>
-                    Wyloguj
-                </button>
-                <div className="container mx-auto px-4">
-                    <h1 className="text-text-ocean-white text-2xl md:text-3xl font-bold text-center">
-                        PANEL ADMINISTRATORA
-                    </h1>
-                    <p className="text-center text-text-ocean-white mt-1 text-base">
-                        Zarządzanie portalem PC-Build
-                    </p>
-                </div>
-            </div>
 
-            <div className="flex min-h-[600px] gap-4 px-2">
-                <div className="flex flex-col w-52 bg-ocean-white rounded-lg shadow-md border border-gray-200 h-full py-3">
-                    {[
-                        { key: 'general', label: 'Ogólne' },
-                        { key: 'offersUpdate', label: 'Aktualizacje ofert' },
-                        { key: 'offers', label: 'Oferty' },
-                        { key: 'components', label: 'Komponenty' },
-                        { key: 'users', label: 'Użytkownicy' },
-                        { key: 'games', label: 'Gry' },
-                    ].map((item) => (
+    return (
+        <div className="min-h-screen bg-gray-100 font-sans flex flex-col">
+            {/* Header */}
+            <header className="bg-gradient-blue-horizontal text-white shadow-lg flex-shrink-0">
+                <div className="px-6 py-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center">
+                            <ShieldCheck size={18} className="text-white" />
+                        </div>
+                        <div>
+                            <h1 className="text-lg font-bold leading-none">Panel Administratora</h1>
+                            <p className="text-white/70 text-xs mt-0.5">Zarządzanie portalem PC-Build</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-sm font-medium transition-all"
+                    >
+                        <LogOut size={15} />
+                        Wyloguj
+                    </button>
+                </div>
+
+                {/* Tab bar w headerze */}
+                <nav className="px-6 pb-0 flex gap-1 overflow-x-auto">
+                    {TABS.map(({ key, label, icon: Icon }) => (
                         <button
-                            key={item.key}
-                            onClick={() => setActiveTab(item.key as typeof activeTab)}
-                            className={`mb-1.5 mx-2 px-4 py-2.5 rounded-lg text-sm transition-all duration-200 text-left font-medium ${
-                                activeTab === item.key
-                                    ? 'bg-ocean-dark-blue text-ocean-white shadow-sm'
-                                    : 'text-gray-600 hover:text-ocean-dark-blue'
+                            key={key}
+                            onClick={() => setActiveTab(key)}
+                            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-t-lg whitespace-nowrap transition-all border-b-2 ${
+                                activeTab === key
+                                    ? "bg-white text-ocean-blue border-white"
+                                    : "text-white/80 hover:text-white border-transparent hover:bg-white/10"
                             }`}
                         >
-                            {item.label}
+                            <Icon size={14} />
+                            {label}
                         </button>
                     ))}
-                </div>
+                </nav>
+            </header>
 
-                <div className="flex-1 p-1">
-                    {activeTab === 'general' && <GeneralPage onNavigate={setActiveTab} />}
-                    {activeTab === 'users' && <UsersPage />}
-                    {activeTab === 'components' && <ComponentsPage />}
-                    {activeTab === 'offersUpdate' && <OffersComponent />}
-                    {activeTab === 'offers' && <OffersAdminPage />}
-                    {activeTab === 'games' && <AdminGamesPage />}
-                </div>
-            </div>
+            {/* Content */}
+            <main className="flex-1 p-6 overflow-auto">
+                {activeTab === "general"      && <GeneralPage onNavigate={setActiveTab} />}
+                {activeTab === "users"        && <UsersPage />}
+                {activeTab === "components"   && <ComponentsPage />}
+                {activeTab === "offersUpdate" && <OffersComponent />}
+                {activeTab === "offers"       && <OffersAdminPage />}
+                {activeTab === "games"        && <AdminGamesPage />}
+                {activeTab === "unknown"      && <UnknownOffersPage />}
+            </main>
         </div>
     );
-
-}
+};
 
 export default AdminControlPanel;

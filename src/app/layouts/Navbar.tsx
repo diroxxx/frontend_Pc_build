@@ -1,113 +1,141 @@
-import {useNavigate, useLocation} from "react-router-dom";
-import {useState, useEffect, useRef} from "react";
-import { useAtom } from 'jotai';
-import { userAtom } from '../../features/auth/atoms/userAtom.tsx';
-import {useLogout} from "../../features/auth/user/hooks/useLogout.ts";
-import {useQueryClient} from "@tanstack/react-query";
-import {themeAtom} from "../../shared/atoms/themeAtom.ts";
-import {Sun, Moon} from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useAtom } from "jotai";
+import { userAtom } from "../../features/auth/atoms/userAtom.tsx";
+import { useLogout } from "../../features/auth/user/hooks/useLogout.ts";
+import { useQueryClient } from "@tanstack/react-query";
+import { themeAtom } from "../../shared/atoms/themeAtom.ts";
+import { Sun, Moon, User, LogOut, UserCircle, Cpu } from "lucide-react";
+
+const NAV_LINKS = [
+    { label: "Strona główna", path: "/" },
+    { label: "Konfigurator", path: "/builds" },
+    { label: "Komponenty", path: "/offers" },
+    { label: "Forum", path: "/community" },
+    { label: "Sprawdź gry", path: "/check-games" },
+];
 
 export default function Navbar() {
     const navigate = useNavigate();
     const location = useLocation();
     const [user] = useAtom(userAtom);
     const [theme, setTheme] = useAtom(themeAtom);
-    // const [, logout] = useAtom(logoutUserAtom);
     const [showDropdown, setShowDropdown] = useState(false);
-    const [, setIsScrolled] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const logout = useLogout();
     const queryClient = useQueryClient();
 
     useEffect(() => {
-        const handleScroll = () => {
-            const scrollTop = window.scrollY;
-            setIsScrolled(scrollTop > 100);
-        };
-
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        const onScroll = () => setScrolled(window.scrollY > 10);
+        window.addEventListener("scroll", onScroll);
+        return () => window.removeEventListener("scroll", onScroll);
     }, []);
+
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
                 setShowDropdown(false);
             }
         };
-
-        if (showDropdown) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
+        if (showDropdown) document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [showDropdown]);
 
+    return (
+        <header className={`sticky top-0 z-50 bg-dark-surface border-b border-dark-border transition-shadow duration-200 ${scrolled ? "shadow-lg shadow-black/20" : ""}`}>
+            <div className="px-6 py-3 flex justify-between items-center">
+                {/* Logo */}
+                <button
+                    onClick={() => navigate("/")}
+                    className="flex items-center gap-2 group"
+                >
+                    <div className="w-8 h-8 rounded-lg bg-dark-accent flex items-center justify-center flex-shrink-0 group-hover:bg-dark-accent-hover transition-colors">
+                        <Cpu size={16} className="text-white" />
+                    </div>
+                    <span className="text-xl font-black text-dark-text group-hover:text-dark-accent transition-colors" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                        Pc-Build
+                    </span>
+                </button>
 
-return (
-    <>
-        <header className="bg-gradient-blue-horizontal text-white">
-            <div className="px-6 py-4 flex justify-between items-center">
-                <h1 className="text-ocean-white text-3xl font-bold" style={{fontFamily: "'Space Grotesk', sans-serif"}}>
-                    Pc-Build
-                </h1>
-                
-                <div className="flex gap-3 relative items-center">
+                {/* Nav links — center */}
+                <nav className="hidden md:flex items-center gap-1">
+                    {NAV_LINKS.map(({ label, path }) => {
+                        const active = location.pathname === path;
+                        return (
+                            <button
+                                key={path}
+                                onClick={() => navigate(path)}
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                    active
+                                        ? "bg-dark-surface2 text-dark-accent"
+                                        : "text-dark-muted hover:text-dark-text hover:bg-dark-surface2"
+                                }`}
+                            >
+                                {label}
+                            </button>
+                        );
+                    })}
+                </nav>
+
+                {/* Right side */}
+                <div className="flex items-center gap-2">
+                    {/* Theme toggle */}
                     <button
-                        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                        className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all duration-200"
-                        title={theme === 'dark' ? 'Przełącz na jasny motyw' : 'Przełącz na ciemny motyw'}
+                        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                        className="p-2 rounded-lg text-dark-muted hover:text-dark-text hover:bg-dark-surface2 transition-all"
+                        title={theme === "dark" ? "Przełącz na jasny motyw" : "Przełącz na ciemny motyw"}
                     >
-                        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                        {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
                     </button>
+
                     {user ? (
-                        <div ref={dropdownRef} className="relative flex items-center gap-3">
-                            <span className="text-sm font-medium px-3 py-1 rounded-full">
+                        <div ref={dropdownRef} className="relative flex items-center gap-2">
+                            <span className="hidden sm:block text-sm font-medium text-dark-muted">
                                 {user.nickname}
                             </span>
                             <button
                                 onClick={() => setShowDropdown(!showDropdown)}
-                                className="focus:outline-none hover:bg-ocean-light-blue hover:bg-opacity-30 p-2 rounded-full transition-all duration-300 hover:shadow-lg"
+                                className={`w-9 h-9 rounded-lg flex items-center justify-center border transition-all ${
+                                    showDropdown
+                                        ? "border-dark-accent bg-dark-surface2 text-dark-accent"
+                                        : "border-dark-border bg-dark-surface2 text-dark-muted hover:border-dark-accent hover:text-dark-accent"
+                                }`}
                             >
-                                <img src="user.png" alt="Logo_user" className="h-8 w-8 rounded-full" />
+                                <UserCircle size={18} />
                             </button>
+
                             {showDropdown && (
-                                <div className="absolute right-0 top-12 w-40 bg-white rounded-lg shadow-xl z-50 border border-gray-100">
+                                <div className="absolute right-0 top-11 w-44 bg-dark-surface border border-dark-border rounded-xl shadow-2xl shadow-black/30 z-50 overflow-hidden">
                                     <button
-                                        onClick={() => {
-                                            navigate("/userInfo");
-                                            setShowDropdown(false);
-                                        }}
-                                        className="block w-full text-left px-4 py-3 text-midnight-dark hover:bg-ocean-light-blue hover:bg-opacity-20 transition-colors duration-200 rounded-t-lg"
+                                        onClick={() => { navigate("/userInfo"); setShowDropdown(false); }}
+                                        className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-dark-text hover:bg-dark-surface2 transition-colors"
                                     >
-                                        Profile
+                                        <User size={14} className="text-dark-muted" />
+                                        Profil
                                     </button>
+                                    <div className="border-t border-dark-border" />
                                     <button
-                                        onClick={() => {
-                                            logout();
-                                            queryClient.clear();
-                                            setShowDropdown(false);
-                                            navigate("/")
-                                        }}
-                                        className="block w-full text-left px-4 py-3 text-midnight-dark hover:bg-ocean-red hover:bg-opacity-20 rounded-b-lg transition-colors duration-200"
+                                        onClick={() => { logout(); queryClient.clear(); setShowDropdown(false); navigate("/"); }}
+                                        className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-ocean-red hover:bg-ocean-red/10 transition-colors"
                                     >
+                                        <LogOut size={14} />
                                         Wyloguj się
                                     </button>
                                 </div>
                             )}
                         </div>
                     ) : (
-                        <div className="flex gap-3">
+                        <div className="flex gap-2">
                             <button
                                 onClick={() => navigate("/login")}
-                                className="bg-white bg-opacity-90 text-midnight-dark px-5 py-2 rounded-lg font-medium hover:bg-ocean-light-blue hover:text-white hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-ocean-light-blue transition-all duration-300 shadow-sm"
+                                className="px-4 py-2 text-sm font-semibold text-dark-text border border-dark-border rounded-lg hover:border-dark-accent hover:text-dark-accent bg-dark-surface2 transition-all"
                             >
                                 Zaloguj się
                             </button>
                             <button
                                 onClick={() => navigate("/register")}
-                                className="border-2 border-white text-white px-5 py-2 rounded-lg font-medium hover:bg-ocean-light-blue hover:border-ocean-light-blue hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-ocean-light-blue transition-all duration-300"
+                                className="px-4 py-2 text-sm font-semibold text-white bg-dark-accent rounded-lg hover:bg-dark-accent-hover transition-all"
                             >
                                 Rejestracja
                             </button>
@@ -116,65 +144,25 @@ return (
                 </div>
             </div>
 
-            { (
-                <div className="border-t border-white border-opacity-20">
-                    <nav className="px-6 py-3">
-                        <div className="flex gap-1 justify-center flex-wrap">
-                            <button 
-                                onClick={() => navigate("/")} 
-                                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                                    location.pathname === "/" 
-                                        ? "bg-white text-ocean-blue shadow-sm" 
-                                        : "text-white hover:bg-ocean-light-blue hover:bg-opacity-25 hover:shadow-md hover:backdrop-blur-sm"
-                                }`}
-                            >
-                                Strona główna
-                            </button>
-                            <button 
-                                onClick={() => navigate("/builds")} 
-                                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                                    location.pathname === "/builds" 
-                                        ? "bg-white text-ocean-blue shadow-sm" 
-                                        : "text-white hover:bg-ocean-light-blue hover:bg-opacity-25 hover:shadow-md hover:backdrop-blur-sm"
-                                }`}
-                            >
-                                Konfigurator
-                            </button>
-                            <button 
-                                onClick={() => navigate("/offers")} 
-                                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                                    location.pathname === "/offers" 
-                                        ? "bg-white text-ocean-blue shadow-sm" 
-                                        : "text-white hover:bg-ocean-light-blue hover:bg-opacity-25 hover:shadow-md hover:backdrop-blur-sm"
-                                }`}
-                            >
-                                Komponenty
-                            </button>
-                            <button 
-                                onClick={() => navigate("/community")} 
-                                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                                    location.pathname === "/community" 
-                                        ? "bg-white text-ocean-blue shadow-sm" 
-                                        : "text-white hover:bg-ocean-light-blue hover:bg-opacity-25 hover:shadow-md hover:backdrop-blur-sm"
-                                }`}
-                            >
-                                Forum
-                            </button>
-                            <button 
-                                onClick={() => navigate("/check-games")} 
-                                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                                    location.pathname === "/check-games" 
-                                        ? "bg-white text-ocean-blue shadow-sm" 
-                                        : "text-white hover:bg-ocean-light-blue hover:bg-opacity-25 hover:shadow-md hover:backdrop-blur-sm"
-                                }`}
-                            >
-                                Sprawdź gry
-                            </button>
-                        </div>
-                    </nav>
-                </div>
-            )}
+            {/* Mobile nav */}
+            <nav className="md:hidden border-t border-dark-border px-4 py-2 flex gap-1 overflow-x-auto">
+                {NAV_LINKS.map(({ label, path }) => {
+                    const active = location.pathname === path;
+                    return (
+                        <button
+                            key={path}
+                            onClick={() => navigate(path)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+                                active
+                                    ? "bg-dark-surface2 text-dark-accent"
+                                    : "text-dark-muted hover:text-dark-text"
+                            }`}
+                        >
+                            {label}
+                        </button>
+                    );
+                })}
+            </nav>
         </header>
-    </>
-);
+    );
 }

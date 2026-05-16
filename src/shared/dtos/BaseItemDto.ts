@@ -9,6 +9,7 @@ export enum ComponentTypeEnum {
     STORAGE = "STORAGE",
     CASE_PC = "CASE_PC",
     CPU_COOLER = "CPU_COOLER",
+    UNKNOWN = "UNKNOWN",
 }
 
 export const PolishComponentTypeEnum: Record<ComponentTypeEnum, string> = {
@@ -20,6 +21,7 @@ export const PolishComponentTypeEnum: Record<ComponentTypeEnum, string> = {
     [ComponentTypeEnum.STORAGE]: "Dysk",
     [ComponentTypeEnum.CASE_PC]: "Obudowa",
     [ComponentTypeEnum.CPU_COOLER]: "Chłodzenie CPU",
+    [ComponentTypeEnum.UNKNOWN]: "Nieznany",
 };
 export interface NewComponentRow {
     componentType: ComponentTypeEnum;
@@ -64,7 +66,8 @@ export type ComponentItem =
     | PowerSupplyItem
     | StorageItem
     | CaseItem
-    | CoolerItem;
+    | CoolerItem
+    | UnknownItem;
 
 export interface ProcessorItem extends BaseItem {
     componentType: ComponentTypeEnum.PROCESSOR;
@@ -131,5 +134,9 @@ export interface StorageItem extends BaseItem {
 export interface CaseItem extends BaseItem {
     componentType: ComponentTypeEnum.CASE_PC;
     format: string;
+}
+
+export interface UnknownItem extends BaseItem {
+    componentType: ComponentTypeEnum.UNKNOWN;
 }
 

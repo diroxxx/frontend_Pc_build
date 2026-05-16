@@ -1,4 +1,4 @@
-import type { CaseItem, CoolerItem, GraphicsCardItem, MemoryItem, MotherboardItem, PowerSupplyItem, ProcessorItem, StorageItem } from "./BaseItemDto.ts";
+import type { CaseItem, CoolerItem, GraphicsCardItem, MemoryItem, MotherboardItem, PowerSupplyItem, ProcessorItem, StorageItem, UnknownItem } from "./BaseItemDto.ts";
 export interface OfferBase {
     title: string;
     condition: string;
@@ -13,7 +13,7 @@ export interface OfferBase {
 
 
 export type ComponentOffer = ProcessorOffer | CoolerOffer | GraphicsCardOffer |
-    MemoryOffer | MotherboardOffer | PowerSupplyOffer | StorageOffer | CaseOffer;
+    MemoryOffer | MotherboardOffer | PowerSupplyOffer | StorageOffer | CaseOffer | UnknownOffer;
 
 export interface ProcessorOffer extends ProcessorItem, OfferBase {}
 export interface CoolerOffer extends CoolerItem, OfferBase {}
@@ -23,4 +23,5 @@ export interface MotherboardOffer extends MotherboardItem, OfferBase {}
 export interface PowerSupplyOffer extends PowerSupplyItem, OfferBase {}
 export interface StorageOffer extends StorageItem, OfferBase {}
 export interface CaseOffer extends CaseItem, OfferBase {}
+export interface UnknownOffer extends UnknownItem, OfferBase {}
 

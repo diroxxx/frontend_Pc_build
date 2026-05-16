@@ -57,7 +57,7 @@ function OffersUserPage() {
 
     if (error) return <p className="p-4 text-ocean-red">Błąd podczas pobierania danych.</p>;
     return (
-        <div className="min-h-screen bg-dark-bg">
+        <div className="bg-dark-bg">
             <SidePanelBuilds />
 
             <div className="border-b border-dark-border sticky top-0 z-20 bg-dark-surface/90 backdrop-blur-sm">

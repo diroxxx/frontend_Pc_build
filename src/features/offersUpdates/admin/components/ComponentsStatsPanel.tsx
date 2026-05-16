@@ -22,7 +22,7 @@ export default function ComponentsStatsPanel() {
     }
 
  return (
-        <div className="bg-white border border-ocean-light-blue rounded-xl shadow-sm p-3 sm:p-4 mb-6 relative">
+        <div className="bg-white border border-ocean-light-blue rounded-xl shadow-sm p-3 sm:p-4 relative">
             {isFetching && (
                 <div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex items-center gap-1.5 sm:gap-2 text-ocean-blue text-xs sm:text-sm">
                     <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
@@ -60,7 +60,7 @@ export default function ComponentsStatsPanel() {
                         </div>
 
                         {expanded === stat.componentType && (
-    <div className="mt-2 pl-2 sm:pl-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+    <div className="mt-2 pl-2 grid grid-cols-1 gap-1">
         {Object.entries(stat.shopBreakdown).map(([shop, count]) => (
             <div
                 key={shop}

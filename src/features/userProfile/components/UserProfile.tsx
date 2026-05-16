@@ -2,13 +2,13 @@ import { useState } from 'react';
 import customAxios from '../../../lib/customAxios.tsx';
 import { useAtom } from 'jotai';
 import { userAtom } from '../../auth/atoms/userAtom.tsx';
-import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import {useLogout} from "../../auth/user/hooks/useLogout.ts";
+import { useLogout } from '../../auth/user/hooks/useLogout.ts';
 import { showToast } from '../../../lib/ToastContainer.tsx';
+import { Eye, EyeOff, User, Mail, Lock, CheckCircle } from 'lucide-react';
 
-function UserProfile(){
-    const [user,] = useAtom(userAtom);
+function UserProfile() {
+    const [user] = useAtom(userAtom);
     const navigate = useNavigate();
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -19,25 +19,21 @@ function UserProfile(){
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const logout = useLogout();
+
     const verifyCurrentPassword = async () => {
         if (!currentPassword) {
-            showToast.error('Please enter your current password');
+            showToast.error('Wprowadź aktualne hasło');
             return;
         }
-
         setIsVerifying(true);
-
         try {
-            const response = await customAxios.post('/auth/verify-password', {
-                currentPassword: currentPassword
-            });
-
+            const response = await customAxios.post('/auth/verify-password', { currentPassword });
             if (response.status === 200) {
                 setIsPasswordVerified(true);
-                showToast.success('Password verified successfully');
+                showToast.success('Hasło zweryfikowane');
             }
         } catch (error: any) {
-            showToast.error(error.response?.data?.message || 'Current password is incorrect');
+            showToast.error(error.response?.data?.message || 'Nieprawidłowe hasło');
             setIsPasswordVerified(false);
         } finally {
             setIsVerifying(false);
@@ -46,36 +42,26 @@ function UserProfile(){
 
     const handlePasswordChange = async () => {
         if (!newPassword || !confirmPassword) {
-            showToast.error('Please fill in all password fields');
+            showToast.error('Wypełnij wszystkie pola');
             return;
         }
-
         if (newPassword !== confirmPassword) {
-            showToast.error('New passwords do not match');
+            showToast.error('Nowe hasła nie są identyczne');
             return;
         }
-
         if (newPassword.length < 8) {
-            showToast.error('New password must be at least 8 characters long');
+            showToast.error('Hasło musi mieć co najmniej 8 znaków');
             return;
         }
-
         try {
-            const response = await customAxios.put('/auth/change-password', {
-                currentPassword: newPassword
-            });
-
+            const response = await customAxios.put('/auth/change-password', { currentPassword: newPassword });
             if (response.status === 200) {
-                showToast.success('Password changed successfully! You will be logged out.');
-
+                showToast.success('Hasło zmienione. Za chwilę zostaniesz wylogowany.');
                 resetPasswordForm();
-                setTimeout(() => {
-                    logout();
-                    navigate('/login');
-                }, 1000);
+                setTimeout(() => { logout(); navigate('/login'); }, 1000);
             }
         } catch (error: any) {
-            showToast.error(error.response?.data?.message || 'Failed to change password');
+            showToast.error(error.response?.data?.message || 'Nie udało się zmienić hasła');
         }
     };
 
@@ -85,191 +71,156 @@ function UserProfile(){
         setConfirmPassword('');
         setIsPasswordVerified(false);
     };
-    
-    return(
-        <div className="bg-gray-100 rounded-lg shadow-lg p-8 max-w-md mx-auto">
-                        <div className="flex justify-center mb-6">
-                            <div className="relative">
-                                <img
-                                    src="user2.png"
-                                    alt="Profile"
-                                    className="w-32 h-32 rounded-full object-cover border-4 border-gray-300"
-                                    onError={(e) => {
-                                        console.log("Image failed to load:", e.currentTarget.src);
-                                        // e.currentTarget.style.backgroundColor = "#e5e7eb";
-                                        e.currentTarget.style.display = "block";
-                                    }}
-                                    onLoad={() => {
-                                        console.log("Image loaded successfully");
-                                    }}
-                                />
-                            </div>
-                        </div>
 
+    const inputClass = "w-full px-3 py-2 bg-dark-surface2 border border-dark-border rounded-lg text-dark-text text-sm focus:outline-none focus:border-dark-accent transition-colors";
+    const labelClass = "block text-xs font-medium text-dark-muted mb-1.5 uppercase tracking-wide";
 
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Username
-                                </label>
+    return (
+        <div className="bg-dark-surface border border-dark-border rounded-xl p-6 max-w-md mx-auto">
+            {/* Avatar */}
+            <div className="flex justify-center mb-6">
+                <div className="w-20 h-20 rounded-full bg-dark-surface2 border-2 border-dark-border flex items-center justify-center">
+                    <User size={36} className="text-dark-muted" />
+                </div>
+            </div>
+
+            <div className="space-y-4">
+                {/* Username */}
+                <div>
+                    <label className={labelClass}>
+                        <span className="flex items-center gap-1.5"><User size={11} /> Nazwa użytkownika</span>
+                    </label>
+                    <input
+                        type="text"
+                        value={user?.nickname || ''}
+                        className={`${inputClass} opacity-60 cursor-not-allowed`}
+                        disabled
+                        readOnly
+                    />
+                    <p className="text-[11px] text-dark-muted mt-1">Nie można zmienić nazwy użytkownika</p>
+                </div>
+
+                {/* Email */}
+                <div>
+                    <label className={labelClass}>
+                        <span className="flex items-center gap-1.5"><Mail size={11} /> Email</span>
+                    </label>
+                    <input
+                        type="email"
+                        value={user?.email || ''}
+                        className={`${inputClass} opacity-60 cursor-not-allowed`}
+                        disabled
+                        readOnly
+                    />
+                    <p className="text-[11px] text-dark-muted mt-1">Nie można zmienić adresu email</p>
+                </div>
+
+                {/* Password section */}
+                <div className="border-t border-dark-border pt-4">
+                    <h3 className="flex items-center gap-2 text-sm font-semibold text-dark-text mb-4">
+                        <Lock size={14} className="text-dark-muted" />
+                        Zmiana hasła
+                    </h3>
+
+                    {/* Current password */}
+                    <div className="mb-3">
+                        <label className={labelClass}>Aktualne hasło</label>
+                        <div className="flex gap-2">
+                            <div className="relative flex-1">
                                 <input
-                                    type="text"
-                                    value={user?.nickname || ''}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500 cursor-not-allowed"
-                                    disabled
-                                    readOnly
+                                    type={showCurrentPassword ? "text" : "password"}
+                                    value={currentPassword}
+                                    onChange={(e) => setCurrentPassword(e.target.value)}
+                                    className={`${inputClass} pr-10 ${isPasswordVerified ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                    placeholder="Wprowadź aktualne hasło"
+                                    disabled={isPasswordVerified}
                                 />
-                                <p className="text-xs text-gray-500 mt-1">
-                                    Username cannot be changed
-                                </p>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-dark-muted hover:text-dark-text transition-colors"
+                                    disabled={isPasswordVerified}
+                                >
+                                    {showCurrentPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                                </button>
                             </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Email
-                                </label>
-                                <input
-                                    type="email"
-                                    value={user?.email || ''}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500 cursor-not-allowed"
-                                    disabled
-                                    readOnly
-                                />
-                                <p className="text-xs text-gray-500 mt-1">
-                                    Email cannot be changed
-                                </p>
-                            </div>
-
-                            <div className="border-t pt-4">
-                                <h3 className="text-lg font-medium text-gray-700 mb-3">Change Password</h3>
-
-                                <div className="mb-3">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Current Password
-                                    </label>
-                                    <div className="flex gap-2">
-                                        <div className="relative flex-1">
-                                            <input
-                                                type={showCurrentPassword ? "text" : "password"}
-                                                value={currentPassword}
-                                                onChange={(e) => setCurrentPassword(e.target.value)}
-                                                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                                                placeholder="Enter current password"
-                                                disabled={isPasswordVerified}
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                                                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
-                                                disabled={isPasswordVerified}
-                                            >
-                                                {showCurrentPassword ? (
-                                                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                                                    </svg>
-                                                ) : (
-                                                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                    </svg>
-                                                )}
-                                            </button>
-                                        </div>
-                                        {!isPasswordVerified && (
-                                            <button
-                                                onClick={verifyCurrentPassword}
-                                                disabled={isVerifying || !currentPassword}
-                                                className="px-4 py-2 bg-ocean-blue text-white rounded-md hover:bg-ocean-blue-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 cursor-pointer"
-                                            >
-                                                {isVerifying ? 'Verifying...' : 'Verify'}
-                                            </button>
-                                        )}
-                                    </div>
+                            {!isPasswordVerified ? (
+                                <button
+                                    onClick={verifyCurrentPassword}
+                                    disabled={isVerifying || !currentPassword}
+                                    className="px-4 py-2 bg-dark-accent text-white rounded-lg hover:bg-dark-accent-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+                                >
+                                    {isVerifying ? 'Sprawdzam...' : 'Weryfikuj'}
+                                </button>
+                            ) : (
+                                <div className="flex items-center px-3 text-green-400">
+                                    <CheckCircle size={18} />
                                 </div>
-
-                                {isPasswordVerified && (
-                                    <>
-                                        <div className="mb-3">
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                New Password
-                                            </label>
-                                            <div className="relative">
-                                                <input
-                                                    type={showNewPassword ? "text" : "password"}
-                                                    value={newPassword}
-                                                    onChange={(e) => setNewPassword(e.target.value)}
-                                                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                                                    placeholder="Enter new password"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setShowNewPassword(!showNewPassword)}
-                                                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
-                                                >
-                                                    {showNewPassword ? (
-                                                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                                                    </svg>
-                                                    ) : (
-                                                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                    </svg>
-                                                    )}
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div className="mb-3">
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Confirm New Password
-                                            </label>
-                                            <div className="relative">
-                                                <input
-                                                    type={showConfirmPassword ? "text" : "password"}
-                                                    value={confirmPassword}
-                                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                                                    placeholder="Confirm new password"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
-                                                >
-                                                    {showConfirmPassword ? (
-                                                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                                                    </svg>
-                                                    ) : (
-                                                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                    </svg>
-                                                    )}
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={handlePasswordChange}
-                                                className="flex-1 bg-ocean-teal text-white py-2 rounded-md hover:bg-teal-400 transition-colors duration-200"
-                                            >
-                                                Change Password
-                                            </button>
-                                            <button
-                                                onClick={resetPasswordForm}
-                                                className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors duration-200"
-                                            >
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
+                            )}
                         </div>
                     </div>
+
+                    {isPasswordVerified && (
+                        <>
+                            <div className="mb-3">
+                                <label className={labelClass}>Nowe hasło</label>
+                                <div className="relative">
+                                    <input
+                                        type={showNewPassword ? "text" : "password"}
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        className={`${inputClass} pr-10`}
+                                        placeholder="Wprowadź nowe hasło"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNewPassword(!showNewPassword)}
+                                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-dark-muted hover:text-dark-text transition-colors"
+                                    >
+                                        {showNewPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="mb-4">
+                                <label className={labelClass}>Potwierdź nowe hasło</label>
+                                <div className="relative">
+                                    <input
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        className={`${inputClass} pr-10`}
+                                        placeholder="Powtórz nowe hasło"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-dark-muted hover:text-dark-text transition-colors"
+                                    >
+                                        {showConfirmPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={handlePasswordChange}
+                                    className="flex-1 bg-dark-accent hover:bg-dark-accent-hover text-white py-2 rounded-lg transition-colors text-sm font-semibold"
+                                >
+                                    Zmień hasło
+                                </button>
+                                <button
+                                    onClick={resetPasswordForm}
+                                    className="px-4 py-2 bg-dark-surface2 border border-dark-border text-dark-muted hover:text-dark-text rounded-lg transition-colors text-sm"
+                                >
+                                    Anuluj
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+        </div>
     );
 }
 

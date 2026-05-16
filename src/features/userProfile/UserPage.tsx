@@ -2,24 +2,15 @@ import { useState, useEffect } from "react";
 import { useAtom } from "jotai";
 import { userAtom } from "../auth/atoms/userAtom.tsx";
 import UserProfile from "./components/UserProfile.tsx";
-import UserComputers from "./components/UserComputers.tsx";
 import customAxios from "../../lib/customAxios.tsx";
 import PostDetails from "../Community/PostDetails.tsx";
 import PaginatedList from "../Community/PaginatedPosts.tsx";
-import {
-    FaDesktop,
-    FaMicrochip,
-    FaMoneyBillWave,
-    FaUserCircle,
-    FaThumbsUp,
-    FaThumbsDown
-} from "react-icons/fa";
-import {useNavigate} from "react-router-dom";
+import { Monitor, Cpu, Banknote, User, ThumbsUp, ThumbsDown, FileText, Bookmark, ExternalLink, ImageOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { getCategoryColor } from "../Community/categoryUtils.tsx";
 import { parseDateArray, formatDate } from "../Community/PostTime.tsx";
 
-
-interface User {
+interface UserDto {
     id: number;
     username: string;
     nickname: string;
@@ -36,7 +27,7 @@ interface Post {
     postId?: number;
     title: string;
     content: string;
-    user: User;
+    user: UserDto;
     authorName?: string;
     createdAt: number[];
     category?: Category;
@@ -55,35 +46,26 @@ interface Computer {
 interface PostListItemProps {
     post: Post;
     onClick: () => void;
-    currentUser: User | null;
+    currentUser: UserDto | null;
 }
 
 const PostListItem: React.FC<PostListItemProps> = ({ post, onClick, currentUser }) => {
     const realPostId = post.postId && post.postId !== 0 ? post.postId : post.id;
-
     const [netScore, setNetScore] = useState<number>(0);
     const [userVoteStatus, setUserVoteStatus] = useState<'upvote' | 'downvote' | null>(null);
     const date = parseDateArray(post.createdAt);
-
     const categoryName = post.categoryName || post.category?.name || 'Brak kategorii';
     const imageIdToUse = post.thumbnailImageId || post.imageId;
-    const thumbnailUrl = imageIdToUse
-        ? `http://localhost:8080/community/image/${imageIdToUse}`
-        : null;
+    const thumbnailUrl = imageIdToUse ? `http://localhost:8080/community/image/${imageIdToUse}` : null;
 
     useEffect(() => {
         const fetchVoteStatus = async () => {
             try {
                 const scoreResponse = await customAxios.get<number>(`community/posts/${realPostId}/vote`);
                 setNetScore(scoreResponse.data);
-
                 if (currentUser) {
                     const statusResponse = await customAxios.get<string | null>(`community/posts/${realPostId}/vote/status`);
-                    if (statusResponse.data) {
-                        setUserVoteStatus(statusResponse.data as 'upvote' | 'downvote');
-                    } else {
-                        setUserVoteStatus(null);
-                    }
+                    setUserVoteStatus(statusResponse.data ? (statusResponse.data as 'upvote' | 'downvote') : null);
                 }
             } catch (err) {
                 console.error(`Błąd głosowania dla posta ${realPostId}`, err);
@@ -94,98 +76,77 @@ const PostListItem: React.FC<PostListItemProps> = ({ post, onClick, currentUser 
 
     const handleVote = async (e: React.MouseEvent, voteType: 'upvote' | 'downvote') => {
         e.stopPropagation();
-
-        if (!currentUser) {
-            alert("Musisz być zalogowany, aby głosować!");
-            return;
-        }
-
+        if (!currentUser) { alert("Musisz być zalogowany, aby głosować!"); return; }
         try {
             const response = await customAxios.post<number>(`community/posts/${realPostId}/vote?type=${voteType}`);
             setNetScore(response.data);
             setUserVoteStatus(prev => prev === voteType ? null : voteType);
         } catch (err: any) {
             console.error("Błąd głosowania:", err);
-            if (err.response?.status === 401) {
-                alert("Sesja wygasła.");
-            }
+            if (err.response?.status === 401) alert("Sesja wygasła.");
         }
     };
 
     return (
         <div
             onClick={onClick}
-            className="cursor-pointer bg-white rounded-lg shadow-md hover:shadow-lg transition duration-200 mb-4 border border-gray-200 overflow-hidden"
+            className="cursor-pointer bg-dark-surface border border-dark-border rounded-xl hover:border-dark-accent/50 hover:bg-dark-surface2 transition-all duration-200 mb-3 overflow-hidden"
         >
             <div className="p-4">
-                <div className="flex items-start">
+                <div className="flex items-start gap-4">
                     {thumbnailUrl ? (
-                        <div className="mr-4 flex-shrink-0">
-                            <img
-                                src={thumbnailUrl}
-                                alt="Miniatura"
-                                className="w-24 h-24 object-cover rounded-md border border-gray-200"
-                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                            />
-                        </div>
+                        <img
+                            src={thumbnailUrl}
+                            alt="Miniatura"
+                            className="w-20 h-20 object-cover rounded-lg border border-dark-border flex-shrink-0"
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                        />
                     ) : (
-                        <div className="mr-4 flex-shrink-0 w-24 h-24 bg-gray-100 rounded-md flex items-center justify-center border border-gray-200 text-gray-400 text-xs text-center p-1">
-                            Brak zdjęcia
+                        <div className="w-20 h-20 bg-dark-surface2 rounded-lg border border-dark-border flex items-center justify-center flex-shrink-0">
+                            <ImageOff size={20} className="text-dark-muted" />
                         </div>
                     )}
 
-                    <div className="flex-1 min-w-0 flex flex-col justify-between">
-
-                        <div className="flex justify-between items-start mb-1">
-                            <div className="flex items-center overflow-hidden mr-2">
-                                <span className={`flex-shrink-0 text-white text-xs font-semibold px-2 py-0.5 rounded-full mr-2 shadow-sm ${getCategoryColor(categoryName)}`}>
+                    <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                        <div className="flex justify-between items-start gap-2">
+                            <div className="flex items-center gap-2 min-w-0">
+                                <span className={`flex-shrink-0 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full ${getCategoryColor(categoryName)}`}>
                                     {categoryName}
                                 </span>
-                                <h3 className="text-lg font-bold text-gray-800 truncate">{post.title}</h3>
+                                <h3 className="text-sm font-bold text-dark-text truncate">{post.title}</h3>
                             </div>
-
-                            <div className="text-right text-gray-400 text-xs flex-shrink-0">
-                                <span className="block">{formatDate(date)}</span>
-                                {/*<span className="block text-[10px] mt-0.5">({timeAgo(date)})</span>*/}
-                            </div>
+                            <span className="text-[11px] text-dark-muted flex-shrink-0">{formatDate(date)}</span>
                         </div>
 
-                        <p className="text-gray-600 text-sm line-clamp-2 mb-3">{post.content}</p>
+                        <p className="text-xs text-dark-muted line-clamp-2">{post.content}</p>
 
-                        <div className="flex justify-between items-end mt-auto">
-
-                            <div className="flex items-center text-gray-500 text-xs pb-1">
-                                <span className="mr-1">Autor:</span>
-                                <div className="flex items-center text-gray-700 font-semibold">
-                                    <FaUserCircle className="w-3 h-3 mr-1 text-gray-400"/>
-                                    {post.authorName || post.user?.username || 'Nieznany'}
-                                </div>
+                        <div className="flex justify-between items-center mt-1">
+                            <div className="flex items-center gap-1 text-xs text-dark-muted">
+                                <User size={11} />
+                                <span className="font-medium text-dark-text">{post.authorName || post.user?.username || 'Nieznany'}</span>
                             </div>
 
                             <div
-                                className="flex items-center space-x-2 bg-gray-50 px-3 py-1 rounded-full border border-gray-200 shadow-sm"
+                                className="flex items-center gap-2 bg-dark-surface2 border border-dark-border px-2.5 py-1 rounded-full"
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 <button
                                     onClick={(e) => handleVote(e, 'upvote')}
-                                    className={`p-1 hover:scale-110 transition ${userVoteStatus === 'upvote' ? 'text-blue-600' : 'text-gray-400 hover:text-blue-500'}`}
+                                    className={`transition-colors ${userVoteStatus === 'upvote' ? 'text-blue-400' : 'text-dark-muted hover:text-blue-400'}`}
                                 >
-                                    <FaThumbsUp className="w-4 h-4" />
+                                    <ThumbsUp size={13} />
                                 </button>
-
-                                <span className={`font-bold text-sm min-w-[1.5rem] text-center ${netScore > 0 ? 'text-blue-600' : netScore < 0 ? 'text-red-600' : 'text-gray-600'}`}>
+                                <span className={`text-xs font-bold min-w-[1rem] text-center ${netScore > 0 ? 'text-blue-400' : netScore < 0 ? 'text-red-400' : 'text-dark-muted'}`}>
                                     {netScore}
                                 </span>
-
                                 <button
                                     onClick={(e) => handleVote(e, 'downvote')}
-                                    className={`p-1 hover:scale-110 transition ${userVoteStatus === 'downvote' ? 'text-red-600' : 'text-gray-400 hover:text-red-500'}`}
+                                    className={`transition-colors ${userVoteStatus === 'downvote' ? 'text-red-400' : 'text-dark-muted hover:text-red-400'}`}
                                 >
-                                    <FaThumbsDown className="w-4 h-4" />
+                                    <ThumbsDown size={13} />
                                 </button>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -193,9 +154,15 @@ const PostListItem: React.FC<PostListItemProps> = ({ post, onClick, currentUser 
     );
 };
 
+const TABS = [
+    { key: "profile", label: "Mój Profil",      icon: User },
+    { key: "posts",   label: "Moje Posty",       icon: FileText },
+    { key: "builds",  label: "Moje Zestawy",     icon: Monitor },
+    { key: "saved",   label: "Zapisane Posty",   icon: Bookmark },
+] as const;
 
 function UserPage() {
-    const [activeTab, setActiveTab] = useState("profile");
+    const [activeTab, setActiveTab] = useState<string>("profile");
     const navigate = useNavigate();
 
     const [posts, setPosts] = useState<Post[]>([]);
@@ -215,144 +182,98 @@ function UserPage() {
 
     useEffect(() => {
         if (activeTab === "posts" && user?.nickname) {
-            const fetchPosts = async () => {
-                try {
-                    setLoadingPosts(true);
-                    setErrorPosts(null);
-                    const response = await customAxios.get(`community/posts/user/${user.nickname}`);
-                    const data = response.data;
-
-                    if (Array.isArray(data)) {
-                        const postsWithUser = data.map((post: any) => ({
-                            ...post,
-                            user: post.user || { username: user.nickname }
-                        }));
-                        setPosts(postsWithUser);
-                    } else {
-                        setPosts([]);
-                    }
-                } catch (err: any) {
-                    console.error(err);
-                    setErrorPosts(err.message || "Failed to load posts");
-                } finally {
-                    setLoadingPosts(false);
-                }
-            };
-            fetchPosts();
+            setLoadingPosts(true);
+            setErrorPosts(null);
+            customAxios.get(`community/posts/user/${user.nickname}`)
+                .then((res) => {
+                    const data = Array.isArray(res.data) ? res.data : [];
+                    setPosts(data.map((p: any) => ({ ...p, user: p.user || { username: user.nickname } })));
+                })
+                .catch((err) => setErrorPosts(err.message || "Błąd ładowania postów"))
+                .finally(() => setLoadingPosts(false));
         }
     }, [activeTab, user?.nickname]);
 
     useEffect(() => {
         if (activeTab === "builds" && user?.email) {
-            const fetchComputers = async () => {
-                try {
-                    setLoadingComputers(true);
-                    setErrorComputers(null);
-                    const response = await customAxios.get(`api/users/${user.email}/computers`);
-                    setComputers(response.data);
-                } catch (err: any) {
-                    console.error("Błąd pobierania zestawów:", err);
-                    setErrorComputers("Nie udało się pobrać konfiguracji PC.");
-                } finally {
-                    setLoadingComputers(false);
-                }
-            };
-            fetchComputers();
+            setLoadingComputers(true);
+            setErrorComputers(null);
+            customAxios.get(`api/users/${user.email}/computers`)
+                .then((res) => setComputers(res.data))
+                .catch(() => setErrorComputers("Nie udało się pobrać konfiguracji PC."))
+                .finally(() => setLoadingComputers(false));
         }
     }, [activeTab, user?.email]);
 
     useEffect(() => {
         if (activeTab === "saved" && user?.nickname) {
-            const fetchSaved = async () => {
-                try {
-                    setLoadingSaved(true);
-                    setErrorSaved(null);
-                    const response = await customAxios.get(`community/posts/saved/${user.nickname}`);
-
-                    const data = response.data;
-
-                    if (Array.isArray(data)) {
-                        const formattedSavedPosts = data.map((item: any) => ({
-                            ...item,
-                            user: {
-                                id: 0,
-                                username: item.authorName || "Nieznany autor"
-                            }
-                        }));
-                        setSavedPosts(formattedSavedPosts);
-                    } else {
-                        setSavedPosts([]);
-                    }
-
-                } catch (err: any) {
-                    console.error(err);
-                    setErrorSaved(err.message || "Failed to load saved items");
-                } finally {
-                    setLoadingSaved(false);
-                }
-            };
-            fetchSaved();
+            setLoadingSaved(true);
+            setErrorSaved(null);
+            customAxios.get(`community/posts/saved/${user.nickname}`)
+                .then((res) => {
+                    const data = Array.isArray(res.data) ? res.data : [];
+                    setSavedPosts(data.map((item: any) => ({ ...item, user: { id: 0, username: item.authorName || "Nieznany autor" } })));
+                })
+                .catch((err) => setErrorSaved(err.message || "Błąd ładowania zapisanych postów"))
+                .finally(() => setLoadingSaved(false));
         }
     }, [activeTab, user?.nickname]);
 
-    const handlePostClick = (post: Post) => {
-        setSelectedPost(post);
-    };
-
-    const handleBackToList = () => {
-        setSelectedPost(null);
-    };
-
     if (selectedPost) {
         return (
-            <div className="min-h-screen bg-gray-100 py-4">
-                <PostDetails
-                    post={selectedPost}
-                    onBack={handleBackToList}
-                />
+            <div className="bg-dark-bg py-4">
+                <PostDetails post={selectedPost} onBack={() => setSelectedPost(null)} />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <div className="max-w-4xl mx-auto py-8 px-4">
+        <div className="bg-dark-bg">
+            <div className="max-w-3xl mx-auto py-8 px-4">
+
+                {/* Tab bar */}
                 <div className="flex justify-center mb-8">
-                    <div className="bg-gray-200 rounded-full p-1 flex flex-wrap justify-center">
-                        {["profile", "posts", "builds", "saved"].map((tab) => (
+                    <div className="bg-dark-surface border border-dark-border rounded-xl p-1 flex gap-1">
+                        {TABS.map(({ key, label, icon: Icon }) => (
                             <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`px-6 py-2 rounded-full transition-all duration-200 capitalize m-1 ${
-                                    activeTab === tab
-                                        ? "bg-white text-gray-800 shadow-sm font-medium"
-                                        : "text-gray-600 hover:text-gray-800"
+                                key={key}
+                                onClick={() => setActiveTab(key)}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                    activeTab === key
+                                        ? "bg-dark-surface2 text-dark-text shadow-sm"
+                                        : "text-dark-muted hover:text-dark-text"
                                 }`}
                             >
-                                {tab === "profile" ? "Mój Profil" :
-                                    tab === "posts" ? "Moje Posty" :
-                                        tab === "builds" ? "Moje Zestawy" : "Zapisane Posty"}
+                                <Icon size={14} />
+                                {label}
                             </button>
                         ))}
                     </div>
                 </div>
 
+                {/* Profile tab */}
                 {activeTab === "profile" && <UserProfile />}
 
+                {/* Posts tab */}
                 {activeTab === "posts" && (
-                    <div className="py-8">
-                        <h3 className="text-xl font-semibold text-center mb-4">Moje Posty</h3>
+                    <div>
+                        <h3 className="text-base font-bold text-dark-text mb-4">Moje Posty</h3>
 
-                        {loadingPosts && <p className="text-gray-600 text-center animate-pulse">Loading posts...</p>}
-                        {errorPosts && <p className="text-red-500 text-center">{errorPosts}</p>}
+                        {loadingPosts && (
+                            <div className="space-y-3">
+                                {[1,2,3].map(i => <div key={i} className="h-24 bg-dark-surface rounded-xl animate-pulse border border-dark-border" />)}
+                            </div>
+                        )}
+                        {errorPosts && <p className="text-red-400 text-sm text-center py-6">{errorPosts}</p>}
 
                         {!loadingPosts && !errorPosts && posts.length === 0 && (
-                            <div className="text-center py-10 bg-white rounded-lg shadow-sm">
-                                <p className="text-gray-500">Nie stworzyłeś jeszcze żadnych postów.</p>
+                            <div className="text-center py-12 bg-dark-surface border border-dark-border rounded-xl">
+                                <FileText size={36} className="mx-auto text-dark-muted mb-3" />
+                                <p className="text-dark-muted text-sm">Nie stworzyłeś jeszcze żadnych postów.</p>
                             </div>
                         )}
 
-                        {!loadingPosts && !errorPosts && (
+                        {!loadingPosts && !errorPosts && posts.length > 0 && (
                             <PaginatedList
                                 items={posts}
                                 itemsPerPage={5}
@@ -360,8 +281,8 @@ function UserPage() {
                                     <PostListItem
                                         key={post.id}
                                         post={post}
-                                        onClick={() => handlePostClick(post)}
-                                        currentUser={user as unknown as User}
+                                        onClick={() => setSelectedPost(post)}
+                                        currentUser={user as unknown as UserDto}
                                     />
                                 )}
                             />
@@ -369,53 +290,56 @@ function UserPage() {
                     </div>
                 )}
 
-                {activeTab === "builds" && <UserComputers />}
+                {/* Builds tab */}
                 {activeTab === "builds" && (
-                    <div className="py-8">
-                        <h3 className="text-xl font-semibold text-center mb-4">Moje Konfiguracje PC</h3>
+                    <div>
+                        <h3 className="text-base font-bold text-dark-text mb-4">Moje Konfiguracje PC</h3>
 
-                        {loadingComputers && <p className="text-gray-600 text-center animate-pulse">Ładowanie zestawów...</p>}
-                        {errorComputers && <p className="text-red-500 text-center">{errorComputers}</p>}
+                        {loadingComputers && (
+                            <div className="space-y-3">
+                                {[1,2].map(i => <div key={i} className="h-20 bg-dark-surface rounded-xl animate-pulse border border-dark-border" />)}
+                            </div>
+                        )}
+                        {errorComputers && <p className="text-red-400 text-sm text-center py-6">{errorComputers}</p>}
 
                         {!loadingComputers && !errorComputers && computers.length === 0 && (
-                            <div className="text-center py-10 bg-white rounded-lg shadow-sm">
-                                <FaDesktop className="mx-auto text-gray-300 w-12 h-12 mb-3" />
-                                <p className="text-gray-500">Nie stworzyłeś jeszcze żadnych zestawów.</p>
+                            <div className="text-center py-12 bg-dark-surface border border-dark-border rounded-xl">
+                                <Monitor size={36} className="mx-auto text-dark-muted mb-3" />
+                                <p className="text-dark-muted text-sm">Nie stworzyłeś jeszcze żadnych zestawów.</p>
                             </div>
                         )}
 
                         {!loadingComputers && !errorComputers && computers.length > 0 && (
-                            <div className="grid gap-4">
+                            <div className="space-y-3">
                                 {computers.map((comp) => (
                                     <div
                                         key={comp.id}
-                                        className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition border-l-4 border-green-500 flex flex-col sm:flex-row justify-between items-start sm:items-center"
+                                        className="bg-dark-surface border border-dark-border rounded-xl px-5 py-4 hover:border-dark-accent/50 hover:bg-dark-surface2 transition-all duration-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
                                     >
-                                        <div className="mb-4 sm:mb-0">
+                                        <div>
                                             <div className="flex items-center gap-2 mb-2">
-                                                <FaDesktop className="text-gray-600 text-xl" />
-                                                <h4 className="text-xl font-bold text-gray-800">{comp.name}</h4>
+                                                <Monitor size={16} className="text-dark-muted" />
+                                                <h4 className="text-sm font-bold text-dark-text">{comp.name}</h4>
                                             </div>
-
-                                            <div
-                                                className="flex flex-col sm:flex-row gap-2 sm:gap-6 text-sm text-gray-500">
-                                                <span className="flex items-center gap-1">
-                                                    <FaMicrochip/> Części: {comp.offers ? comp.offers.length : 0}
+                                            <div className="flex flex-wrap gap-4 text-xs text-dark-muted">
+                                                <span className="flex items-center gap-1.5">
+                                                    <Cpu size={12} />
+                                                    {comp.offers ? comp.offers.length : 0} komponentów
                                                 </span>
-                                                <span
-                                                    className="flex items-center gap-1 text-green-700 font-bold text-base">
-                                                         <FaMoneyBillWave/>
-                                                        Cena: {comp.offers
-                                                    ? comp.offers.reduce((sum: number, part: any) => sum + (part.price || 0), 0).toFixed(2)
-                                                    : "0.00"} PLN
+                                                <span className="flex items-center gap-1.5 text-dark-accent font-semibold">
+                                                    <Banknote size={12} />
+                                                    {comp.offers
+                                                        ? comp.offers.reduce((sum: number, p: any) => sum + (p.price || 0), 0).toLocaleString("pl-PL")
+                                                        : "0"} zł
                                                 </span>
                                             </div>
                                         </div>
 
                                         <button
-                                            className="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm font-medium shadow"
+                                            className="flex items-center gap-1.5 px-4 py-2 bg-dark-accent/15 text-dark-accent hover:bg-dark-accent hover:text-white border border-dark-accent/20 hover:border-dark-accent rounded-lg transition-all text-xs font-semibold flex-shrink-0"
                                             onClick={() => navigate('/builds')}
                                         >
+                                            <ExternalLink size={13} />
                                             Zobacz szczegóły
                                         </button>
                                     </div>
@@ -425,34 +349,40 @@ function UserPage() {
                     </div>
                 )}
 
+                {/* Saved posts tab */}
                 {activeTab === "saved" && (
-                    <div className="py-8">
-                        <h3 className="text-xl font-semibold text-center mb-4">Zapisane Posty</h3>
+                    <div>
+                        <h3 className="text-base font-bold text-dark-text mb-4">Zapisane Posty</h3>
 
-                        {!loadingSaved && !errorSaved && (
+                        {loadingSaved && (
+                            <div className="space-y-3">
+                                {[1,2,3].map(i => <div key={i} className="h-24 bg-dark-surface rounded-xl animate-pulse border border-dark-border" />)}
+                            </div>
+                        )}
+                        {errorSaved && <p className="text-red-400 text-sm text-center py-6">{errorSaved}</p>}
+
+                        {!loadingSaved && !errorSaved && savedPosts.length === 0 && (
+                            <div className="text-center py-12 bg-dark-surface border border-dark-border rounded-xl">
+                                <Bookmark size={36} className="mx-auto text-dark-muted mb-3" />
+                                <p className="text-dark-muted text-sm">Nie masz jeszcze żadnych zapisanych postów.</p>
+                            </div>
+                        )}
+
+                        {!loadingSaved && !errorSaved && savedPosts.length > 0 && (
                             <PaginatedList
                                 items={savedPosts}
                                 itemsPerPage={5}
                                 renderItem={(savedItem) => {
-                                    const postForList = {
-                                        ...savedItem,
-                                        id: savedItem.postId || savedItem.id
-                                    };
-
+                                    const postForList = { ...savedItem, id: savedItem.postId || savedItem.id };
                                     return (
                                         <PostListItem
                                             key={savedItem.id}
                                             post={postForList}
                                             onClick={() => {
-                                                const correctPostObject = {
-                                                    ...savedItem,
-                                                    id: savedItem.postId ?? 0
-                                                };
-                                                if (correctPostObject.id !== 0) {
-                                                    handlePostClick(correctPostObject);
-                                                }
+                                                const correctPost = { ...savedItem, id: savedItem.postId ?? 0 };
+                                                if (correctPost.id !== 0) setSelectedPost(correctPost);
                                             }}
-                                            currentUser={user as unknown as User}
+                                            currentUser={user as unknown as UserDto}
                                         />
                                     );
                                 }}
